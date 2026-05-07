@@ -6,9 +6,6 @@
 <title>Canal 10 — Sala de Edición</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
-/* ═══════════════════════════════════════════════
-   VARIABLES & RESET
-═══════════════════════════════════════════════ */
 :root {
   --rojo:       #C0392B;
   --rojo-v:     #E74C3C;
@@ -19,6 +16,9 @@
   --azul-t:     #1A5276;
   --verde:      #A9DFBF;
   --verde-t:    #1E8449;
+  --morado:     #8E44AD;
+  --morado-dim: rgba(142,68,173,0.15);
+  --naranja:    #E67E22;
   --bg:         #0D0F12;
   --bg2:        #141720;
   --bg3:        #1C2030;
@@ -35,249 +35,115 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
-body{
-  font-family:var(--sans);
-  background:var(--bg);
-  color:var(--txt);
-  min-height:100vh;
-  overflow-x:hidden;
-}
+body{ font-family:var(--sans); background:var(--bg); color:var(--txt); min-height:100vh; overflow-x:hidden; }
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:var(--bg2);}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px;}
 a{color:inherit;text-decoration:none;}
 button,input,textarea,select{font-family:var(--sans);}
 
-/* ═══════════════════════════════════════════════
-   AUTH SCREEN
-═══════════════════════════════════════════════ */
-#auth-screen{
-  display:flex;align-items:center;justify-content:center;
-  min-height:100vh;
-  background:var(--bg);
-  padding:2rem 1rem;
-}
-.auth-box{
-  width:100%;max-width:420px;
-  background:var(--bg2);
-  border:1px solid var(--borde2);
-  border-radius:18px;
-  padding:2.5rem 2rem;
-  text-align:center;
-}
-.auth-logo{
-  display:inline-flex;align-items:center;gap:10px;
-  background:var(--bg3);border:1px solid var(--borde2);
-  border-radius:40px;padding:8px 20px;margin-bottom:2rem;
-}
-.auth-logo-num{
-  background:var(--rojo);color:#fff;
-  font-family:var(--mono);font-size:17px;font-weight:500;
-  padding:3px 10px;border-radius:6px;letter-spacing:1px;
-}
+/* ══ AUTH ══ */
+#auth-screen{ display:flex;align-items:center;justify-content:center; min-height:100vh; background:var(--bg); padding:2rem 1rem; }
+.auth-box{ width:100%;max-width:440px; background:var(--bg2); border:1px solid var(--borde2); border-radius:18px; padding:2.5rem 2rem; text-align:center; }
+.auth-logo{ display:inline-flex;align-items:center;gap:10px; background:var(--bg3);border:1px solid var(--borde2); border-radius:40px;padding:8px 20px;margin-bottom:2rem; }
+.auth-logo-num{ background:var(--rojo);color:#fff; font-family:var(--mono);font-size:17px;font-weight:500; padding:3px 10px;border-radius:6px;letter-spacing:1px; }
 .auth-logo-txt{font-size:13px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);}
 .auth-title{font-size:22px;font-weight:700;color:var(--txt);margin-bottom:6px;}
 .auth-sub{font-size:13px;color:var(--txt2);margin-bottom:2rem;line-height:1.6;}
-.auth-divider{
-  display:flex;align-items:center;gap:10px;margin:1.5rem 0;
-  font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;
-}
+.auth-divider{ display:flex;align-items:center;gap:10px;margin:1.5rem 0; font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px; }
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--borde);}
-
-.btn-google{
-  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
-  background:var(--blanco);color:#1a1a2e;
-  border:none;border-radius:var(--radio);padding:13px 20px;
-  font-size:14px;font-weight:600;cursor:pointer;
-  transition:all 0.15s;margin-bottom:1rem;
-}
+.btn-google{ width:100%;display:flex;align-items:center;justify-content:center;gap:10px; background:var(--blanco);color:#1a1a2e; border:none;border-radius:var(--radio);padding:13px 20px; font-size:14px;font-weight:600;cursor:pointer; transition:all 0.15s;margin-bottom:1rem; }
 .btn-google:hover{background:#f0f0f0;transform:translateY(-1px);}
 .btn-google svg{width:20px;height:20px;flex-shrink:0;}
-
 .auth-form .field{margin-bottom:1rem;text-align:left;}
 .auth-form label{font-size:12px;color:var(--txt2);display:block;margin-bottom:5px;font-weight:500;}
-.auth-form input,.auth-form select{
-  width:100%;background:var(--bg3);border:1px solid var(--borde2);
-  border-radius:var(--radio);padding:11px 14px;font-size:14px;
-  color:var(--txt);transition:border 0.15s;
-}
+.auth-form input,.auth-form select{ width:100%;background:var(--bg3);border:1px solid var(--borde2); border-radius:var(--radio);padding:11px 14px;font-size:14px; color:var(--txt);transition:border 0.15s; }
 .auth-form input:focus,.auth-form select:focus{outline:none;border-color:var(--rojo);}
 .auth-form select option{background:var(--bg3);}
-.btn-auth{
-  width:100%;background:var(--rojo);color:#fff;border:none;
-  border-radius:var(--radio);padding:13px;font-size:14px;
-  font-weight:600;cursor:pointer;transition:background 0.15s;
-}
+
+/* Rol selector en registro */
+.rol-selector{ display:flex;gap:8px;margin-bottom:1rem; }
+.rol-btn{ flex:1;padding:10px 8px;border-radius:8px;border:1px solid var(--borde2); background:var(--bg3);color:var(--txt2);font-size:12px;font-weight:600; cursor:pointer;transition:all 0.15s;text-align:center; }
+.rol-btn:hover{border-color:var(--rojo);color:var(--rojo);}
+.rol-btn.active.sol{border-color:var(--azul-t);background:rgba(26,82,118,0.2);color:var(--azul);}
+.rol-btn.active.ed{border-color:var(--verde-t);background:rgba(30,132,73,0.2);color:var(--verde);}
+
+.btn-auth{ width:100%;background:var(--rojo);color:#fff;border:none; border-radius:var(--radio);padding:13px;font-size:14px; font-weight:600;cursor:pointer;transition:background 0.15s; }
 .btn-auth:hover{background:var(--rojo-v);}
 .btn-auth:disabled{background:var(--bg4);color:var(--txt3);cursor:not-allowed;}
 .auth-msg{font-size:12px;margin-top:10px;padding:8px 12px;border-radius:8px;}
 .auth-msg.err{background:rgba(192,57,43,0.15);color:#E74C3C;}
 .auth-msg.ok{background:rgba(39,174,96,0.15);color:#27AE60;}
 
-/* ═══════════════════════════════════════════════
-   APP LAYOUT
-═══════════════════════════════════════════════ */
+/* ══ APP ══ */
 #app{display:none;flex-direction:column;height:100vh;overflow:hidden;}
 #app.visible{display:flex;}
 
-/* ── Top bar ── */
-.topbar{
-  height:48px;min-height:48px;
-  background:var(--bg2);
-  border-bottom:1px solid var(--borde);
-  display:flex;align-items:center;
-  padding:0 1rem;gap:1rem;
-  z-index:100;
-}
-.topbar-logo{
-  display:flex;align-items:center;gap:8px;flex-shrink:0;
-}
-.topbar-num{
-  background:var(--rojo);color:#fff;
-  font-family:var(--mono);font-size:13px;font-weight:500;
-  padding:2px 8px;border-radius:5px;letter-spacing:1px;
-}
+/* Topbar */
+.topbar{ height:48px;min-height:48px; background:var(--bg2); border-bottom:1px solid var(--borde); display:flex;align-items:center; padding:0 1rem;gap:1rem; z-index:100; }
+.topbar-logo{ display:flex;align-items:center;gap:8px;flex-shrink:0; }
+.topbar-num{ background:var(--rojo);color:#fff; font-family:var(--mono);font-size:13px;font-weight:500; padding:2px 8px;border-radius:5px;letter-spacing:1px; }
 .topbar-canal{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);}
-
 .topbar-tabs{display:flex;gap:2px;flex:1;overflow:hidden;}
-.topbar-tab{
-  padding:6px 14px;border-radius:6px;font-size:12px;
-  font-weight:600;cursor:pointer;color:var(--txt3);
-  background:transparent;border:none;
-  letter-spacing:0.3px;transition:all 0.12s;white-space:nowrap;
-}
+.topbar-tab{ padding:6px 14px;border-radius:6px;font-size:12px; font-weight:600;cursor:pointer;color:var(--txt3); background:transparent;border:none; letter-spacing:0.3px;transition:all 0.12s;white-space:nowrap; }
 .topbar-tab:hover{color:var(--txt);background:var(--bg3);}
 .topbar-tab.active{color:var(--txt);background:var(--bg3);}
-.topbar-tab .tab-dot{
-  display:inline-block;width:6px;height:6px;
-  border-radius:50%;margin-right:5px;
-}
-
-.topbar-right{
-  display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0;
-}
-.topbar-user{
-  display:flex;align-items:center;gap:7px;cursor:pointer;
-}
-.topbar-avatar{
-  width:28px;height:28px;border-radius:50%;
-  background:var(--rojo);display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
-}
+.topbar-tab.admin-tab{color:var(--morado);}
+.topbar-tab.admin-tab.active{background:var(--morado-dim);color:#C39BD3;}
+.topbar-tab.editor-tab{color:var(--verde-t);}
+.topbar-tab.editor-tab.active{background:rgba(30,132,73,0.15);color:var(--verde);}
+.tab-dot{ display:inline-block;width:6px;height:6px; border-radius:50%;margin-right:5px; }
+.topbar-right{ display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0; }
+.topbar-user{ display:flex;align-items:center;gap:7px;cursor:pointer; }
+.topbar-avatar{ width:28px;height:28px;border-radius:50%; background:var(--rojo);display:flex;align-items:center;justify-content:center; font-size:11px;font-weight:700;color:#fff;flex-shrink:0; }
 .topbar-uname{font-size:12px;font-weight:500;color:var(--txt2);}
-.btn-logout{
-  font-size:11px;color:var(--txt3);background:none;border:none;cursor:pointer;
-  padding:4px 8px;border-radius:5px;transition:all 0.12s;
-}
+.topbar-rol-badge{ font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px; padding:2px 7px;border-radius:10px;flex-shrink:0; }
+.topbar-rol-badge.superadmin{background:var(--morado-dim);color:#C39BD3;border:1px solid rgba(142,68,173,0.3);}
+.topbar-rol-badge.editor{background:rgba(30,132,73,0.2);color:var(--verde);border:1px solid rgba(30,132,73,0.3);}
+.topbar-rol-badge.solicitante{background:var(--rojo-dim);color:var(--rojo-v);border:1px solid rgba(192,57,43,0.3);}
+.btn-logout{ font-size:11px;color:var(--txt3);background:none;border:none;cursor:pointer; padding:4px 8px;border-radius:5px;transition:all 0.12s; }
 .btn-logout:hover{color:var(--rojo);background:var(--rojo-dim);}
-
-.btn-nuevo-pedido{
-  background:var(--rojo);color:#fff;border:none;
-  border-radius:7px;padding:6px 14px;font-size:12px;
-  font-weight:600;cursor:pointer;transition:background 0.12s;
-  display:flex;align-items:center;gap:5px;white-space:nowrap;
-}
+.btn-nuevo-pedido{ background:var(--rojo);color:#fff;border:none; border-radius:7px;padding:6px 14px;font-size:12px; font-weight:600;cursor:pointer;transition:background 0.12s; display:flex;align-items:center;gap:5px;white-space:nowrap; }
 .btn-nuevo-pedido:hover{background:var(--rojo-v);}
 
-/* ── Main area ── */
+/* Main */
 .main{flex:1;overflow:hidden;display:flex;}
 
-/* ═══════════════════════════════════════════════
-   DASHBOARD (ENPS STYLE)
-═══════════════════════════════════════════════ */
-#panel-dashboard{
-  flex:1;overflow-y:auto;padding:1.25rem;
-  display:flex;flex-direction:column;gap:1rem;
-}
-
-.dashboard-header{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:1rem;flex-wrap:wrap;
-}
+/* ══ DASHBOARD ══ */
+#panel-dashboard{ flex:1;overflow-y:auto;padding:1.25rem; display:flex;flex-direction:column;gap:1rem; }
+.dashboard-header{ display:flex;align-items:center;justify-content:space-between; gap:1rem;flex-wrap:wrap; }
 .dashboard-title{font-size:16px;font-weight:700;color:var(--txt);}
 .dashboard-meta{font-size:12px;color:var(--txt3);}
-
-/* Stats row */
-.stats-row{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
-}
-.stat-box{
-  background:var(--bg2);border:1px solid var(--borde);
-  border-radius:var(--radio);padding:12px 14px;
-}
+.stats-row{ display:grid;grid-template-columns:repeat(4,1fr);gap:8px; }
+.stat-box{ background:var(--bg2);border:1px solid var(--borde); border-radius:var(--radio);padding:12px 14px; }
 .stat-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;}
 .stat-val{font-size:22px;font-weight:700;color:var(--txt);font-family:var(--mono);}
 .stat-sub{font-size:10px;color:var(--txt3);margin-top:2px;}
-
-/* Filter bar */
-.filter-bar{
-  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-}
-.filter-chip{
-  padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;
-  cursor:pointer;border:1px solid var(--borde2);background:var(--bg2);
-  color:var(--txt2);transition:all 0.12s;
-}
+.filter-bar{ display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+.filter-chip{ padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600; cursor:pointer;border:1px solid var(--borde2);background:var(--bg2); color:var(--txt2);transition:all 0.12s; }
 .filter-chip:hover{border-color:var(--rojo);color:var(--rojo);}
 .filter-chip.active{background:var(--rojo);border-color:var(--rojo);color:#fff;}
-.filter-search{
-  margin-left:auto;background:var(--bg2);border:1px solid var(--borde2);
-  border-radius:7px;padding:6px 12px;font-size:12px;color:var(--txt);
-  width:200px;
-}
+.filter-search{ margin-left:auto;background:var(--bg2);border:1px solid var(--borde2); border-radius:7px;padding:6px 12px;font-size:12px;color:var(--txt);width:200px; }
 .filter-search:focus{outline:none;border-color:var(--rojo);}
 .filter-search::placeholder{color:var(--txt3);}
-
-/* Rundown table */
-.rundown{
-  background:var(--bg2);border:1px solid var(--borde);
-  border-radius:12px;overflow:hidden;flex:1;
-}
-.rundown-head{
-  display:grid;
-  grid-template-columns: 36px 110px 100px 120px 140px 1fr 90px 90px;
-  gap:0;padding:0 12px;
-  background:var(--bg3);border-bottom:1px solid var(--borde);
-}
-.rh-cell{
-  padding:8px 8px;font-size:10px;font-weight:600;
-  color:var(--txt3);text-transform:uppercase;letter-spacing:0.7px;
-}
+.rundown{ background:var(--bg2);border:1px solid var(--borde); border-radius:12px;overflow:hidden;flex:1; }
+.rundown-head{ display:grid; grid-template-columns: 36px 110px 100px 120px 140px 1fr 90px 90px; gap:0;padding:0 12px; background:var(--bg3);border-bottom:1px solid var(--borde); }
+.rh-cell{ padding:8px 8px;font-size:10px;font-weight:600; color:var(--txt3);text-transform:uppercase;letter-spacing:0.7px; }
 .rundown-body{overflow-y:auto;max-height:calc(100vh - 320px);}
-.story-row{
-  display:grid;
-  grid-template-columns: 36px 110px 100px 120px 140px 1fr 90px 90px;
-  gap:0;padding:0 12px;
-  border-bottom:1px solid var(--borde);
-  cursor:pointer;transition:background 0.1s;
-  align-items:center;min-height:46px;
-}
+.story-row{ display:grid; grid-template-columns: 36px 110px 100px 120px 140px 1fr 90px 90px; gap:0;padding:0 12px; border-bottom:1px solid var(--borde); cursor:pointer;transition:background 0.1s; align-items:center;min-height:46px; }
 .story-row:hover{background:rgba(255,255,255,0.03);}
 .story-row.selected{background:rgba(192,57,43,0.07);border-left:2px solid var(--rojo);}
 .story-row.estado-realizado{opacity:0.55;}
-
 .s-prio{display:flex;align-items:center;justify-content:center;}
-.prio-badge{
-  width:22px;height:22px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:700;color:#fff;
-}
+.prio-badge{ width:22px;height:22px;border-radius:50%; display:flex;align-items:center;justify-content:center; font-size:10px;font-weight:700;color:#fff; }
 .prio-badge.p1{background:#C0392B;}
 .prio-badge.p2{background:#E67E22;}
 .prio-badge.p3{background:#27AE60;}
 .prio-badge.p4{background:#2980B9;}
 .prio-badge.p-{background:var(--bg4);color:var(--txt3);}
-
-.s-ticket{
-  font-family:var(--mono);font-size:10px;
-  color:var(--txt3);padding:0 8px;
-}
+.s-ticket{ font-family:var(--mono);font-size:10px; color:var(--txt3);padding:0 8px; }
 .s-estado{padding:0 8px;}
-.estado-pill{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:3px 9px;border-radius:20px;
-  font-size:10px;font-weight:600;white-space:nowrap;
-}
+.estado-pill{ display:inline-flex;align-items:center;gap:5px; padding:3px 9px;border-radius:20px; font-size:10px;font-weight:600;white-space:nowrap; }
 .estado-pill.pendiente{background:rgba(249,231,159,0.15);color:#D4AC0D;}
 .estado-pill.en-curso {background:rgba(174,214,241,0.15);color:#5DADE2;} 
 .estado-pill.realizado{background:rgba(169,223,191,0.15);color:#52BE80;}
@@ -286,349 +152,249 @@ button,input,textarea,select{font-family:var(--sans);}
 .en-curso  .estado-dot{background:#5DADE2;animation:blink 1.2s ease infinite;}
 .realizado .estado-dot{background:#52BE80;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-
 .s-area{padding:0 8px;font-size:11px;color:var(--txt2);}
 .s-tipo{padding:0 8px;font-size:11px;color:var(--txt2);}
 .s-desc{padding:0 8px;font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .s-sol {padding:0 8px;font-size:11px;color:var(--txt3);}
 .s-time{padding:0 8px;font-size:10px;color:var(--txt3);font-family:var(--mono);text-align:right;}
-.s-clip{
-  display:flex;align-items:center;gap:3px;
-  padding:0 8px;
-}
-.clip-icon{font-size:12px;opacity:0.6;}
 
-/* ── Story detail panel ── */
-.detail-panel{
-  width:380px;min-width:380px;
-  background:var(--bg2);
-  border-left:1px solid var(--borde);
-  display:flex;flex-direction:column;
-  overflow:hidden;
-  transition:width 0.2s ease;
-}
+/* Detail panel */
+.detail-panel{ width:400px;min-width:400px; background:var(--bg2); border-left:1px solid var(--borde); display:flex;flex-direction:column; overflow:hidden; transition:width 0.2s ease; }
 .detail-panel.hidden{width:0;min-width:0;overflow:hidden;}
 .detail-inner{flex:1;overflow-y:auto;padding:1.25rem;}
-
-.detail-ticket{
-  font-family:var(--mono);font-size:11px;color:var(--txt3);
-  margin-bottom:4px;display:flex;align-items:center;gap:8px;
-}
+.detail-ticket{ font-family:var(--mono);font-size:11px;color:var(--txt3); margin-bottom:4px;display:flex;align-items:center;gap:8px; }
 .detail-title{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px;line-height:1.4;}
 .detail-pills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:1rem;}
-.detail-pill{
-  padding:3px 10px;border-radius:20px;
-  font-size:11px;font-weight:600;
-  background:var(--bg3);color:var(--txt2);
-  border:1px solid var(--borde);
-}
+.detail-pill{ padding:3px 10px;border-radius:20px; font-size:11px;font-weight:600; background:var(--bg3);color:var(--txt2); border:1px solid var(--borde); }
 .detail-pill.p1{background:rgba(192,57,43,0.2);color:#E74C3C;border-color:rgba(192,57,43,0.3);}
 .detail-pill.p2{background:rgba(230,126,34,0.2);color:#E67E22;border-color:rgba(230,126,34,0.3);}
 .detail-pill.p3{background:rgba(39,174,96,0.2);color:#27AE60;border-color:rgba(39,174,96,0.3);}
 .detail-pill.p4{background:rgba(41,128,185,0.2);color:#2980B9;border-color:rgba(41,128,185,0.3);}
-
 .detail-section{margin-bottom:1.25rem;}
-.detail-section-label{
-  font-size:10px;font-weight:600;color:var(--txt3);
-  text-transform:uppercase;letter-spacing:0.7px;
-  margin-bottom:8px;padding-bottom:5px;
-  border-bottom:1px solid var(--borde);
-}
-.detail-row{
-  display:flex;justify-content:space-between;gap:8px;
-  padding:5px 0;font-size:12px;
-  border-bottom:1px solid var(--borde);
-}
+.detail-section-label{ font-size:10px;font-weight:600;color:var(--txt3); text-transform:uppercase;letter-spacing:0.7px; margin-bottom:8px;padding-bottom:5px; border-bottom:1px solid var(--borde); }
+.detail-row{ display:flex;justify-content:space-between;gap:8px; padding:5px 0;font-size:12px; border-bottom:1px solid var(--borde); }
 .detail-row:last-child{border-bottom:none;}
 .detail-row-key{color:var(--txt3);flex-shrink:0;}
 .detail-row-val{color:var(--txt);text-align:right;font-weight:500;}
-.detail-desc{
-  font-size:12px;color:var(--txt2);line-height:1.6;
-  background:var(--bg3);border-radius:8px;padding:10px 12px;
-}
-
-/* Timeline en detalle */
+.detail-desc{ font-size:12px;color:var(--txt2);line-height:1.6; background:var(--bg3);border-radius:8px;padding:10px 12px; }
 .tl-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px;}
 .tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 .tl-dot.done{background:var(--rojo);}
 .tl-dot.wait{background:var(--bg4);border:2px solid var(--borde2);}
 .tl-label{flex:1;color:var(--txt2);}
 .tl-time{font-size:10px;color:var(--txt3);font-family:var(--mono);}
-
-/* Archivos adjuntos */
 .arch-list{display:flex;flex-direction:column;gap:5px;}
-.arch-item{
-  display:flex;align-items:center;gap:8px;
-  background:var(--bg3);border:1px solid var(--borde);
-  border-radius:8px;padding:8px 10px;font-size:12px;
-}
+.arch-item{ display:flex;align-items:center;gap:8px; background:var(--bg3);border:1px solid var(--borde); border-radius:8px;padding:8px 10px;font-size:12px; }
 .arch-ico{font-size:16px;flex-shrink:0;}
 .arch-name{flex:1;color:var(--txt);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .arch-tipo{font-size:10px;color:var(--txt3);}
-.arch-link{font-size:11px;color:var(--rojo);font-weight:600;white-space:nowrap;}
+.arch-link{ font-size:11px;color:var(--rojo);font-weight:600;white-space:nowrap; text-decoration:none;cursor:pointer; }
+.arch-link:hover{color:var(--rojo-v);}
 .arch-empty{font-size:12px;color:var(--txt3);text-align:center;padding:10px;}
-
-/* Editor row en detalle */
-.editor-box{
-  background:var(--bg3);border:1px solid var(--borde);
-  border-radius:8px;padding:10px 12px;
-  display:flex;align-items:center;gap:10px;
-}
-.editor-ava{
-  width:30px;height:30px;border-radius:50%;
-  background:var(--azul);display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:700;color:var(--azul-t);flex-shrink:0;
-}
+.editor-box{ background:var(--bg3);border:1px solid var(--borde); border-radius:8px;padding:10px 12px; display:flex;align-items:center;gap:10px; }
+.editor-ava{ width:30px;height:30px;border-radius:50%; background:var(--azul);display:flex;align-items:center;justify-content:center; font-size:12px;font-weight:700;color:var(--azul-t);flex-shrink:0; }
 .editor-name{font-size:12px;font-weight:600;color:var(--txt);}
 .editor-label{font-size:10px;color:var(--txt3);}
-
-/* Close button */
-.detail-close{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px;border-bottom:1px solid var(--borde);flex-shrink:0;
-}
+.detail-close{ display:flex;align-items:center;justify-content:space-between; padding:10px 14px;border-bottom:1px solid var(--borde);flex-shrink:0; }
 .detail-close-title{font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:0.7px;}
-.btn-close{
-  background:none;border:none;color:var(--txt3);cursor:pointer;
-  font-size:16px;padding:2px 6px;border-radius:4px;transition:all 0.12s;
-}
+.btn-close{ background:none;border:none;color:var(--txt3);cursor:pointer; font-size:16px;padding:2px 6px;border-radius:4px;transition:all 0.12s; }
 .btn-close:hover{background:var(--bg3);color:var(--txt);}
-
-/* Btn actualizar en detalle */
-.btn-refresh{
-  width:100%;background:var(--bg3);border:1px solid var(--borde2);
-  border-radius:8px;padding:9px;font-size:12px;font-weight:600;
-  color:var(--txt2);cursor:pointer;transition:all 0.12s;margin-top:10px;
-}
+.btn-refresh{ width:100%;background:var(--bg3);border:1px solid var(--borde2); border-radius:8px;padding:9px;font-size:12px;font-weight:600; color:var(--txt2);cursor:pointer;transition:all 0.12s;margin-top:10px; }
 .btn-refresh:hover{border-color:var(--rojo);color:var(--rojo);}
 
-/* ═══════════════════════════════════════════════
-   MODAL NUEVO PEDIDO
-═══════════════════════════════════════════════ */
-.modal-overlay{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,0.7);
-  display:none;align-items:center;justify-content:center;
-  z-index:500;padding:1rem;
-  backdrop-filter:blur(4px);
-}
-.modal-overlay.open{display:flex;}
+/* ══ PANEL EDITOR ══ */
+#panel-editor{ flex:1;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:1rem; }
+.editor-header{ display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem; }
+.editor-welcome{ font-size:16px;font-weight:700;color:var(--txt); }
+.editor-sub{ font-size:12px;color:var(--txt3);margin-top:2px; }
+.editor-stats{ display:grid;grid-template-columns:repeat(3,1fr);gap:8px; }
+.task-card{ background:var(--bg2);border:1px solid var(--borde);border-radius:12px; padding:14px 16px;cursor:pointer;transition:all 0.15s; }
+.task-card:hover{border-color:var(--borde2);background:var(--bg3);}
+.task-card.urgente{border-left:3px solid var(--rojo);}
+.task-card-head{ display:flex;align-items:center;gap:8px;margin-bottom:8px; }
+.task-card-body{ font-size:12px;color:var(--txt2);line-height:1.5;margin-bottom:10px; }
+.task-card-foot{ display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+.task-card-foot .detail-pill{ font-size:10px;padding:2px 8px; }
+.task-actions{ display:flex;gap:6px;margin-top:10px; }
+.btn-task{ padding:7px 14px;border-radius:7px;font-size:11px;font-weight:700; cursor:pointer;border:none;transition:all 0.12s; }
+.btn-task.iniciar{background:rgba(93,173,226,0.2);color:#5DADE2;border:1px solid rgba(93,173,226,0.3);}
+.btn-task.iniciar:hover{background:rgba(93,173,226,0.35);}
+.btn-task.completar{background:rgba(82,190,128,0.2);color:#52BE80;border:1px solid rgba(82,190,128,0.3);}
+.btn-task.completar:hover{background:rgba(82,190,128,0.35);}
+.btn-task.disabled{opacity:0.4;cursor:not-allowed;}
+.empty-state{ flex:1;display:flex;flex-direction:column; align-items:center;justify-content:center; padding:3rem;text-align:center; }
+.empty-ico{font-size:40px;margin-bottom:12px;opacity:0.4;}
+.empty-txt{font-size:14px;color:var(--txt3);}
 
-.modal{
-  background:var(--bg2);border:1px solid var(--borde2);
-  border-radius:16px;width:100%;max-width:580px;
-  max-height:90vh;display:flex;flex-direction:column;
-  overflow:hidden;
-}
-.modal-head{
-  padding:1.25rem 1.5rem;border-bottom:1px solid var(--borde);
-  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
-}
-.modal-title{font-size:15px;font-weight:700;color:var(--txt);}
-.modal-body{overflow-y:auto;padding:1.5rem;flex:1;}
-.modal-foot{
-  padding:1rem 1.5rem;border-top:1px solid var(--borde);
-  display:flex;gap:8px;flex-shrink:0;
-}
+/* ══ PANEL SUPERADMIN ══ */
+#panel-admin{ flex:1;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:1.25rem; }
+.admin-header{ display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem; }
+.admin-title{ font-size:16px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px; }
+.admin-badge{ background:var(--morado-dim);color:#C39BD3; border:1px solid rgba(142,68,173,0.3); padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700; }
+.admin-grid{ display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem; }
+.admin-card{ background:var(--bg2);border:1px solid var(--borde);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px; }
+.admin-card-head{ display:flex;align-items:flex-start;justify-content:space-between;gap:8px; }
+.admin-card-ticket{ font-family:var(--mono);font-size:10px;color:var(--txt3); }
+.admin-card-desc{ font-size:13px;font-weight:600;color:var(--txt);line-height:1.4;flex:1; }
+.admin-card-meta{ display:flex;align-items:center;gap:6px;flex-wrap:wrap; }
+.admin-card-divider{ height:1px;background:var(--borde); }
+.assign-section{ display:flex;flex-direction:column;gap:8px; }
+.assign-label{ font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.7px; }
+.assign-select{ background:var(--bg3);border:1px solid var(--borde2); border-radius:8px;padding:8px 10px;font-size:12px;color:var(--txt); width:100%;cursor:pointer;transition:border 0.12s; }
+.assign-select:focus{outline:none;border-color:var(--morado);}
+.assign-select option{background:var(--bg3);}
+.assign-actions{ display:flex;gap:6px; }
+.btn-admin{ padding:8px 14px;border-radius:7px;font-size:11px;font-weight:700; cursor:pointer;border:none;transition:all 0.12s; }
+.btn-admin.asignar{ background:var(--morado-dim);color:#C39BD3;border:1px solid rgba(142,68,173,0.3); }
+.btn-admin.asignar:hover{ background:rgba(142,68,173,0.3); }
+.btn-admin.estado-btn{ background:var(--bg3);color:var(--txt2);border:1px solid var(--borde2); }
+.btn-admin.estado-btn:hover{ border-color:var(--borde2);background:var(--bg4); }
+.btn-admin.marcar-completado{ background:rgba(82,190,128,0.15);color:#52BE80;border:1px solid rgba(82,190,128,0.3); }
+.btn-admin.marcar-completado:hover{ background:rgba(82,190,128,0.3); }
+.btn-admin.marcar-curso{ background:rgba(93,173,226,0.15);color:#5DADE2;border:1px solid rgba(93,173,226,0.3); }
+.btn-admin.marcar-curso:hover{ background:rgba(93,173,226,0.3); }
+.btn-admin.eliminar{ background:rgba(192,57,43,0.12);color:var(--rojo-v);border:1px solid rgba(192,57,43,0.3); }
+.btn-admin.eliminar:hover{ background:rgba(192,57,43,0.25); }
 
-/* Steps in modal */
-.m-step{display:none;}
-.m-step.active{display:block;animation:fadeIn 0.18s ease;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+/* Admin tabs */
+.admin-tabs{ display:flex;gap:4px;border-bottom:1px solid var(--borde);padding-bottom:0;margin-bottom:4px; }
+.admin-tab-btn{ padding:6px 16px;border-radius:6px 6px 0 0;font-size:12px;font-weight:600; cursor:pointer;color:var(--txt3);background:transparent;border:none; border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.12s; }
+.admin-tab-btn:hover{color:var(--txt);}
+.admin-tab-btn.active{color:#C39BD3;border-bottom-color:var(--morado);}
 
-.m-step-title{font-size:14px;font-weight:600;color:var(--txt);margin-bottom:4px;}
-.m-step-hint{font-size:12px;color:var(--txt3);margin-bottom:1.25rem;}
+/* Panel editores (admin view) */
+.editors-table{ background:var(--bg2);border:1px solid var(--borde);border-radius:12px;overflow:hidden; }
+.editors-table-head{ display:grid;grid-template-columns:1fr 140px 100px 80px 100px; padding:8px 16px;background:var(--bg3);border-bottom:1px solid var(--borde); }
+.editors-table-head span{ font-size:10px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:0.7px; }
+.editor-row{ display:grid;grid-template-columns:1fr 140px 100px 80px 100px; padding:12px 16px;border-bottom:1px solid var(--borde); align-items:center;transition:background 0.1s; }
+.editor-row:last-child{border-bottom:none;}
+.editor-row:hover{background:rgba(255,255,255,0.02);}
+.editor-row-name{ display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--txt); }
+.editor-row-email{ font-size:11px;color:var(--txt3); }
+.editor-row-tasks{ font-family:var(--mono);font-size:13px;color:var(--txt); }
+.editor-row-status{ }
+.online-dot{ width:7px;height:7px;border-radius:50%;background:var(--verde-t);display:inline-block; }
 
-/* Step indicator */
-.step-dots{display:flex;gap:5px;align-items:center;}
-.step-dot{width:6px;height:6px;border-radius:50%;background:var(--bg4);}
-.step-dot.done{background:var(--rojo);}
-.step-dot.active{background:var(--rojo);width:18px;border-radius:3px;}
-
-/* Selection grids */
-.sel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:1rem;}
-.sel-card{
-  background:var(--bg3);border:1px solid var(--borde);
-  border-radius:var(--radio);padding:12px 8px;
-  text-align:center;cursor:pointer;
-  transition:all 0.12s;user-select:none;
-}
+/* ══ MODAL PEDIDO ══ */
+.modal-overlay{ position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000; display:flex;align-items:center;justify-content:center;padding:1rem; opacity:0;pointer-events:none;transition:opacity 0.2s; }
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{ background:var(--bg2);border:1px solid var(--borde2);border-radius:16px; width:100%;max-width:520px;max-height:90vh; display:flex;flex-direction:column;overflow:hidden; }
+.modal-head{ padding:14px 18px;border-bottom:1px solid var(--borde); display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
+.modal-title{font-size:14px;font-weight:700;color:var(--txt);}
+.step-dots{display:flex;gap:5px;}
+.step-dot{ width:7px;height:7px;border-radius:50%; background:var(--bg4);transition:all 0.2s; }
+.step-dot.active{background:var(--rojo);width:18px;border-radius:4px;}
+.step-dot.done{background:var(--rojo);opacity:0.4;}
+.modal-body{flex:1;overflow-y:auto;padding:1.25rem;}
+.m-step{display:none;flex-direction:column;gap:1rem;}
+.m-step.active{display:flex;}
+.m-step-title{font-size:16px;font-weight:700;color:var(--txt);}
+.m-step-hint{font-size:12px;color:var(--txt3);}
+.sel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.sel-card{ background:var(--bg3);border:1px solid var(--borde2); border-radius:10px;padding:14px 10px;text-align:center; cursor:pointer;transition:all 0.12s; }
 .sel-card:hover{border-color:var(--rojo);background:var(--rojo-dim);}
-.sel-card.sel{border:2px solid var(--rojo);background:var(--rojo-dim);}
-.sel-card .ic{font-size:20px;margin-bottom:5px;}
-.sel-card .nm{font-size:11px;font-weight:500;color:var(--txt);line-height:1.3;}
-
-.prio-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;}
-.prio-card{
-  border-radius:var(--radio);padding:12px;cursor:pointer;
-  border:2px solid transparent;transition:all 0.12s;user-select:none;
-}
-.prio-card.p1{background:rgba(192,57,43,0.12);border-color:rgba(192,57,43,0.2);}
-.prio-card.p1:hover,.prio-card.p1.sel{border-color:var(--rojo);}
-.prio-card.p2{background:rgba(230,126,34,0.12);border-color:rgba(230,126,34,0.2);}
-.prio-card.p2:hover,.prio-card.p2.sel{border-color:#E67E22;}
-.prio-card.p3{background:rgba(39,174,96,0.12);border-color:rgba(39,174,96,0.2);}
-.prio-card.p3:hover,.prio-card.p3.sel{border-color:#27AE60;}
-.prio-card.p4{background:rgba(41,128,185,0.12);border-color:rgba(41,128,185,0.2);}
-.prio-card.p4:hover,.prio-card.p4.sel{border-color:#2980B9;}
-.prio-num{
-  width:24px;height:24px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;color:#fff;margin-bottom:5px;
-}
-.p1 .prio-num{background:#C0392B;} .p2 .prio-num{background:#E67E22;}
-.p3 .prio-num{background:#27AE60;} .p4 .prio-num{background:#2980B9;}
-.prio-lbl{font-size:12px;font-weight:600;color:var(--txt);}
-.prio-desc{font-size:10px;color:var(--txt3);margin-top:2px;}
-
-.dur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:1rem;}
-.dur-btn{
-  background:var(--bg3);border:1px solid var(--borde);
-  border-radius:7px;padding:8px 4px;text-align:center;
-  cursor:pointer;font-size:11px;font-weight:500;color:var(--txt2);
-  transition:all 0.1s;user-select:none;
-}
+.sel-card.sel{border-color:var(--rojo);background:var(--rojo-dim);}
+.sel-card .ic{font-size:22px;margin-bottom:5px;}
+.sel-card .nm{font-size:11px;font-weight:600;color:var(--txt2);}
+.prio-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.prio-card{ border-radius:10px;padding:14px;cursor:pointer;transition:all 0.12s; border:2px solid var(--borde2);background:var(--bg3); }
+.prio-card:hover,.prio-card.sel{border-width:2px;}
+.prio-card.p1{border-color:rgba(192,57,43,0.5);}
+.prio-card.p1:hover,.prio-card.p1.sel{border-color:var(--rojo);background:var(--rojo-dim);}
+.prio-card.p2{border-color:rgba(230,126,34,0.4);}
+.prio-card.p2:hover,.prio-card.p2.sel{border-color:var(--naranja);background:rgba(230,126,34,0.1);}
+.prio-card.p3{border-color:rgba(212,172,13,0.4);}
+.prio-card.p3:hover,.prio-card.p3.sel{border-color:#D4AC0D;background:rgba(212,172,13,0.1);}
+.prio-card.p4{border-color:rgba(41,128,185,0.4);}
+.prio-card.p4:hover,.prio-card.p4.sel{border-color:#2980B9;background:rgba(41,128,185,0.1);}
+.prio-num{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--txt);}
+.prio-lbl{font-size:13px;font-weight:600;color:var(--txt);margin-top:2px;}
+.prio-desc{font-size:11px;color:var(--txt3);margin-top:3px;}
+.dur-grid{display:flex;gap:6px;flex-wrap:wrap;}
+.dur-btn{ padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600; cursor:pointer;border:1px solid var(--borde2);background:var(--bg3); color:var(--txt2);transition:all 0.12s; }
 .dur-btn:hover,.dur-btn.sel{border-color:var(--rojo);color:var(--rojo);background:var(--rojo-dim);}
-
-/* Fields */
-.m-field{margin-bottom:1rem;}
-.m-label{font-size:11px;font-weight:600;color:var(--txt3);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:0.5px;}
-.m-input,.m-textarea{
-  width:100%;background:var(--bg3);border:1px solid var(--borde2);
-  border-radius:var(--radio);padding:10px 12px;font-size:13px;
-  color:var(--txt);transition:border 0.12s;
-}
-.m-textarea{resize:vertical;min-height:90px;}
-.m-input:focus,.m-textarea:focus{outline:none;border-color:var(--rojo);}
-.m-input::placeholder,.m-textarea::placeholder{color:var(--txt3);}
-input[type="datetime-local"].m-input{color-scheme:dark;}
-
-/* File upload zone */
-.file-zone{
-  border:2px dashed var(--borde2);border-radius:var(--radio);
-  padding:1.5rem;text-align:center;cursor:pointer;
-  transition:all 0.12s;margin-bottom:1rem;
-}
+.m-field{display:flex;flex-direction:column;gap:6px;}
+.m-label{font-size:12px;color:var(--txt2);font-weight:500;}
+.m-input{ background:var(--bg3);border:1px solid var(--borde2); border-radius:var(--radio);padding:10px 12px;font-size:13px; color:var(--txt);transition:border 0.15s;width:100%; }
+.m-input:focus{outline:none;border-color:var(--rojo);}
+.m-textarea{ background:var(--bg3);border:1px solid var(--borde2); border-radius:var(--radio);padding:10px 12px;font-size:13px; color:var(--txt);transition:border 0.15s;width:100%;resize:vertical;min-height:80px; }
+.m-textarea:focus{outline:none;border-color:var(--rojo);}
+.m-err{ font-size:11px;color:var(--rojo-v);display:none; padding:4px 0; }
+.file-zone{ border:2px dashed var(--borde2);border-radius:10px; padding:24px;text-align:center;cursor:pointer;transition:all 0.15s; }
 .file-zone:hover,.file-zone.drag{border-color:var(--rojo);background:var(--rojo-dim);}
 .file-zone-ico{font-size:28px;margin-bottom:6px;}
-.file-zone-txt{font-size:12px;color:var(--txt2);}
-.file-zone-sub{font-size:10px;color:var(--txt3);margin-top:3px;}
-#file-input{display:none;}
-
-.files-list{display:flex;flex-direction:column;gap:5px;margin-bottom:1rem;}
-.file-item{
-  display:flex;align-items:center;gap:8px;
-  background:var(--bg3);border:1px solid var(--borde);
-  border-radius:7px;padding:7px 10px;
-}
+.file-zone-txt{font-size:12px;color:var(--txt3);}
+.file-zone-sub{font-size:10px;color:var(--txt3);margin-top:3px;opacity:0.7;}
+.file-item{ display:flex;align-items:center;gap:8px; background:var(--bg3);border:1px solid var(--borde); border-radius:8px;padding:8px 10px;font-size:12px; }
 .file-item-ico{font-size:16px;flex-shrink:0;}
-.file-item-name{flex:1;font-size:12px;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.file-item-size{font-size:10px;color:var(--txt3);}
-.file-item-del{background:none;border:none;color:var(--txt3);cursor:pointer;font-size:14px;padding:0 4px;}
-.file-item-del:hover{color:var(--rojo);}
-
-/* Resumen */
-.resumen-box{
-  background:var(--bg3);border:1px solid var(--borde);
-  border-radius:var(--radio);padding:1rem;
-}
-.res-row{
-  display:flex;justify-content:space-between;gap:10px;
-  padding:6px 0;border-bottom:1px solid var(--borde);font-size:12px;
-}
+.file-item-name{flex:1;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-item-size{font-size:10px;color:var(--txt3);flex-shrink:0;}
+.file-item-del{ background:none;border:none;color:var(--txt3);cursor:pointer; font-size:13px;padding:2px 5px;border-radius:4px;flex-shrink:0; }
+.file-item-del:hover{color:var(--rojo);background:var(--rojo-dim);}
+.file-upload-progress{ font-size:11px;color:var(--azul);margin-top:4px; }
+.resumen{ background:var(--bg3);border:1px solid var(--borde);border-radius:10px;padding:12px; }
+.res-row{ display:flex;justify-content:space-between;gap:8px; padding:5px 0;font-size:12px; border-bottom:1px solid var(--borde); }
 .res-row:last-child{border-bottom:none;}
-.res-k{color:var(--txt3);}
-.res-v{color:var(--txt);font-weight:500;text-align:right;}
-
-/* Err msg */
-.m-err{font-size:11px;color:var(--rojo);margin-top:4px;display:none;}
-
-/* Nav buttons */
-.btn-m-next{
-  flex:1;background:var(--rojo);color:#fff;border:none;
-  border-radius:var(--radio);padding:11px;font-size:13px;
-  font-weight:600;cursor:pointer;transition:background 0.12s;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
+.res-k{color:var(--txt3);flex-shrink:0;}
+.res-v{color:var(--txt);text-align:right;font-weight:500;}
+.modal-foot{ padding:12px 18px;border-top:1px solid var(--borde); display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-shrink:0; }
+.btn-m-next{ background:var(--rojo);color:#fff;border:none; border-radius:var(--radio);padding:11px 22px;font-size:13px; font-weight:600;cursor:pointer;transition:background 0.12s;display:flex;align-items:center;gap:7px; }
 .btn-m-next:hover{background:var(--rojo-v);}
 .btn-m-next:disabled{background:var(--bg4);color:var(--txt3);cursor:not-allowed;}
-.btn-m-back{
-  background:var(--bg3);color:var(--txt2);
-  border:1px solid var(--borde2);border-radius:var(--radio);
-  padding:11px 18px;font-size:13px;cursor:pointer;transition:all 0.12s;
-}
+.btn-m-back{ background:var(--bg3);color:var(--txt2); border:1px solid var(--borde2);border-radius:var(--radio); padding:11px 18px;font-size:13px;cursor:pointer;transition:all 0.12s; }
 .btn-m-back:hover{border-color:var(--borde2);background:var(--bg4);}
-
-/* Success in modal */
 .modal-success{text-align:center;padding:1.5rem 0;}
 .ms-ico{font-size:48px;margin-bottom:12px;}
 .ms-title{font-size:18px;font-weight:700;color:var(--txt);margin-bottom:6px;}
 .ms-msg{font-size:13px;color:var(--txt3);line-height:1.6;margin-bottom:1.25rem;}
-.ms-ticket{
-  background:var(--bg3);border:1px solid var(--borde);
-  border-left:3px solid var(--rojo);border-radius:var(--radio);
-  padding:12px;text-align:left;margin-bottom:1rem;
-}
+.ms-ticket{ background:var(--bg3);border:1px solid var(--borde); border-left:3px solid var(--rojo);border-radius:var(--radio); padding:12px;text-align:left;margin-bottom:1rem; }
 .ms-ticket-id{font-family:var(--mono);font-size:12px;color:var(--txt3);margin-bottom:3px;}
 .ms-ticket-info{font-size:13px;font-weight:600;color:var(--txt);}
 
 /* Spinner */
-.spinner{
-  width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);
-  border-top-color:#fff;border-radius:50%;
-  animation:spin 0.6s linear infinite;display:inline-block;
-}
+.spinner{ width:14px;height:14px;border:2px solid rgba(255,255,255,0.3); border-top-color:#fff;border-radius:50%; animation:spin 0.6s linear infinite;display:inline-block; }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ─── Empty state ──────────────────────────────── */
-.empty-state{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:3rem;text-align:center;
-}
-.empty-ico{font-size:40px;margin-bottom:12px;opacity:0.4;}
-.empty-txt{font-size:14px;color:var(--txt3);}
-
-/* ─── Loading bar ─────────────────────────────── */
-.loading-bar{
-  position:fixed;top:0;left:0;height:2px;
-  background:var(--rojo);width:0;
-  transition:width 0.3s ease;z-index:9999;
-}
+/* Loading bar */
+.loading-bar{ position:fixed;top:0;left:0;height:2px; background:var(--rojo);width:0; transition:width 0.3s ease;z-index:9999; }
 .loading-bar.loading{width:70%;transition:width 1.5s ease;}
 .loading-bar.done{width:100%;transition:width 0.2s ease;}
 
-/* ─── Refresh indicator ───────────────────────── */
-.refresh-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--verde-t);display:inline-block;
-  margin-left:5px;
-}
+/* Refresh dot */
+.refresh-dot{ width:6px;height:6px;border-radius:50%; background:var(--verde-t);display:inline-block;margin-left:5px; }
 .refresh-dot.loading{background:var(--amarillo-t);animation:blink 0.6s linear infinite;}
 
-/* ─── Responsive ──────────────────────────────── */
+/* Notify toast */
+.toast{ position:fixed;bottom:24px;right:24px; background:var(--bg3);border:1px solid var(--borde2); border-radius:10px;padding:12px 18px; font-size:13px;color:var(--txt);z-index:9999; transform:translateY(80px);opacity:0;transition:all 0.25s; max-width:320px;box-shadow:0 4px 20px rgba(0,0,0,0.4); }
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{border-left:3px solid var(--verde-t);}
+.toast.error{border-left:3px solid var(--rojo);}
+.toast.info{border-left:3px solid var(--azul-t);}
+
+/* Responsive */
 @media(max-width:900px){
   .detail-panel{display:none;}
   .stats-row{grid-template-columns:repeat(2,1fr);}
   .rundown-head,.story-row{grid-template-columns:36px 100px 100px 1fr 80px;}
-  .rh-cell:nth-child(4),.rh-cell:nth-child(5),
-  .s-area,.s-tipo{display:none;}
+  .rh-cell:nth-child(4),.rh-cell:nth-child(5),.s-area,.s-tipo{display:none;}
+  .admin-grid{grid-template-columns:1fr;}
+  .editors-table-head,.editor-row{grid-template-columns:1fr 100px 80px;}
 }
 @media(max-width:600px){
   .stats-row{grid-template-columns:repeat(2,1fr);}
   .topbar-tabs{display:none;}
   .prio-grid{grid-template-columns:1fr;}
   .filter-search{width:100%;}
+  .sel-grid{grid-template-columns:repeat(2,1fr);}
 }
 </style>
 </head>
 <body>
 
 <div class="loading-bar" id="loading-bar"></div>
+<div class="toast" id="toast"></div>
 
-<!-- ════════════════════════════════════════════════
-     AUTH SCREEN
-════════════════════════════════════════════════ -->
+<!-- ════ AUTH ════ -->
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">
@@ -638,8 +404,6 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
     </div>
     <div class="auth-title">Sala de Edición</div>
     <div class="auth-sub">Ingresá con tu cuenta para acceder al sistema de pedidos de Posproducción</div>
-
-    <!-- Login con Google -->
     <button class="btn-google" onclick="loginGoogle()">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -649,27 +413,35 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
       </svg>
       Ingresar con Google
     </button>
-
     <div class="auth-divider">o ingresá con tu email</div>
-
     <div class="auth-form">
       <div class="field">
         <label>Email corporativo</label>
         <input type="email" id="auth-email" placeholder="tunombre@canal10.com.ar" />
       </div>
-      <div class="field" id="reg-fields" style="display:none;">
-        <label>Tu nombre completo</label>
-        <input type="text" id="auth-nombre" placeholder="Nombre Apellido" />
-      </div>
-      <div class="field" id="reg-area-field" style="display:none;">
-        <label>Área</label>
-        <select id="auth-area">
-          <option value="">Seleccioná tu área...</option>
-          <option>Informativo</option><option>Redes</option>
-          <option>Administración</option><option>Ventas</option>
-          <option>Comercial</option><option>Programación</option>
-          <option>Operaciones</option><option>Edición</option><option>Posproducción</option><option>Técnica</option>
-        </select>
+      <div id="reg-fields" style="display:none;">
+        <div class="field">
+          <label>Tu nombre completo</label>
+          <input type="text" id="auth-nombre" placeholder="Nombre Apellido" />
+        </div>
+        <div class="field" id="reg-area-field">
+          <label>Área</label>
+          <select id="auth-area">
+            <option value="">Seleccioná tu área...</option>
+            <option>Informativo</option><option>Redes</option>
+            <option>Administración</option><option>Ventas</option>
+            <option>Comercial</option><option>Programación</option>
+            <option>Operaciones</option><option>Edición</option>
+            <option>Posproducción</option><option>Técnica</option>
+          </select>
+        </div>
+        <div class="field" id="reg-rol-field">
+          <label>¿Cómo vas a usar el sistema?</label>
+          <div class="rol-selector">
+            <div class="rol-btn sol active" id="rol-sol" onclick="selectRol('solicitante')">📋 Solicito pedidos</div>
+            <div class="rol-btn ed" id="rol-ed" onclick="selectRol('editor')">🎬 Soy editor</div>
+          </div>
+        </div>
       </div>
       <button class="btn-auth" id="btn-auth" onclick="doAuth()">Continuar →</button>
       <div class="auth-msg" id="auth-msg" style="display:none;"></div>
@@ -677,76 +449,58 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════════
-     APP
-════════════════════════════════════════════════ -->
+<!-- ════ APP ════ -->
 <div id="app">
-
-  <!-- Top bar -->
   <div class="topbar">
     <div class="topbar-logo">
       <span class="auth-logo-txt" style="color:var(--txt3);font-size:11px;letter-spacing:2px;">CANAL</span>
       <span class="topbar-num">10</span>
     </div>
-    <div class="topbar-tabs">
-      <button class="topbar-tab active" onclick="showPanel('dashboard')">
-        <span class="tab-dot" style="background:var(--rojo)"></span>Sala de Edición
+    <div class="topbar-tabs" id="topbar-tabs">
+      <button class="topbar-tab active" id="tab-dashboard" onclick="showPanel('dashboard')">
+        <span class="tab-dot" style="background:var(--rojo)"></span>Rundown
       </button>
-      <button class="topbar-tab" onclick="showPanel('mis-pedidos')">
+      <button class="topbar-tab" id="tab-mis-pedidos" onclick="showPanel('mis-pedidos')">
         <span class="tab-dot" style="background:var(--azul-t)"></span>Mis pedidos
+      </button>
+      <!-- Tabs condicionales por rol -->
+      <button class="topbar-tab editor-tab" id="tab-editor" style="display:none;" onclick="showPanel('editor')">
+        <span class="tab-dot" style="background:var(--verde-t)"></span>Mis tareas
+      </button>
+      <button class="topbar-tab admin-tab" id="tab-admin" style="display:none;" onclick="showPanel('admin')">
+        <span class="tab-dot" style="background:var(--morado)"></span>⚙ Control total
       </button>
     </div>
     <div class="topbar-right">
       <span id="topbar-refresh" style="font-size:10px;color:var(--txt3);display:flex;align-items:center;gap:3px;">
         Live <span class="refresh-dot" id="rdot"></span>
       </span>
-      <button class="btn-nuevo-pedido" onclick="openModal()">＋ Nuevo pedido</button>
+      <button class="btn-nuevo-pedido" id="btn-nuevo-pedido" onclick="openModal()">＋ Nuevo pedido</button>
       <div class="topbar-user">
         <div class="topbar-avatar" id="topbar-avatar">?</div>
         <span class="topbar-uname" id="topbar-uname">—</span>
+        <span class="topbar-rol-badge" id="topbar-rol-badge"></span>
       </div>
       <button class="btn-logout" onclick="logout()">Salir</button>
     </div>
   </div>
 
-  <!-- Main -->
   <div class="main">
 
-    <!-- ── DASHBOARD PANEL ── -->
+    <!-- ── DASHBOARD ── -->
     <div id="panel-dashboard" style="display:none;flex:1;overflow-y:auto;padding:1.25rem;flex-direction:column;gap:1rem;">
-
       <div class="dashboard-header">
         <div>
           <div class="dashboard-title">Sala de Edición — Rundown</div>
           <div class="dashboard-meta" id="dash-meta">Cargando...</div>
         </div>
       </div>
-
-      <!-- Stats -->
       <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-label">Total pedidos</div>
-          <div class="stat-val" id="stat-total">—</div>
-          <div class="stat-sub">Todos los estados</div>
-        </div>
-        <div class="stat-box" style="border-left:2px solid #D4AC0D;">
-          <div class="stat-label">Pendientes</div>
-          <div class="stat-val" id="stat-pendiente" style="color:#D4AC0D;">—</div>
-          <div class="stat-sub">Sin asignar</div>
-        </div>
-        <div class="stat-box" style="border-left:2px solid #5DADE2;">
-          <div class="stat-label">En curso</div>
-          <div class="stat-val" id="stat-encurso" style="color:#5DADE2;">—</div>
-          <div class="stat-sub">Editores trabajando</div>
-        </div>
-        <div class="stat-box" style="border-left:2px solid #52BE80;">
-          <div class="stat-label">Realizados</div>
-          <div class="stat-val" id="stat-realizado" style="color:#52BE80;">—</div>
-          <div class="stat-sub">Listos para retirar</div>
-        </div>
+        <div class="stat-box"><div class="stat-label">Total pedidos</div><div class="stat-val" id="stat-total">—</div><div class="stat-sub">Todos los estados</div></div>
+        <div class="stat-box" style="border-left:2px solid #D4AC0D;"><div class="stat-label">Pendientes</div><div class="stat-val" id="stat-pendiente" style="color:#D4AC0D;">—</div><div class="stat-sub">Sin asignar</div></div>
+        <div class="stat-box" style="border-left:2px solid #5DADE2;"><div class="stat-label">En curso</div><div class="stat-val" id="stat-encurso" style="color:#5DADE2;">—</div><div class="stat-sub">Editores trabajando</div></div>
+        <div class="stat-box" style="border-left:2px solid #52BE80;"><div class="stat-label">Realizados</div><div class="stat-val" id="stat-realizado" style="color:#52BE80;">—</div><div class="stat-sub">Listos para retirar</div></div>
       </div>
-
-      <!-- Filter -->
       <div class="filter-bar">
         <button class="filter-chip active" onclick="setFilter('todos',this)">Todos</button>
         <button class="filter-chip" onclick="setFilter('PENDIENTE',this)">🟡 Pendientes</button>
@@ -755,11 +509,7 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
         <button class="filter-chip" onclick="setFilter('P1',this)">🔴 P1 Urgente</button>
         <input class="filter-search" type="text" placeholder="Buscar ticket, área, descripción..." id="search-input" oninput="renderRundown()"/>
       </div>
-
-      <!-- Rundown table + detail side panel -->
       <div style="display:flex;gap:0;flex:1;min-height:0;background:var(--bg2);border:1px solid var(--borde);border-radius:12px;overflow:hidden;">
-
-        <!-- Table -->
         <div style="flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;">
           <div class="rundown-head">
             <div class="rh-cell"></div>
@@ -775,33 +525,81 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
             <div class="empty-state"><div class="empty-ico">⏳</div><div class="empty-txt">Cargando pedidos...</div></div>
           </div>
         </div>
-
-        <!-- Detail panel -->
         <div class="detail-panel hidden" id="detail-panel">
           <div class="detail-close">
             <span class="detail-close-title">Detalle del pedido</span>
             <button class="btn-close" onclick="closeDetail()">✕</button>
           </div>
-          <div class="detail-inner" id="detail-inner">
-          </div>
+          <div class="detail-inner" id="detail-inner"></div>
         </div>
       </div>
-    </div><!-- /panel-dashboard -->
+    </div>
 
-    <!-- ── MIS PEDIDOS PANEL ── -->
+    <!-- ── MIS PEDIDOS ── -->
     <div id="panel-mis-pedidos" style="display:none;flex:1;overflow-y:auto;padding:1.25rem;flex-direction:column;gap:1rem;">
       <div class="dashboard-title" style="margin-bottom:4px;">Mis pedidos</div>
       <div class="dashboard-meta">Solo tus pedidos registrados</div>
       <div id="mis-pedidos-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
     </div>
 
+    <!-- ── PANEL EDITOR ── -->
+    <div id="panel-editor" style="display:none;flex:1;overflow-y:auto;padding:1.25rem;flex-direction:column;gap:1rem;">
+      <div class="editor-header">
+        <div>
+          <div class="editor-welcome" id="editor-welcome">Mis tareas asignadas</div>
+          <div class="editor-sub" id="editor-sub">Pedidos que te fueron asignados por el administrador</div>
+        </div>
+      </div>
+      <div class="editor-stats" id="editor-stats-row">
+        <div class="stat-box"><div class="stat-label">Asignadas</div><div class="stat-val" id="editor-stat-total" style="color:var(--azul);">—</div></div>
+        <div class="stat-box"><div class="stat-label">En curso</div><div class="stat-val" id="editor-stat-curso" style="color:#5DADE2;">—</div></div>
+        <div class="stat-box"><div class="stat-label">Completadas</div><div class="stat-val" id="editor-stat-done" style="color:#52BE80;">—</div></div>
+      </div>
+      <div id="editor-tasks-list" style="display:flex;flex-direction:column;gap:10px;">
+        <div class="empty-state"><div class="empty-ico">📭</div><div class="empty-txt">Cargando tus tareas...</div></div>
+      </div>
+    </div>
+
+    <!-- ── PANEL SUPERADMIN ── -->
+    <div id="panel-admin" style="display:none;flex:1;overflow-y:auto;padding:1.25rem;flex-direction:column;gap:1.25rem;">
+      <div class="admin-header">
+        <div class="admin-title">⚙ Panel de Control <span class="admin-badge">SUPERADMIN</span></div>
+        <button class="btn-refresh" style="width:auto;padding:7px 16px;margin-top:0;" onclick="loadDashboard();loadAdminPanel();">↻ Actualizar todo</button>
+      </div>
+      <div class="admin-tabs">
+        <button class="admin-tab-btn active" onclick="adminTab('pedidos',this)">📋 Gestión de pedidos</button>
+        <button class="admin-tab-btn" onclick="adminTab('editores',this)">🎬 Editores registrados</button>
+      </div>
+      <!-- Gestión de pedidos -->
+      <div id="admin-tab-pedidos">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="filter-chip active" onclick="setAdminFilter('todos',this)">Todos</button>
+          <button class="filter-chip" onclick="setAdminFilter('PENDIENTE',this)">🟡 Pendientes</button>
+          <button class="filter-chip" onclick="setAdminFilter('EN CURSO',this)">🔵 En curso</button>
+          <button class="filter-chip" onclick="setAdminFilter('REALIZADO',this)">🟢 Realizados</button>
+          <button class="filter-chip" onclick="setAdminFilter('sin-editor',this)">⚠ Sin editor</button>
+        </div>
+        <div class="admin-grid" id="admin-grid">
+          <div class="empty-state"><div class="empty-ico">⏳</div><div class="empty-txt">Cargando...</div></div>
+        </div>
+      </div>
+      <!-- Editores registrados -->
+      <div id="admin-tab-editores" style="display:none;">
+        <div class="editors-table" id="editors-table">
+          <div class="editors-table-head">
+            <span>Editor</span><span>Área</span><span>Asignadas</span><span>Estado</span><span>Acciones</span>
+          </div>
+          <div id="editors-body">
+            <div class="empty-state" style="padding:2rem;"><div class="empty-ico">👥</div><div class="empty-txt">Cargando editores...</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /main -->
 </div><!-- /app -->
 
-
-<!-- ════════════════════════════════════════════════
-     MODAL NUEVO PEDIDO
-════════════════════════════════════════════════ -->
+<!-- ════ MODAL NUEVO PEDIDO ════ -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <div class="modal-head">
@@ -818,14 +616,14 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
         <div class="m-step-title">¿De qué área sos?</div>
         <div class="m-step-hint">Tocá para seleccionar</div>
         <div class="sel-grid">
-          <div class="sel-card" data-val="Informativo"   onclick="mSel('area',this)"><div class="ic">📺</div><div class="nm">Informativo</div></div>
-          <div class="sel-card" data-val="Redes"         onclick="mSel('area',this)"><div class="ic">📱</div><div class="nm">Redes</div></div>
-          <div class="sel-card" data-val="Administración"onclick="mSel('area',this)"><div class="ic">🗂️</div><div class="nm">Administración</div></div>
-          <div class="sel-card" data-val="Ventas"        onclick="mSel('area',this)"><div class="ic">💰</div><div class="nm">Ventas</div></div>
-          <div class="sel-card" data-val="Comercial"     onclick="mSel('area',this)"><div class="ic">🤝</div><div class="nm">Comercial</div></div>
-          <div class="sel-card" data-val="Programación"  onclick="mSel('area',this)"><div class="ic">🗓️</div><div class="nm">Programación</div></div>
-          <div class="sel-card" data-val="Operaciones"   onclick="mSel('area',this)"><div class="ic">⚙️</div><div class="nm">Operaciones</div></div>
-          <div class="sel-card" data-val="Edición"       onclick="mSel('area',this)"><div class="ic">🎬</div><div class="nm">Edición</div></div>
+          <div class="sel-card" data-val="Informativo"    onclick="mSel('area',this)"><div class="ic">📺</div><div class="nm">Informativo</div></div>
+          <div class="sel-card" data-val="Redes"          onclick="mSel('area',this)"><div class="ic">📱</div><div class="nm">Redes</div></div>
+          <div class="sel-card" data-val="Administración" onclick="mSel('area',this)"><div class="ic">🗂️</div><div class="nm">Administración</div></div>
+          <div class="sel-card" data-val="Ventas"         onclick="mSel('area',this)"><div class="ic">💰</div><div class="nm">Ventas</div></div>
+          <div class="sel-card" data-val="Comercial"      onclick="mSel('area',this)"><div class="ic">🤝</div><div class="nm">Comercial</div></div>
+          <div class="sel-card" data-val="Programación"   onclick="mSel('area',this)"><div class="ic">🗓️</div><div class="nm">Programación</div></div>
+          <div class="sel-card" data-val="Operaciones"    onclick="mSel('area',this)"><div class="ic">⚙️</div><div class="nm">Operaciones</div></div>
+          <div class="sel-card" data-val="Edición"        onclick="mSel('area',this)"><div class="ic">🎬</div><div class="nm">Edición</div></div>
           <div class="sel-card" data-val="Posproducción"  onclick="mSel('area',this)"><div class="ic">🎛️</div><div class="nm">Posproducción</div></div>
           <div class="sel-card" data-val="Técnica"        onclick="mSel('area',this)"><div class="ic">🔧</div><div class="nm">Técnica</div></div>
         </div>
@@ -855,18 +653,10 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
         <div class="m-step-title">¿Cuándo lo necesitás?</div>
         <div class="m-step-hint">Prioridad y duración</div>
         <div class="prio-grid">
-          <div class="prio-card p1" data-val="🔴 P1 — Sale al aire" onclick="mSel('prio',this)">
-            <div class="prio-num">1</div><div class="prio-lbl">Sale al aire</div><div class="prio-desc">Tiene hora de emisión hoy</div>
-          </div>
-          <div class="prio-card p2" data-val="🟠 P2 — Mismo día" onclick="mSel('prio',this)">
-            <div class="prio-num">2</div><div class="prio-lbl">Mismo día</div><div class="prio-desc">Redes, clips del día</div>
-          </div>
-          <div class="prio-card p3" data-val="🟡 P3 — Con fecha" onclick="mSel('prio',this)">
-            <div class="prio-num">3</div><div class="prio-lbl">Tiene fecha</div><div class="prio-desc">Deadline planificable</div>
-          </div>
-          <div class="prio-card p4" data-val="🟢 P4 — Sin urgencia" onclick="mSel('prio',this)">
-            <div class="prio-num">4</div><div class="prio-lbl">Sin urgencia</div><div class="prio-desc">Cuando haya tiempo</div>
-          </div>
+          <div class="prio-card p1" data-val="🔴 P1 — Sale al aire" onclick="mSel('prio',this)"><div class="prio-num">1</div><div class="prio-lbl">Sale al aire</div><div class="prio-desc">Tiene hora de emisión hoy</div></div>
+          <div class="prio-card p2" data-val="🟠 P2 — Mismo día"   onclick="mSel('prio',this)"><div class="prio-num">2</div><div class="prio-lbl">Mismo día</div><div class="prio-desc">Redes, clips del día</div></div>
+          <div class="prio-card p3" data-val="🟡 P3 — Con fecha"   onclick="mSel('prio',this)"><div class="prio-num">3</div><div class="prio-lbl">Tiene fecha</div><div class="prio-desc">Deadline planificable</div></div>
+          <div class="prio-card p4" data-val="🟢 P4 — Sin urgencia" onclick="mSel('prio',this)"><div class="prio-num">4</div><div class="prio-lbl">Sin urgencia</div><div class="prio-desc">Cuando haya tiempo</div></div>
         </div>
         <div class="m-err" id="me-prio">Indicá la urgencia.</div>
         <div class="m-field">
@@ -898,36 +688,36 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
           <input type="text" class="m-input" id="m-ubic" placeholder="Servidor A / carpeta EntreNos / link de descarga..."/>
         </div>
         <div class="m-field">
-          <label class="m-label">Archivos adjuntos (scripts, guiones, PPT, Word, audio...)</label>
+          <label class="m-label">Archivos adjuntos — se subirán a Google Drive</label>
           <div class="file-zone" id="file-zone" onclick="document.getElementById('file-input').click()"
                ondragover="event.preventDefault();this.classList.add('drag')"
                ondragleave="this.classList.remove('drag')"
                ondrop="handleDrop(event)">
-            <div class="file-zone-ico">📎</div>
-            <div class="file-zone-txt">Hacé clic o arrastrá archivos acá</div>
-            <div class="file-zone-sub">Word, Excel, PPT, PDF, MP3, MP4, imágenes · Máx. 10 archivos</div>
+            <div class="file-zone-ico">☁️</div>
+            <div class="file-zone-txt">Arrastrá archivos acá o hacé clic para seleccionar</div>
+            <div class="file-zone-sub">Se subirán a la carpeta de Drive de Posproducción · Máx 10 archivos</div>
           </div>
-          <input type="file" id="file-input" multiple accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,.pdf,.mp3,.mp4,.wav,.jpg,.jpeg,.png,.txt" onchange="handleFiles(this.files)"/>
-          <div class="files-list" id="files-list"></div>
+          <input type="file" id="file-input" multiple style="display:none;" onchange="handleFiles(this.files)"/>
+          <div id="files-list" style="display:flex;flex-direction:column;gap:4px;margin-top:6px;"></div>
+          <div id="upload-progress" style="display:none;" class="file-upload-progress">⬆ Subiendo archivos a Drive...</div>
         </div>
       </div>
 
       <!-- PASO 4: Resumen -->
       <div class="m-step" id="ms-4">
         <div class="m-step-title">Revisá tu pedido</div>
-        <div class="m-step-hint">Confirmá antes de enviar</div>
-        <div class="resumen-box" id="m-resumen"></div>
-        <div id="m-arch-resumen" style="margin-top:10px;"></div>
+        <div class="resumen" id="m-resumen"></div>
+        <div id="m-arch-resumen"></div>
       </div>
 
-      <!-- PASO 5: Success -->
+      <!-- PASO 5: Éxito -->
       <div class="m-step" id="ms-5">
         <div class="modal-success">
           <div class="ms-ico">✅</div>
           <div class="ms-title">¡Pedido enviado!</div>
-          <div class="ms-msg">Tu pedido quedó registrado. El equipo de edición lo verá en el rundown.</div>
+          <div class="ms-msg">Tu pedido fue registrado en el sistema. El equipo de edición lo recibirá y te avisarán cuando esté listo.</div>
           <div class="ms-ticket" id="ms-ticket-box"></div>
-          <button class="btn-auth" style="margin-top:0.5rem;" onclick="closeModal();showPanel('dashboard');">Ver en el rundown →</button>
+          <button class="btn-auth" onclick="closeModal()">Cerrar</button>
         </div>
       </div>
 
@@ -939,68 +729,119 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
   </div>
 </div>
 
-
 <script>
-// ════════════════════════════════════════════════
-//  ⚙️ CONFIGURACIÓN — pegá la URL de tu Web App
-// ════════════════════════════════════════════════
-var API = "https://script.google.com/macros/s/AKfycbzYXB-FK9WeiYQj2jPnHsXElJvmYQoEvdgctvsqaK3cyg_mSOQvAf1vY9u_3cgUCVOG_A/exec";
-// ════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  CONFIGURACIÓN — EDITÁ ESTOS VALORES
+// ═══════════════════════════════════════════════════════
 
-// ─── Estado global ────────────────────────────
-var usuario = null;      // { email, nombre, area, rol }
-var pedidos  = [];
-var filtro   = "todos";
+// URL de tu Google Apps Script Web App
+var API = 'https://script.google.com/macros/s/TU_SCRIPT_ID_AQUI/exec';
+
+// ID de la carpeta de Google Drive donde se subirán los archivos
+// Carpeta: https://drive.google.com/drive/folders/1JslwxmipJQ9t88PZeIkozaoXit6wVp3p
+var DRIVE_FOLDER_ID = '1JslwxmipJQ9t88PZeIkozaoXit6wVp3p';
+
+// Email del superadministrador
+var SUPERADMIN_EMAIL = 'admin@canal10.com.ar';
+
+// ═══════════════════════════════════════════════════════
+//  ESTADO GLOBAL
+// ═══════════════════════════════════════════════════════
+var usuario        = null;
+var pedidos        = [];
+var editores       = [];
+var filtro         = 'todos';
+var adminFiltro    = 'todos';
 var selectedTicket = null;
-var refreshInterval = null;
-var mState   = { area:'', tipo:'', prio:'', dur:'', deadline:'', desc:'', ubic:'', files:[] };
-var mStep    = 0;
-var TOTAL_STEPS = 5;
+var refreshInterval= null;
+var mState         = { area:'', tipo:'', prio:'', dur:'', deadline:'', desc:'', ubic:'', files:[] };
+var mStep          = 0;
+var TOTAL_STEPS    = 5;
+var regRol         = 'solicitante';
 
-// ─── Utils ────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════
 function bar(on){ var b=document.getElementById('loading-bar'); b.className='loading-bar'+(on?' loading':' done'); if(!on)setTimeout(function(){b.className='loading-bar';b.style.width='0';},400); }
-
 function getExt(name){ return (name.split('.').pop()||'').toLowerCase(); }
-function fileIco(name){
-  var e=getExt(name);
-  if(['doc','docx'].includes(e))  return '📝';
-  if(['xls','xlsx'].includes(e))  return '📊';
-  if(['ppt','pptx'].includes(e))  return '📑';
-  if(['pdf'].includes(e))          return '📄';
-  if(['mp3','wav','aac'].includes(e)) return '🎵';
-  if(['mp4','mov','avi'].includes(e)) return '🎬';
-  if(['jpg','jpeg','png','gif'].includes(e)) return '🖼️';
-  return '📎';
-}
+function fileIco(name){ var e=getExt(name); if(['doc','docx'].includes(e))return '📝'; if(['xls','xlsx'].includes(e))return '📊'; if(['ppt','pptx'].includes(e))return '📑'; if(['pdf'].includes(e))return '📄'; if(['mp3','wav','aac'].includes(e))return '🎵'; if(['mp4','mov','avi','mxf'].includes(e))return '🎬'; if(['jpg','jpeg','png','gif'].includes(e))return '🖼️'; return '📎'; }
 function fmtSize(b){ if(b<1024)return b+'B'; if(b<1048576)return (b/1024).toFixed(0)+'KB'; return (b/1048576).toFixed(1)+'MB'; }
-function prioClass(p){
-  if(!p) return '-';
-  if(p.includes('P1')) return 'p1';
-  if(p.includes('P2')) return 'p2';
-  if(p.includes('P3')) return 'p3';
-  return 'p4';
-}
+function prioClass(p){ if(!p)return '-'; if(p.includes('P1'))return 'p1'; if(p.includes('P2'))return 'p2'; if(p.includes('P3'))return 'p3'; return 'p4'; }
 function estadoClass(e){ return e==='EN CURSO'?'en-curso':e==='REALIZADO'?'realizado':'pendiente'; }
 function fmtHora(f){ if(!f)return '—'; var parts=f.split(' '); return parts[1]||parts[0]; }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function mkRow(k,v){ return '<div class="detail-row"><span class="detail-row-key">'+k+'</span><span class="detail-row-val">'+esc(v)+'</span></div>'; }
 
-// ═════════════════════════════════════════════
+function toast(msg, type){
+  type = type || 'info';
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast '+type+' show';
+  setTimeout(function(){ t.className='toast'; }, 3500);
+}
+
+// ═══════════════════════════════════════════════════════
+//  API
+// ═══════════════════════════════════════════════════════
+async function get(params){
+  var r = await fetch(API+'?action='+params);
+  return r.json();
+}
+async function post(data){
+  var r = await fetch(API, { method:'POST', body:JSON.stringify(data) });
+  return r.json();
+}
+
+// ═══════════════════════════════════════════════════════
+//  SUBIDA A GOOGLE DRIVE
+//  Utiliza la API de Drive a través del Apps Script que debe
+//  exponer una acción "upload_file" que reciba:
+//  { accion, ticket, nombre, tipo, base64, folderId }
+//  y devuelva { ok, url, fileId }
+// ═══════════════════════════════════════════════════════
+async function uploadFileToDrive(file, ticket){
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = async function(e){
+      try {
+        var base64 = e.target.result.split(',')[1];
+        var r = await post({
+          accion:    'upload_file',
+          ticket:    ticket,
+          nombre:    file.name,
+          tipo:      file.type || 'application/octet-stream',
+          base64:    base64,
+          folderId:  DRIVE_FOLDER_ID
+        });
+        resolve(r);
+      } catch(err){ reject(err); }
+    };
+    reader.onerror = function(){ reject(new Error('Error leyendo archivo')); };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
 //  AUTH
-// ═════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+function selectRol(rol){
+  regRol = rol;
+  document.getElementById('rol-sol').className = 'rol-btn sol'+(rol==='solicitante'?' active':'');
+  document.getElementById('rol-ed').className  = 'rol-btn ed'+(rol==='editor'?' active':'');
+}
+
 async function loginGoogle(){
-  // Abre Google OAuth popup — en producción usar Google Identity Services
-  // Aquí simulamos con flujo email para compatibilidad total sin OAuth app setup
-  var email = prompt("Ingresá tu email de Google (@gmail.com o @canal10.com.ar):");
+  var email = prompt('Ingresá tu email de Google (@gmail.com o @canal10.com.ar):');
   if(!email || !email.includes('@')) return;
   document.getElementById('auth-email').value = email;
   doAuth();
 }
 
-var authMode = 'check'; // 'check' | 'register'
+var authMode = 'check';
 async function doAuth(){
-  var email  = document.getElementById('auth-email').value.trim().toLowerCase();
-  var btn    = document.getElementById('btn-auth');
-  var msg    = document.getElementById('auth-msg');
-
+  var email = document.getElementById('auth-email').value.trim().toLowerCase();
+  var btn   = document.getElementById('btn-auth');
+  var msg   = document.getElementById('auth-msg');
   if(!email || !email.includes('@')){ showAuthMsg('Ingresá un email válido.','err'); return; }
 
   if(authMode==='register'){
@@ -1008,31 +849,30 @@ async function doAuth(){
     var area   = document.getElementById('auth-area').value;
     if(!nombre){ showAuthMsg('Ingresá tu nombre.','err'); return; }
     if(!area)  { showAuthMsg('Elegí tu área.','err'); return; }
-
+    var rolFinal = (email===SUPERADMIN_EMAIL) ? 'superadmin' : regRol;
     btn.disabled=true; btn.textContent='Registrando...';
     bar(true);
     try{
-      var r = await post({ accion:'registrar_usuario', email, nombre, area });
+      var r = await post({ accion:'registrar_usuario', email, nombre, area, rol:rolFinal });
       bar(false);
-      if(r.ok){ enterApp({ email, nombre:r.nombre||nombre, area:r.area||area, rol:r.rol||'solicitante' }); }
+      if(r.ok){ enterApp({ email, nombre:r.nombre||nombre, area:r.area||area, rol:r.rol||rolFinal }); }
       else { showAuthMsg(r.error||'Error al registrar.','err'); btn.disabled=false; btn.textContent='Registrarme'; }
     }catch(e){ bar(false); showAuthMsg('Error de conexión.','err'); btn.disabled=false; btn.textContent='Registrarme'; }
     return;
   }
 
-  // check
   btn.disabled=true; btn.textContent='Verificando...';
   bar(true);
   try{
     var res = await get('check_user&email='+encodeURIComponent(email));
     bar(false);
     if(res.ok){
-      enterApp({ email, nombre:res.nombre, area:res.area, rol:res.rol });
+      // Forzar superadmin si coincide con el email hardcoded
+      var rol = (email===SUPERADMIN_EMAIL) ? 'superadmin' : res.rol;
+      enterApp({ email, nombre:res.nombre, area:res.area, rol:rol });
     } else if(res.error==='not_registered'){
-      // Mostrar campos de registro
       authMode='register';
       document.getElementById('reg-fields').style.display='';
-      document.getElementById('reg-area-field').style.display='';
       btn.textContent='Registrarme';
       btn.disabled=false;
       showAuthMsg('Tu email no está registrado. Completá los datos para crear tu cuenta.','ok');
@@ -1050,19 +890,57 @@ function showAuthMsg(txt, cls){
 
 function enterApp(u){
   usuario = u;
-  // Guardar sesión
   try{ localStorage.setItem('c10_user', JSON.stringify(u)); }catch(e){}
 
-  // UI
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
-  document.getElementById('topbar-uname').textContent = u.nombre.split(' ')[0];
-  document.getElementById('topbar-avatar').textContent = u.nombre.charAt(0).toUpperCase();
 
-  showPanel('dashboard');
+  // Avatar y nombre
+  var firstLetter = u.nombre.charAt(0).toUpperCase();
+  document.getElementById('topbar-uname').textContent = u.nombre.split(' ')[0];
+  document.getElementById('topbar-avatar').textContent = firstLetter;
+
+  // Badge de rol
+  var badge = document.getElementById('topbar-rol-badge');
+  if(u.rol==='superadmin'){
+    badge.textContent='SUPERADMIN';
+    badge.className='topbar-rol-badge superadmin';
+    document.getElementById('topbar-avatar').style.background='var(--morado)';
+  } else if(u.rol==='editor'){
+    badge.textContent='EDITOR';
+    badge.className='topbar-rol-badge editor';
+    document.getElementById('topbar-avatar').style.background='var(--verde-t)';
+  } else {
+    badge.textContent='SOLICITANTE';
+    badge.className='topbar-rol-badge solicitante';
+  }
+
+  // Tabs según rol
+  if(u.rol==='superadmin'){
+    document.getElementById('tab-admin').style.display='';
+    document.getElementById('btn-nuevo-pedido').style.display='';
+  } else if(u.rol==='editor'){
+    document.getElementById('tab-editor').style.display='';
+    // Los editores no crean pedidos
+    document.getElementById('btn-nuevo-pedido').style.display='none';
+    document.getElementById('tab-mis-pedidos').style.display='none';
+  }
+
+  // Panel inicial
+  if(u.rol==='editor'){
+    showPanel('editor');
+  } else {
+    showPanel('dashboard');
+  }
+
   loadDashboard();
-  // Auto-refresh cada 30 segundos
-  refreshInterval = setInterval(function(){ silentRefresh(); }, 30000);
+  if(u.rol==='editor') loadEditorPanel();
+  if(u.rol==='superadmin') loadAdminPanel();
+
+  refreshInterval = setInterval(function(){
+    silentRefresh();
+    if(u.rol==='editor') loadEditorPanel();
+  }, 30000);
 }
 
 function logout(){
@@ -1071,16 +949,19 @@ function logout(){
   usuario=null; pedidos=[];
   document.getElementById('auth-screen').style.display='flex';
   document.getElementById('app').classList.remove('visible');
-  authMode='check';
+  authMode='check'; regRol='solicitante';
   document.getElementById('reg-fields').style.display='none';
-  document.getElementById('reg-area-field').style.display='none';
   document.getElementById('auth-email').value='';
   document.getElementById('btn-auth').disabled=false;
   document.getElementById('btn-auth').textContent='Continuar →';
   document.getElementById('auth-msg').style.display='none';
+  // Reset tabs
+  document.getElementById('tab-admin').style.display='none';
+  document.getElementById('tab-editor').style.display='none';
+  document.getElementById('tab-mis-pedidos').style.display='';
+  document.getElementById('btn-nuevo-pedido').style.display='';
 }
 
-// Restaurar sesión
 window.addEventListener('load', function(){
   try{
     var saved = JSON.parse(localStorage.getItem('c10_user'));
@@ -1088,43 +969,44 @@ window.addEventListener('load', function(){
   }catch(e){}
 });
 
-// ═════════════════════════════════════════════
-//  API CALLS
-// ═════════════════════════════════════════════
-async function get(params){
-  var r = await fetch(API+'?action='+params);
-  return r.json();
-}
-async function post(data){
-  var r = await fetch(API, { method:'POST', body:JSON.stringify(data) });
-  return r.json();
-}
-
-// ═════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  PANELS
-// ═════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 function showPanel(name){
-  var panels = ['dashboard','mis-pedidos'];
-  panels.forEach(function(p){
+  var all = ['dashboard','mis-pedidos','editor','admin'];
+  all.forEach(function(p){
     var el = document.getElementById('panel-'+p);
     if(el) el.style.display = (p===name)?'flex':'none';
   });
-  document.querySelectorAll('.topbar-tab').forEach(function(t,i){
-    t.classList.toggle('active', ['dashboard','mis-pedidos'][i]===name);
+  document.querySelectorAll('.topbar-tab').forEach(function(t){
+    t.classList.remove('active');
   });
+  var activeTab = document.getElementById('tab-'+name);
+  if(!activeTab){
+    // para 'mis-pedidos'
+    activeTab = document.getElementById('tab-mis-pedidos');
+  }
+  if(activeTab) activeTab.classList.add('active');
+
   if(name==='mis-pedidos') renderMisPedidos();
+  if(name==='admin') renderAdminGrid();
+  if(name==='editor') loadEditorPanel();
 }
 
-// ═════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  DASHBOARD
-// ═════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 async function loadDashboard(){
   if(!usuario) return;
   bar(true);
   try{
     var r = await get('dashboard&email='+encodeURIComponent(usuario.email));
     bar(false);
-    if(r.ok){ pedidos=r.pedidos||[]; renderAll(); }
+    if(r.ok){
+      pedidos  = r.pedidos  || [];
+      editores = r.editores || [];
+      renderAll();
+    }
   }catch(e){ bar(false); }
 }
 
@@ -1134,7 +1016,12 @@ async function silentRefresh(){
   rdot.className='refresh-dot loading';
   try{
     var r = await get('dashboard&email='+encodeURIComponent(usuario.email));
-    if(r.ok){ pedidos=r.pedidos||[]; renderAll(); if(selectedTicket) refreshDetail(selectedTicket); }
+    if(r.ok){
+      pedidos  = r.pedidos  || [];
+      editores = r.editores || [];
+      renderAll();
+      if(selectedTicket) refreshDetail(selectedTicket);
+    }
   }catch(e){}
   rdot.className='refresh-dot';
 }
@@ -1148,13 +1035,13 @@ function renderAll(){
 
 function updateStats(){
   var total=pedidos.length;
-  var pend=pedidos.filter(function(p){return p.estado==='PENDIENTE';}).length;
-  var enc =pedidos.filter(function(p){return p.estado==='EN CURSO';}).length;
-  var real=pedidos.filter(function(p){return p.estado==='REALIZADO';}).length;
-  document.getElementById('stat-total').textContent=total;
-  document.getElementById('stat-pendiente').textContent=pend;
-  document.getElementById('stat-encurso').textContent=enc;
-  document.getElementById('stat-realizado').textContent=real;
+  var pend =pedidos.filter(function(p){return p.estado==='PENDIENTE';}).length;
+  var enc  =pedidos.filter(function(p){return p.estado==='EN CURSO';}).length;
+  var real =pedidos.filter(function(p){return p.estado==='REALIZADO';}).length;
+  document.getElementById('stat-total').textContent    = total;
+  document.getElementById('stat-pendiente').textContent= pend;
+  document.getElementById('stat-encurso').textContent  = enc;
+  document.getElementById('stat-realizado').textContent= real;
 }
 
 function setFilter(f, el){
@@ -1167,52 +1054,36 @@ function setFilter(f, el){
 function renderRundown(){
   var q = (document.getElementById('search-input').value||'').toLowerCase();
   var lista = pedidos.filter(function(p){
-    if(filtro!=='todos' && filtro!=='P1' && filtro!=='P2' && filtro!=='P3' && filtro!=='P4'){
-      if(p.estado!==filtro) return false;
-    }
-    if(filtro==='P1'||filtro==='P2'||filtro==='P3'||filtro==='P4'){
-      if(!p.prio.includes(filtro)) return false;
-    }
-    if(q){
-      var hay = (p.ticket+p.area+p.tipo+p.desc+p.nombre+p.email).toLowerCase().includes(q);
-      if(!hay) return false;
-    }
+    if(filtro!=='todos'&&!['P1','P2','P3','P4'].includes(filtro)){if(p.estado!==filtro)return false;}
+    if(['P1','P2','P3','P4'].includes(filtro)){if(!p.prio.includes(filtro))return false;}
+    if(q){ var hay=(p.ticket+p.area+p.tipo+p.desc+p.nombre+p.email).toLowerCase().includes(q); if(!hay)return false; }
     return true;
   });
-
   var body = document.getElementById('rundown-body');
-  if(!lista.length){
-    body.innerHTML='<div class="empty-state"><div class="empty-ico">📋</div><div class="empty-txt">No hay pedidos con esos filtros</div></div>';
-    return;
-  }
-
+  if(!lista.length){ body.innerHTML='<div class="empty-state"><div class="empty-ico">📋</div><div class="empty-txt">No hay pedidos con esos filtros</div></div>'; return; }
   body.innerHTML = lista.map(function(p){
-    var pClass  = prioClass(p.prio);
-    var eClass  = estadoClass(p.estado);
-    var sel     = p.ticket===selectedTicket?' selected':'';
-    var dim     = p.estado==='REALIZADO'?' estado-realizado':'';
-    var pNum    = pClass==='p1'?'1':pClass==='p2'?'2':pClass==='p3'?'3':pClass==='p4'?'4':'·';
-    var archIco = p.archivos ? '📎' : '';
-    return '<div class="story-row'+sel+dim+'" onclick="selectStory(\''+p.ticket+'\')">' +
-      '<div class="s-prio"><div class="prio-badge '+pClass+'">'+pNum+'</div></div>' +
-      '<div class="s-ticket">'+p.ticket+'</div>' +
-      '<div class="s-estado"><span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span></div>' +
-      '<div class="s-area">'+p.area+'</div>' +
-      '<div class="s-tipo">'+p.tipo+'</div>' +
-      '<div class="s-desc">'+(archIco?'<span style="margin-right:4px;">'+archIco+'</span>':'')+esc(p.desc)+'</div>' +
-      '<div class="s-sol">'+esc(p.nombre)+'</div>' +
-      '<div class="s-time">'+fmtHora(p.fecha)+'</div>' +
+    var pClass=prioClass(p.prio); var eClass=estadoClass(p.estado);
+    var sel=p.ticket===selectedTicket?' selected':'';
+    var dim=p.estado==='REALIZADO'?' estado-realizado':'';
+    var pNum=pClass==='p1'?'1':pClass==='p2'?'2':pClass==='p3'?'3':pClass==='p4'?'4':'·';
+    var archIco=p.archivos?'📎':'';
+    return '<div class="story-row'+sel+dim+'" onclick="selectStory(\''+p.ticket+'\')">'+
+      '<div class="s-prio"><div class="prio-badge '+pClass+'">'+pNum+'</div></div>'+
+      '<div class="s-ticket">'+p.ticket+'</div>'+
+      '<div class="s-estado"><span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span></div>'+
+      '<div class="s-area">'+p.area+'</div>'+
+      '<div class="s-tipo">'+p.tipo+'</div>'+
+      '<div class="s-desc">'+(archIco?'<span style="margin-right:4px;">'+archIco+'</span>':'')+esc(p.desc)+'</div>'+
+      '<div class="s-sol">'+esc(p.nombre)+'</div>'+
+      '<div class="s-time">'+fmtHora(p.fecha)+'</div>'+
     '</div>';
   }).join('');
 }
 
-function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// ─── Detail panel ────────────────────────────
 function selectStory(ticket){
   selectedTicket=ticket;
-  renderRundown(); // re-render para marcar selected
-  var p = pedidos.find(function(x){return x.ticket===ticket;});
+  renderRundown();
+  var p=pedidos.find(function(x){return x.ticket===ticket;});
   if(p) showDetail(p);
   document.getElementById('detail-panel').classList.remove('hidden');
 }
@@ -1224,13 +1095,27 @@ function closeDetail(){
 }
 
 function showDetail(p){
-  var pClass = prioClass(p.prio);
-  var eClass = estadoClass(p.estado);
-  var archivos = p.archivos ? p.archivos.split(' | ') : [];
+  var pClass=prioClass(p.prio);
+  var eClass=estadoClass(p.estado);
+
+  // Archivos: si vienen como array de objetos { nombre, url } o string separado por |
+  var archivos=[];
+  if(p.archivos_data){
+    try{ archivos=JSON.parse(p.archivos_data); }catch(e){ archivos=[]; }
+  } else if(p.archivos){
+    // Compatibilidad con formato antiguo (nombres separados por |)
+    archivos = p.archivos.split(' | ').map(function(a){ return {nombre:a, url:''}; });
+  }
 
   var archHtml = archivos.length
     ? archivos.map(function(a){
-        return '<div class="arch-item"><div class="arch-ico">'+fileIco(a)+'</div><div class="arch-name">'+esc(a)+'</div></div>';
+        var nombre = (typeof a==='object') ? a.nombre : a;
+        var url    = (typeof a==='object') ? a.url    : '';
+        return '<div class="arch-item">'+
+          '<div class="arch-ico">'+fileIco(nombre)+'</div>'+
+          '<div class="arch-name">'+esc(nombre)+'</div>'+
+          (url ? '<a class="arch-link" href="'+url+'" target="_blank">↓ Ver</a>' : '')+
+        '</div>';
       }).join('')
     : '<div class="arch-empty">Sin archivos adjuntos</div>';
 
@@ -1246,48 +1131,41 @@ function showDetail(p){
       '<span class="detail-pill">'+p.tipo+'</span>'+
       (p.dur?'<span class="detail-pill">'+p.dur+'</span>':'')+
     '</div>'+
-
     '<div class="detail-section">'+
       '<div class="detail-section-label">Información</div>'+
-      mkRow('Solicitante', p.nombre)+
-      mkRow('Email', p.email)+
-      mkRow('Deadline', p.deadline||'No especificado')+
-      (p.ubic?mkRow('Material en', p.ubic):'')+
+      mkRow('Solicitante',p.nombre)+
+      mkRow('Email',p.email)+
+      mkRow('Deadline',p.deadline||'No especificado')+
+      (p.ubic?mkRow('Material en',p.ubic):'')+
     '</div>'+
-
     (p.editor?
       '<div class="detail-section">'+
         '<div class="detail-section-label">Editor asignado</div>'+
         '<div class="editor-box">'+
           '<div class="editor-ava">'+p.editor.charAt(0).toUpperCase()+'</div>'+
-          '<div><div class="editor-name">'+esc(p.editor)+'</div><div class="editor-label">Editor de turno</div></div>'+
+          '<div><div class="editor-name">'+esc(p.editor)+'</div><div class="editor-label">Editor asignado</div></div>'+
         '</div>'+
       '</div>'
     :'')+
-
     '<div class="detail-section">'+
       '<div class="detail-section-label">Progreso</div>'+
       '<div class="tl-row"><div class="tl-dot done"></div><div class="tl-label">Pedido recibido</div><div class="tl-time">'+fmtHora(p.fecha)+'</div></div>'+
       '<div class="tl-row"><div class="tl-dot '+(p.inicio?'done':'wait')+'"></div><div class="tl-label">Edición iniciada</div><div class="tl-time">'+(p.inicio?fmtHora(p.inicio):'Esperando')+'</div></div>'+
       '<div class="tl-row"><div class="tl-dot '+(p.fin?'done':'wait')+'"></div><div class="tl-label">Pedido realizado</div><div class="tl-time">'+(p.fin?fmtHora(p.fin):'Pendiente')+'</div></div>'+
     '</div>'+
-
     '<div class="detail-section">'+
       '<div class="detail-section-label">Archivos adjuntos</div>'+
       '<div class="arch-list">'+archHtml+'</div>'+
     '</div>'+
-
     '<button class="btn-refresh" onclick="silentRefresh()">↻ Actualizar estado</button>';
 }
 
-function mkRow(k,v){ return '<div class="detail-row"><span class="detail-row-key">'+k+'</span><span class="detail-row-val">'+esc(v)+'</span></div>'; }
-
 function refreshDetail(ticket){
-  var p = pedidos.find(function(x){return x.ticket===ticket;});
+  var p=pedidos.find(function(x){return x.ticket===ticket;});
   if(p) showDetail(p);
 }
 
-// ─── Mis pedidos ─────────────────────────────
+// ─── Mis pedidos ──────────────────────────────────
 function renderMisPedidos(){
   var mis = pedidos.filter(function(p){ return p.email===usuario.email; });
   var el  = document.getElementById('mis-pedidos-list');
@@ -1296,8 +1174,7 @@ function renderMisPedidos(){
     return;
   }
   el.innerHTML = mis.map(function(p){
-    var eClass = estadoClass(p.estado);
-    var pClass = prioClass(p.prio);
+    var eClass=estadoClass(p.estado); var pClass=prioClass(p.prio);
     return '<div style="background:var(--bg2);border:1px solid var(--borde);border-radius:10px;padding:14px 16px;cursor:pointer;" onclick="showPanel(\'dashboard\');selectStory(\''+p.ticket+'\')">'+
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'+
         '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
@@ -1306,13 +1183,275 @@ function renderMisPedidos(){
       '</div>'+
       '<div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:3px;">'+esc(p.desc.substring(0,80))+(p.desc.length>80?'…':'')+'</div>'+
       '<div style="font-size:11px;color:var(--txt3);">'+p.area+' · '+p.tipo+' · '+p.fecha+'</div>'+
+      (p.editor?'<div style="font-size:11px;color:var(--verde-t);margin-top:4px;">🎬 Editor: '+esc(p.editor)+'</div>':'')+
     '</div>';
   }).join('');
 }
 
-// ═════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  PANEL EDITOR
+// ═══════════════════════════════════════════════════════
+async function loadEditorPanel(){
+  if(!usuario || usuario.rol!=='editor') return;
+  try{
+    var r = await get('editor_tasks&email='+encodeURIComponent(usuario.email));
+    if(r.ok){
+      renderEditorTasks(r.tareas||[]);
+    }
+  }catch(e){}
+}
+
+function renderEditorTasks(tareas){
+  document.getElementById('editor-welcome').textContent = 'Hola, '+usuario.nombre.split(' ')[0]+' 👋';
+  document.getElementById('editor-sub').textContent = 'Estas son tus tareas asignadas';
+
+  var total  = tareas.length;
+  var curso  = tareas.filter(function(t){ return t.estado==='EN CURSO'; }).length;
+  var done   = tareas.filter(function(t){ return t.estado==='REALIZADO'; }).length;
+  document.getElementById('editor-stat-total').textContent = total;
+  document.getElementById('editor-stat-curso').textContent = curso;
+  document.getElementById('editor-stat-done').textContent  = done;
+
+  var el = document.getElementById('editor-tasks-list');
+  if(!tareas.length){
+    el.innerHTML='<div class="empty-state"><div class="empty-ico">🎉</div><div class="empty-txt">No tenés tareas asignadas por ahora</div></div>';
+    return;
+  }
+
+  el.innerHTML = tareas.map(function(p){
+    var pClass = prioClass(p.prio);
+    var eClass = estadoClass(p.estado);
+    var urgente= p.prio&&p.prio.includes('P1')?' urgente':'';
+    var esCurso = p.estado==='EN CURSO';
+    var isDone  = p.estado==='REALIZADO';
+
+    // Archivos con links reales a Drive
+    var archivos=[];
+    if(p.archivos_data){ try{ archivos=JSON.parse(p.archivos_data); }catch(e){ archivos=[]; } }
+    else if(p.archivos){ archivos=p.archivos.split(' | ').map(function(a){return{nombre:a,url:''};}) }
+
+    var archHtml = archivos.length
+      ? '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">'+
+          archivos.map(function(a){
+            var nombre=(typeof a==='object')?a.nombre:a;
+            var url=(typeof a==='object')?a.url:'';
+            return url
+              ? '<a href="'+url+'" target="_blank" style="display:flex;align-items:center;gap:4px;background:var(--bg4);border:1px solid var(--borde);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--azul);text-decoration:none;">'+fileIco(nombre)+' '+esc(nombre)+'</a>'
+              : '<span style="display:flex;align-items:center;gap:4px;background:var(--bg4);border:1px solid var(--borde);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--txt3);">'+fileIco(nombre)+' '+esc(nombre)+'</span>';
+          }).join('')+
+        '</div>'
+      : '';
+
+    return '<div class="task-card'+urgente+'">'+
+      '<div class="task-card-head">'+
+        '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
+        '<span style="font-family:var(--mono);font-size:10px;color:var(--txt3);">'+p.ticket+'</span>'+
+      '</div>'+
+      '<div class="task-card-body">'+esc(p.desc)+'</div>'+
+      archHtml+
+      '<div class="task-card-foot" style="margin-top:8px;">'+
+        '<span class="detail-pill '+pClass+'">'+p.prio+'</span>'+
+        '<span class="detail-pill">'+p.area+'</span>'+
+        '<span class="detail-pill">'+p.tipo+'</span>'+
+        (p.deadline?'<span class="detail-pill" style="color:var(--naranja);">⏰ '+p.deadline+'</span>':'')+
+      '</div>'+
+      (p.ubic?'<div style="font-size:11px;color:var(--txt3);margin-top:6px;">📂 '+esc(p.ubic)+'</div>':'')+
+      '<div class="task-actions">'+
+        (!esCurso&&!isDone?'<button class="btn-task iniciar" onclick="editorCambiarEstado(\''+p.ticket+'\',\'EN CURSO\')">▶ Iniciar</button>':'')+
+        (esCurso?'<button class="btn-task completar" onclick="editorCambiarEstado(\''+p.ticket+'\',\'REALIZADO\')">✓ Marcar completado</button>':'')+
+        (isDone?'<span style="font-size:11px;color:var(--verde-t);font-weight:600;">✅ Completado</span>':'')+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function editorCambiarEstado(ticket, nuevoEstado){
+  bar(true);
+  try{
+    var r = await post({
+      accion:  'cambiar_estado',
+      email:   usuario.email,
+      ticket:  ticket,
+      estado:  nuevoEstado
+    });
+    bar(false);
+    if(r.ok){
+      toast('Estado actualizado: '+nuevoEstado, 'success');
+      silentRefresh();
+      loadEditorPanel();
+    } else {
+      toast('Error: '+(r.error||'No se pudo actualizar'), 'error');
+    }
+  }catch(e){ bar(false); toast('Error de conexión','error'); }
+}
+
+// ═══════════════════════════════════════════════════════
+//  PANEL SUPERADMIN
+// ═══════════════════════════════════════════════════════
+var adminTabActual = 'pedidos';
+
+function adminTab(tab, el){
+  adminTabActual = tab;
+  document.querySelectorAll('.admin-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  if(el) el.classList.add('active');
+  document.getElementById('admin-tab-pedidos').style.display  = (tab==='pedidos')  ? '' : 'none';
+  document.getElementById('admin-tab-editores').style.display = (tab==='editores') ? '' : 'none';
+  if(tab==='editores') renderEditoresTable();
+}
+
+async function loadAdminPanel(){
+  if(!usuario || usuario.rol!=='superadmin') return;
+  // Cargar lista de editores del sistema
+  try{
+    var r = await get('get_editores&email='+encodeURIComponent(usuario.email));
+    if(r.ok) editores = r.editores || [];
+  }catch(e){}
+  renderAdminGrid();
+}
+
+var adminFiltroActual = 'todos';
+function setAdminFilter(f, el){
+  adminFiltroActual = f;
+  document.querySelectorAll('#admin-tab-pedidos .filter-chip').forEach(function(c){ c.classList.remove('active'); });
+  if(el) el.classList.add('active');
+  renderAdminGrid();
+}
+
+function renderAdminGrid(){
+  if(!usuario || usuario.rol!=='superadmin') return;
+  var lista = pedidos.filter(function(p){
+    if(adminFiltroActual==='todos') return true;
+    if(adminFiltroActual==='sin-editor') return !p.editor;
+    return p.estado===adminFiltroActual;
+  });
+  var grid = document.getElementById('admin-grid');
+  if(!lista.length){
+    grid.innerHTML='<div class="empty-state" style="grid-column:1/-1;"><div class="empty-ico">📋</div><div class="empty-txt">No hay pedidos con esos filtros</div></div>';
+    return;
+  }
+
+  // Opciones de editores para el select
+  var editorOptions = '<option value="">-- Sin asignar --</option>'+
+    editores.map(function(e){ return '<option value="'+esc(e.nombre)+'">'+esc(e.nombre)+' ('+esc(e.email)+')</option>'; }).join('');
+
+  grid.innerHTML = lista.map(function(p){
+    var pClass=prioClass(p.prio); var eClass=estadoClass(p.estado);
+    var edSelect = '<select class="assign-select" id="ed-sel-'+p.ticket+'">'+editorOptions+'</select>';
+    // Pre-seleccionar editor actual
+    var selScript = p.editor ? 'setTimeout(function(){var s=document.getElementById("ed-sel-'+p.ticket+'");if(s){for(var i=0;i<s.options.length;i++){if(s.options[i].text.startsWith("'+p.editor+'")){s.selectedIndex=i;break;}}};},50);' : '';
+
+    return '<div class="admin-card">'+
+      '<div class="admin-card-head">'+
+        '<div>'+
+          '<div class="admin-card-ticket">'+p.ticket+' · '+p.fecha+'</div>'+
+          '<div class="admin-card-desc">'+esc(p.desc)+'</div>'+
+        '</div>'+
+        '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
+      '</div>'+
+      '<div class="admin-card-meta">'+
+        '<span class="detail-pill '+pClass+'">'+p.prio+'</span>'+
+        '<span class="detail-pill">'+p.area+'</span>'+
+        '<span class="detail-pill">'+p.tipo+'</span>'+
+        (p.deadline?'<span class="detail-pill" style="color:var(--naranja);">⏰ '+p.deadline+'</span>':'')+
+      '</div>'+
+      '<div class="admin-card-divider"></div>'+
+      '<div class="assign-section">'+
+        '<div class="assign-label">Asignar editor</div>'+
+        edSelect+
+        '<div class="assign-actions">'+
+          '<button class="btn-admin asignar" onclick="asignarEditor(\''+p.ticket+'\')">✓ Asignar</button>'+
+          '<button class="btn-admin marcar-curso" onclick="adminCambiarEstado(\''+p.ticket+'\',\'EN CURSO\')">▶ En curso</button>'+
+          '<button class="btn-admin marcar-completado" onclick="adminCambiarEstado(\''+p.ticket+'\',\'REALIZADO\')">✅ Realizado</button>'+
+        '</div>'+
+      '</div>'+
+      '<script>'+selScript+'<\/script>'+
+    '</div>';
+  }).join('');
+}
+
+async function asignarEditor(ticket){
+  var sel = document.getElementById('ed-sel-'+ticket);
+  if(!sel) return;
+  var editorNombre = sel.value;
+  bar(true);
+  try{
+    var r = await post({
+      accion:  'asignar_editor',
+      email:   usuario.email,
+      ticket:  ticket,
+      editor:  editorNombre
+    });
+    bar(false);
+    if(r.ok){
+      toast('Editor asignado correctamente', 'success');
+      silentRefresh();
+      renderAdminGrid();
+    } else {
+      toast('Error: '+(r.error||'No se pudo asignar'), 'error');
+    }
+  }catch(e){ bar(false); toast('Error de conexión','error'); }
+}
+
+async function adminCambiarEstado(ticket, nuevoEstado){
+  bar(true);
+  try{
+    var r = await post({
+      accion:  'cambiar_estado',
+      email:   usuario.email,
+      ticket:  ticket,
+      estado:  nuevoEstado
+    });
+    bar(false);
+    if(r.ok){
+      toast('Estado cambiado a: '+nuevoEstado, 'success');
+      silentRefresh();
+    } else {
+      toast('Error: '+(r.error||''), 'error');
+    }
+  }catch(e){ bar(false); toast('Error de conexión','error'); }
+}
+
+function renderEditoresTable(){
+  var body = document.getElementById('editors-body');
+  if(!editores.length){
+    body.innerHTML='<div class="empty-state" style="padding:2rem;"><div class="empty-ico">👥</div><div class="empty-txt">No hay editores registrados todavía</div></div>';
+    return;
+  }
+  body.innerHTML = editores.map(function(e){
+    var tareas = pedidos.filter(function(p){ return p.editor===e.nombre; }).length;
+    var activas= pedidos.filter(function(p){ return p.editor===e.nombre && p.estado==='EN CURSO'; }).length;
+    return '<div class="editor-row">'+
+      '<div class="editor-row-name">'+
+        '<div class="editor-ava" style="width:28px;height:28px;font-size:11px;">'+e.nombre.charAt(0).toUpperCase()+'</div>'+
+        '<div>'+
+          '<div>'+esc(e.nombre)+'</div>'+
+          '<div class="editor-row-email">'+esc(e.email)+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="font-size:12px;color:var(--txt2);">'+esc(e.area||'—')+'</div>'+
+      '<div class="editor-row-tasks">'+tareas+' <span style="font-size:10px;color:var(--txt3);">('+activas+' activas)</span></div>'+
+      '<div class="editor-row-status"><span class="online-dot"></span></div>'+
+      '<div>'+
+        '<button class="btn-admin eliminar" onclick="cambiarRolEditor(\''+esc(e.email)+'\',\'solicitante\')" style="font-size:10px;padding:5px 10px;">Remover rol</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function cambiarRolEditor(email, nuevoRol){
+  if(!confirm('¿Seguro que querés cambiar el rol de '+email+'?')) return;
+  bar(true);
+  try{
+    var r = await post({ accion:'cambiar_rol', email:usuario.email, target_email:email, rol:nuevoRol });
+    bar(false);
+    if(r.ok){ toast('Rol actualizado','success'); loadAdminPanel(); }
+    else{ toast('Error: '+(r.error||''),'error'); }
+  }catch(e){ bar(false); toast('Error de conexión','error'); }
+}
+
+// ═══════════════════════════════════════════════════════
 //  MODAL NUEVO PEDIDO
-// ═════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 function openModal(){
   resetModal();
   document.getElementById('modal-overlay').classList.add('open');
@@ -1333,6 +1472,7 @@ function resetModal(){
   document.getElementById('m-desc').value='';
   document.getElementById('m-ubic').value='';
   document.getElementById('files-list').innerHTML='';
+  document.getElementById('upload-progress').style.display='none';
   document.getElementById('btn-m-next').textContent='Continuar →';
   document.getElementById('btn-m-next').disabled=false;
   document.getElementById('btn-m-back').style.display='none';
@@ -1343,13 +1483,13 @@ function resetModal(){
 function updateStepDots(){
   var dots='';
   for(var i=0;i<TOTAL_STEPS;i++){
-    var cls = i<mStep?'done':i===mStep?'active':'';
+    var cls=i<mStep?'done':i===mStep?'active':'';
     dots+='<div class="step-dot '+cls+'"></div>';
   }
   document.getElementById('step-dots').innerHTML=dots;
 }
 
-function mSel(field, el){
+function mSel(field,el){
   var parent=el.parentElement;
   parent.querySelectorAll('[data-val]').forEach(function(b){b.classList.remove('sel');});
   el.classList.add('sel');
@@ -1359,12 +1499,8 @@ function mSel(field, el){
 function showMErr(id,show){ document.getElementById(id).style.display=show?'block':'none'; }
 
 async function mNext(){
-  if(mStep===0){
-    if(!mState.area){showMErr('me-area',true);return;} showMErr('me-area',false);
-  }
-  if(mStep===1){
-    if(!mState.tipo){showMErr('me-tipo',true);return;} showMErr('me-tipo',false);
-  }
+  if(mStep===0){ if(!mState.area){showMErr('me-area',true);return;} showMErr('me-area',false); }
+  if(mStep===1){ if(!mState.tipo){showMErr('me-tipo',true);return;} showMErr('me-tipo',false); }
   if(mStep===2){
     if(!mState.prio){showMErr('me-prio',true);return;} showMErr('me-prio',false);
     mState.dur=mState.dur||'No especificada';
@@ -1376,16 +1512,13 @@ async function mNext(){
     if(!mState.desc){showMErr('me-desc',true);return;} showMErr('me-desc',false);
     buildResumen();
   }
-  if(mStep===4){
-    await enviarPedido(); return;
-  }
-
+  if(mStep===4){ await enviarPedido(); return; }
   mStep++;
   setMStep(mStep);
 }
-function mBack(){
-  if(mStep>0){ mStep--; setMStep(mStep); }
-}
+
+function mBack(){ if(mStep>0){ mStep--; setMStep(mStep); } }
+
 function setMStep(n){
   document.querySelectorAll('.m-step').forEach(function(s,i){s.classList.toggle('active',i===n);});
   document.getElementById('btn-m-back').style.display=n>0&&n<5?'':'none';
@@ -1396,11 +1529,7 @@ function setMStep(n){
   document.getElementById('modal-title').textContent=titles[n]||'Nuevo pedido';
 }
 
-function fmtDt(v){
-  if(!v)return '';
-  var d=new Date(v);
-  return d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-}
+function fmtDt(v){ if(!v)return ''; var d=new Date(v); return d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
 
 function buildResumen(){
   document.getElementById('m-resumen').innerHTML=
@@ -1410,8 +1539,8 @@ function buildResumen(){
     mRow('Solicitante',usuario?usuario.nombre:'—');
   var archHtml='';
   if(mState.files.length){
-    archHtml='<div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.5px;margin-top:10px;margin-bottom:5px;">Archivos ('+mState.files.length+')</div>'+
-      mState.files.map(function(f){return '<div class="file-item"><div class="file-item-ico">'+fileIco(f.name)+'</div><div class="file-item-name">'+esc(f.name)+'</div><div class="file-item-size">'+fmtSize(f.size)+'</div></div>';}).join('');
+    archHtml='<div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.5px;margin-top:10px;margin-bottom:5px;">Archivos ('+mState.files.length+') — se subirán a Drive</div>'+
+      mState.files.map(function(f){ return '<div class="file-item"><div class="file-item-ico">'+fileIco(f.name)+'</div><div class="file-item-name">'+esc(f.name)+'</div><div class="file-item-size">'+fmtSize(f.size)+'</div></div>'; }).join('');
   }
   document.getElementById('m-arch-resumen').innerHTML=archHtml;
 }
@@ -1424,6 +1553,7 @@ async function enviarPedido(){
   btn.innerHTML='<span class="spinner"></span> Guardando...';
   bar(true);
   try{
+    // 1. Crear el pedido primero para obtener el ticket
     var r=await post({
       accion:'nuevo_pedido',
       email:usuario.email,
@@ -1432,42 +1562,62 @@ async function enviarPedido(){
       desc:mState.desc,nombre:usuario.nombre
     });
     bar(false);
-    if(!r.ok) throw new Error(r.error||'Error');
+    if(!r.ok) throw new Error(r.error||'Error al crear pedido');
     var ticket=r.ticket||'—';
 
-    // Nota sobre archivos: en una implementación completa se subirían a Drive
-    // aquí guardamos los nombres como metadata
+    // 2. Subir archivos a Drive
     if(mState.files.length){
+      var progress = document.getElementById('upload-progress');
+      progress.style.display='block';
+      var archivosData=[];
       for(var i=0;i<mState.files.length;i++){
         var f=mState.files[i];
-        await post({ accion:'adjuntar_archivo', email:usuario.email, ticket:ticket, nombre:f.name, tipo:getExt(f.name), url:'(adjunto local)' });
+        progress.textContent='⬆ Subiendo '+f.name+' ('+( i+1)+'/'+mState.files.length+')...';
+        try{
+          var up = await uploadFileToDrive(f, ticket);
+          if(up.ok){
+            archivosData.push({ nombre:f.name, url:up.url||'', fileId:up.fileId||'' });
+          } else {
+            // Si falla la subida a Drive, guardar solo el nombre
+            archivosData.push({ nombre:f.name, url:'', fileId:'' });
+          }
+        }catch(uploadErr){
+          archivosData.push({ nombre:f.name, url:'', fileId:'' });
+        }
       }
+      progress.style.display='none';
+
+      // 3. Guardar metadata de archivos en el sheet
+      await post({
+        accion:'guardar_archivos',
+        ticket:ticket,
+        archivos:JSON.stringify(archivosData)
+      });
     }
 
     document.getElementById('ms-ticket-box').innerHTML=
       '<div class="ms-ticket-id">'+ticket+'</div>'+
       '<div class="ms-ticket-info">'+mState.area+' → '+mState.tipo+'</div>'+
       (mState.prio?'<div style="font-size:11px;color:var(--txt3);margin-top:3px;">'+mState.prio+'</div>':'')+
-      '<div style="font-size:11px;color:var(--txt3);margin-top:3px;">Solicitante: '+usuario.nombre+'</div>';
+      '<div style="font-size:11px;color:var(--txt3);margin-top:3px;">Solicitante: '+usuario.nombre+'</div>'+
+      (mState.files.length?'<div style="font-size:11px;color:var(--verde-t);margin-top:3px;">📎 '+mState.files.length+' archivo(s) subidos a Drive</div>':'');
 
     mStep=5; setMStep(5);
-    // Guardar ticket en local
     try{
       var lista=JSON.parse(localStorage.getItem('c10_tickets')||'[]');
       lista.unshift({ticket,area:mState.area,tipo:mState.tipo,nombre:usuario.nombre,ts:Date.now()});
       localStorage.setItem('c10_tickets',JSON.stringify(lista.slice(0,10)));
     }catch(e){}
-
-    // Refrescar dashboard
     silentRefresh();
+    toast('Pedido '+ticket+' creado correctamente','success');
   }catch(e){
     bar(false);
     btn.disabled=false; btn.textContent='Reintentar';
-    alert('❌ No se pudo guardar el pedido.\nVerificá la conexión e intentá de nuevo.');
+    toast('No se pudo guardar el pedido. Verificá la conexión.','error');
   }
 }
 
-// ─── File handling ────────────────────────────
+// ─── File handling ─────────────────────────────────
 function handleFiles(fileList){
   var arr=Array.from(fileList);
   arr.forEach(function(f){ if(mState.files.length<10) mState.files.push(f); });
@@ -1478,10 +1628,7 @@ function handleDrop(e){
   document.getElementById('file-zone').classList.remove('drag');
   handleFiles(e.dataTransfer.files);
 }
-function removeFile(i){
-  mState.files.splice(i,1);
-  renderFileList();
-}
+function removeFile(i){ mState.files.splice(i,1); renderFileList(); }
 function renderFileList(){
   document.getElementById('files-list').innerHTML=
     mState.files.map(function(f,i){
@@ -1494,6 +1641,36 @@ function renderFileList(){
     }).join('');
 }
 </script>
+
+<!-- ════════════════════════════════════════════════
+     NOTA PARA EL DESARROLLADOR
+     
+     Para que los archivos se suban realmente a Drive,
+     tu Google Apps Script necesita estas nuevas acciones:
+
+     1. "upload_file" — Recibe base64 + nombre + tipo + folderId
+        y lo sube a Drive, devolviendo { ok, url, fileId }
+     
+     2. "guardar_archivos" — Guarda el JSON con urls de Drive
+        en la columna archivos_data del sheet
+     
+     3. "editor_tasks" — Devuelve pedidos donde editor == email
+        del editor que consulta: { ok, tareas: [...] }
+     
+     4. "asignar_editor" — Permite al superadmin asignar editor
+        a un pedido: { ok }
+     
+     5. "get_editores" — Devuelve lista de usuarios con rol editor
+        { ok, editores: [{nombre, email, area}] }
+     
+     6. "cambiar_rol" — Cambia rol de un usuario (solo superadmin)
+     
+     7. "cambiar_estado" — Ya debe existir; acepta llamadas de
+        editores también (validar que el editor sea el asignado)
+     
+     El campo "archivos_data" en el sheet guarda JSON con:
+     [{ nombre: "file.mp4", url: "https://drive.google.com/...", fileId: "..." }]
+════════════════════════════════════════════════ -->
 
 </body>
 </html>
