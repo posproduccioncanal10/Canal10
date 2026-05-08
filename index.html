@@ -671,6 +671,13 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
           <option>Operaciones</option><option>Edición</option><option>Posproducción</option><option>Técnica</option>
         </select>
       </div>
+      <div class="field" id="reg-rol-field" style="display:none;">
+        <label>¿Sos editor/a de posproducción?</label>
+        <select id="auth-rol">
+          <option value="solicitante">No, soy de otra área</option>
+          <option value="editor">Sí, soy editor/a</option>
+        </select>
+      </div>
       <button class="btn-auth" id="btn-auth" onclick="doAuth()">Continuar →</button>
       <div class="auth-msg" id="auth-msg" style="display:none;"></div>
     </div>
@@ -694,6 +701,12 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
       </button>
       <button class="topbar-tab" onclick="showPanel('mis-pedidos')">
         <span class="tab-dot" style="background:var(--azul-t)"></span>Mis pedidos
+      </button>
+      <button class="topbar-tab" id="tab-mis-tareas" style="display:none;" onclick="showPanel('mis-tareas')">
+        <span class="tab-dot" style="background:var(--verde-t)"></span>Mis tareas
+      </button>
+      <button class="topbar-tab" id="tab-admin" style="display:none;" onclick="showPanel('admin')">
+        <span class="tab-dot" style="background:#9B59B6)"></span>⚡ Admin
       </button>
     </div>
     <div class="topbar-right">
@@ -793,6 +806,65 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
       <div class="dashboard-title" style="margin-bottom:4px;">Mis pedidos</div>
       <div class="dashboard-meta">Solo tus pedidos registrados</div>
       <div id="mis-pedidos-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
+    </div>
+
+    <!-- ── MIS TAREAS (EDITOR) PANEL ── -->
+    <div id="panel-mis-tareas" style="display:none;flex:1;overflow-y:auto;padding:1.25rem;flex-direction:column;gap:1rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div class="dashboard-title">Mis tareas asignadas</div>
+          <div class="dashboard-meta" id="tareas-meta">Tus pedidos activos como editor</div>
+        </div>
+        <button class="btn-nuevo-pedido" style="background:var(--verde-t);" onclick="loadMisTareas()">↻ Actualizar</button>
+      </div>
+      <div class="stats-row" id="tareas-stats"></div>
+      <div id="mis-tareas-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
+    <!-- ── ADMIN PANEL ── -->
+    <div id="panel-admin" style="display:none;flex:1;overflow-y:auto;padding:1.25rem;flex-direction:column;gap:1rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div class="dashboard-title" style="color:#A78BFA;">⚡ Panel Superadmin</div>
+          <div class="dashboard-meta" id="admin-meta">Control total del sistema</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-nuevo-pedido" style="background:#7C3AED;" onclick="showAdminTab('pedidos')">📋 Pedidos</button>
+          <button class="btn-nuevo-pedido" style="background:#0F766E;" onclick="showAdminTab('usuarios')">👥 Usuarios</button>
+          <button class="btn-nuevo-pedido" onclick="loadAdmin()">↻ Actualizar</button>
+        </div>
+      </div>
+
+      <!-- Stats admin -->
+      <div class="stats-row" id="admin-stats"></div>
+
+      <!-- Tab Pedidos Admin -->
+      <div id="admin-tab-pedidos">
+        <!-- Filtro asignación -->
+        <div class="filter-bar" style="margin-bottom:8px;">
+          <button class="filter-chip active" onclick="setAdminFilter('todos',this)">Todos</button>
+          <button class="filter-chip" onclick="setAdminFilter('sin-asignar',this)">⚠️ Sin asignar</button>
+          <button class="filter-chip" onclick="setAdminFilter('PENDIENTE',this)">🟡 Pendiente</button>
+          <button class="filter-chip" onclick="setAdminFilter('EN CURSO',this)">🔵 En curso</button>
+          <button class="filter-chip" onclick="setAdminFilter('REALIZADO',this)">🟢 Realizado</button>
+          <input class="filter-search" type="text" placeholder="Buscar..." id="admin-search" oninput="renderAdminPedidos()"/>
+        </div>
+        <div id="admin-pedidos-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+
+      <!-- Tab Usuarios Admin -->
+      <div id="admin-tab-usuarios" style="display:none;">
+        <div style="background:var(--bg2);border:1px solid var(--borde);border-radius:12px;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:1fr 120px 120px 120px 120px;gap:0;padding:0 12px;background:var(--bg3);border-bottom:1px solid var(--borde);">
+            <div class="rh-cell">Nombre / Email</div>
+            <div class="rh-cell">Área</div>
+            <div class="rh-cell">Rol</div>
+            <div class="rh-cell">Estado</div>
+            <div class="rh-cell">Acciones</div>
+          </div>
+          <div id="admin-usuarios-list"></div>
+        </div>
+      </div>
     </div>
 
   </div><!-- /main -->
@@ -898,16 +970,16 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
           <input type="text" class="m-input" id="m-ubic" placeholder="Servidor A / carpeta EntreNos / link de descarga..."/>
         </div>
         <div class="m-field">
-          <label class="m-label">Archivos adjuntos (scripts, guiones, PPT, Word, audio...)</label>
+          <label class="m-label">Archivos adjuntos — se suben a Google Drive 📁</label>
           <div class="file-zone" id="file-zone" onclick="document.getElementById('file-input').click()"
                ondragover="event.preventDefault();this.classList.add('drag')"
                ondragleave="this.classList.remove('drag')"
                ondrop="handleDrop(event)">
             <div class="file-zone-ico">📎</div>
             <div class="file-zone-txt">Hacé clic o arrastrá archivos acá</div>
-            <div class="file-zone-sub">Word, Excel, PPT, PDF, MP3, MP4, imágenes · Máx. 10 archivos</div>
+            <div class="file-zone-sub">Word, Excel, PPT, PDF, MP3, MP4, imágenes · Máx. 10 archivos · Se suben automáticamente a Drive</div>
           </div>
-          <input type="file" id="file-input" multiple accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,.pdf,.mp3,.mp4,.wav,.jpg,.jpeg,.png,.txt" onchange="handleFiles(this.files)"/>
+          <input type="file" id="file-input" multiple accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,.pdf,.mp3,.mp4,.wav,.jpg,.jpeg,.png,.txt,.zip" onchange="handleFiles(this.files)"/>
           <div class="files-list" id="files-list"></div>
         </div>
       </div>
@@ -942,127 +1014,118 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
 
 <script>
 // ════════════════════════════════════════════════
-//  ⚙️ CONFIGURACIÓN — pegá la URL de tu Web App
+//  ⚙️ CONFIGURACIÓN
 // ════════════════════════════════════════════════
 var API = "https://script.google.com/macros/s/AKfycbzYXB-FK9WeiYQj2jPnHsXElJvmYQoEvdgctvsqaK3cyg_mSOQvAf1vY9u_3cgUCVOG_A/exec";
-// ════════════════════════════════════════════════
+var DRIVE_FOLDER_ID = "1JslwxmipJQ9t88PZeIkozaoXit6wVp3p";
 
 // ─── Estado global ────────────────────────────
-var usuario = null;      // { email, nombre, area, rol }
+var usuario = null;
 var pedidos  = [];
+var editores = [];
 var filtro   = "todos";
+var adminFiltro = "todos";
+var adminPedidos = [];
 var selectedTicket = null;
 var refreshInterval = null;
-var mState   = { area:'', tipo:'', prio:'', dur:'', deadline:'', desc:'', ubic:'', files:[] };
+var mState = { area:'', tipo:'', prio:'', dur:'', deadline:'', desc:'', ubic:'', files:[], uploadedFiles:[] };
 var mStep    = 0;
 var TOTAL_STEPS = 5;
 
 // ─── Utils ────────────────────────────────────
 function bar(on){ var b=document.getElementById('loading-bar'); b.className='loading-bar'+(on?' loading':' done'); if(!on)setTimeout(function(){b.className='loading-bar';b.style.width='0';},400); }
-
-function getExt(name){ return (name.split('.').pop()||'').toLowerCase(); }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function getExt(name){ return ((typeof name==='string'?name:(name&&name.name)||'').split('.').pop()||'').toLowerCase(); }
 function fileIco(name){
   var e=getExt(name);
-  if(['doc','docx'].includes(e))  return '📝';
-  if(['xls','xlsx'].includes(e))  return '📊';
-  if(['ppt','pptx'].includes(e))  return '📑';
-  if(['pdf'].includes(e))          return '📄';
+  if(['doc','docx'].includes(e)) return '📝';
+  if(['xls','xlsx'].includes(e)) return '📊';
+  if(['ppt','pptx'].includes(e)) return '📑';
+  if(['pdf'].includes(e)) return '📄';
   if(['mp3','wav','aac'].includes(e)) return '🎵';
   if(['mp4','mov','avi'].includes(e)) return '🎬';
   if(['jpg','jpeg','png','gif'].includes(e)) return '🖼️';
+  if(['zip','rar'].includes(e)) return '🗜️';
   return '📎';
 }
 function fmtSize(b){ if(b<1024)return b+'B'; if(b<1048576)return (b/1024).toFixed(0)+'KB'; return (b/1048576).toFixed(1)+'MB'; }
-function prioClass(p){
-  if(!p) return '-';
-  if(p.includes('P1')) return 'p1';
-  if(p.includes('P2')) return 'p2';
-  if(p.includes('P3')) return 'p3';
-  return 'p4';
-}
+function prioClass(p){ if(!p)return 'p-'; if(p.includes('P1'))return 'p1'; if(p.includes('P2'))return 'p2'; if(p.includes('P3'))return 'p3'; return 'p4'; }
 function estadoClass(e){ return e==='EN CURSO'?'en-curso':e==='REALIZADO'?'realizado':'pendiente'; }
-function fmtHora(f){ if(!f)return '—'; var parts=f.split(' '); return parts[1]||parts[0]; }
+function fmtHora(f){ if(!f)return '—'; var parts=(f+'').split(' '); return parts[1]||parts[0]; }
+function fmtDt(v){ if(!v)return ''; var d=new Date(v); return d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
 
-// ═════════════════════════════════════════════
+// ─── API ─────────────────────────────────────
+async function get(params){ var r=await fetch(API+'?action='+params); return r.json(); }
+async function post(data){ var r=await fetch(API,{method:'POST',body:JSON.stringify(data)}); return r.json(); }
+
+// ════════════════════════════════════════════
 //  AUTH
-// ═════════════════════════════════════════════
+// ════════════════════════════════════════════
 async function loginGoogle(){
-  // Abre Google OAuth popup — en producción usar Google Identity Services
-  // Aquí simulamos con flujo email para compatibilidad total sin OAuth app setup
-  var email = prompt("Ingresá tu email de Google (@gmail.com o @canal10.com.ar):");
-  if(!email || !email.includes('@')) return;
-  document.getElementById('auth-email').value = email;
+  var email=prompt("Ingresá tu email Google (@gmail.com o @canal10.com.ar):");
+  if(!email||!email.includes('@')) return;
+  document.getElementById('auth-email').value=email;
   doAuth();
 }
 
-var authMode = 'check'; // 'check' | 'register'
+var authMode='check';
 async function doAuth(){
-  var email  = document.getElementById('auth-email').value.trim().toLowerCase();
-  var btn    = document.getElementById('btn-auth');
-  var msg    = document.getElementById('auth-msg');
-
-  if(!email || !email.includes('@')){ showAuthMsg('Ingresá un email válido.','err'); return; }
+  var email=document.getElementById('auth-email').value.trim().toLowerCase();
+  var btn=document.getElementById('btn-auth');
+  if(!email||!email.includes('@')){ showAuthMsg('Ingresá un email válido.','err'); return; }
 
   if(authMode==='register'){
-    var nombre = document.getElementById('auth-nombre').value.trim();
-    var area   = document.getElementById('auth-area').value;
+    var nombre=document.getElementById('auth-nombre').value.trim();
+    var area=document.getElementById('auth-area').value;
+    var rrf=document.getElementById('auth-rol');
+    var rolSel=rrf?rrf.value:'solicitante';
     if(!nombre){ showAuthMsg('Ingresá tu nombre.','err'); return; }
-    if(!area)  { showAuthMsg('Elegí tu área.','err'); return; }
-
-    btn.disabled=true; btn.textContent='Registrando...';
-    bar(true);
+    if(!area){ showAuthMsg('Elegí tu área.','err'); return; }
+    btn.disabled=true; btn.textContent='Registrando...'; bar(true);
     try{
-      var r = await post({ accion:'registrar_usuario', email, nombre, area });
+      var r=await post({accion:'registrar_usuario',email:email,nombre:nombre,area:area,rol:rolSel});
       bar(false);
-      if(r.ok){ enterApp({ email, nombre:r.nombre||nombre, area:r.area||area, rol:r.rol||'solicitante' }); }
-      else { showAuthMsg(r.error||'Error al registrar.','err'); btn.disabled=false; btn.textContent='Registrarme'; }
+      if(r.ok){ enterApp({email:email,nombre:r.nombre||nombre,area:r.area||area,rol:r.rol||'solicitante'}); }
+      else{ showAuthMsg(r.error||'Error.','err'); btn.disabled=false; btn.textContent='Registrarme'; }
     }catch(e){ bar(false); showAuthMsg('Error de conexión.','err'); btn.disabled=false; btn.textContent='Registrarme'; }
     return;
   }
 
-  // check
-  btn.disabled=true; btn.textContent='Verificando...';
-  bar(true);
+  btn.disabled=true; btn.textContent='Verificando...'; bar(true);
   try{
-    var res = await get('check_user&email='+encodeURIComponent(email));
+    var res=await get('check_user&email='+encodeURIComponent(email));
     bar(false);
-    if(res.ok){
-      enterApp({ email, nombre:res.nombre, area:res.area, rol:res.rol });
-    } else if(res.error==='not_registered'){
-      // Mostrar campos de registro
+    if(res.ok){ enterApp({email:email,nombre:res.nombre,area:res.area,rol:res.rol}); }
+    else if(res.error==='not_registered'){
       authMode='register';
       document.getElementById('reg-fields').style.display='';
       document.getElementById('reg-area-field').style.display='';
-      btn.textContent='Registrarme';
-      btn.disabled=false;
+      var rf=document.getElementById('reg-rol-field'); if(rf) rf.style.display='';
+      btn.textContent='Registrarme'; btn.disabled=false;
       showAuthMsg('Tu email no está registrado. Completá los datos para crear tu cuenta.','ok');
-    } else {
-      showAuthMsg(res.error||'Error de verificación.','err');
-      btn.disabled=false; btn.textContent='Continuar →';
-    }
-  }catch(e){ bar(false); showAuthMsg('Error de conexión. Verificá la URL del script.','err'); btn.disabled=false; btn.textContent='Continuar →'; }
+    } else { showAuthMsg(res.error||'Error.','err'); btn.disabled=false; btn.textContent='Continuar →'; }
+  }catch(e){ bar(false); showAuthMsg('Error de conexión.','err'); btn.disabled=false; btn.textContent='Continuar →'; }
 }
 
-function showAuthMsg(txt, cls){
-  var m=document.getElementById('auth-msg');
-  m.textContent=txt; m.className='auth-msg '+cls; m.style.display='block';
-}
+function showAuthMsg(txt,cls){ var m=document.getElementById('auth-msg'); m.textContent=txt; m.className='auth-msg '+cls; m.style.display='block'; }
 
 function enterApp(u){
-  usuario = u;
-  // Guardar sesión
-  try{ localStorage.setItem('c10_user', JSON.stringify(u)); }catch(e){}
-
-  // UI
+  usuario=u;
+  try{ localStorage.setItem('c10_user',JSON.stringify(u)); }catch(e){}
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
-  document.getElementById('topbar-uname').textContent = u.nombre.split(' ')[0];
-  document.getElementById('topbar-avatar').textContent = u.nombre.charAt(0).toUpperCase();
+  document.getElementById('topbar-uname').textContent=u.nombre.split(' ')[0];
+  document.getElementById('topbar-avatar').textContent=u.nombre.charAt(0).toUpperCase();
+
+  // Mostrar tabs según rol
+  var tabMisTareas=document.getElementById('tab-mis-tareas');
+  var tabAdmin=document.getElementById('tab-admin');
+  if((u.rol==='editor'||u.rol==='admin')&&tabMisTareas) tabMisTareas.style.display='';
+  if(u.rol==='admin'&&tabAdmin) tabAdmin.style.display='';
 
   showPanel('dashboard');
   loadDashboard();
-  // Auto-refresh cada 30 segundos
-  refreshInterval = setInterval(function(){ silentRefresh(); }, 30000);
+  refreshInterval=setInterval(function(){ silentRefresh(); },30000);
 }
 
 function logout(){
@@ -1074,55 +1137,42 @@ function logout(){
   authMode='check';
   document.getElementById('reg-fields').style.display='none';
   document.getElementById('reg-area-field').style.display='none';
+  var rf=document.getElementById('reg-rol-field'); if(rf) rf.style.display='none';
   document.getElementById('auth-email').value='';
   document.getElementById('btn-auth').disabled=false;
   document.getElementById('btn-auth').textContent='Continuar →';
   document.getElementById('auth-msg').style.display='none';
 }
 
-// Restaurar sesión
-window.addEventListener('load', function(){
-  try{
-    var saved = JSON.parse(localStorage.getItem('c10_user'));
-    if(saved && saved.email) enterApp(saved);
-  }catch(e){}
+window.addEventListener('load',function(){
+  try{ var saved=JSON.parse(localStorage.getItem('c10_user')); if(saved&&saved.email) enterApp(saved); }catch(e){}
 });
 
-// ═════════════════════════════════════════════
-//  API CALLS
-// ═════════════════════════════════════════════
-async function get(params){
-  var r = await fetch(API+'?action='+params);
-  return r.json();
-}
-async function post(data){
-  var r = await fetch(API, { method:'POST', body:JSON.stringify(data) });
-  return r.json();
-}
-
-// ═════════════════════════════════════════════
+// ════════════════════════════════════════════
 //  PANELS
-// ═════════════════════════════════════════════
+// ════════════════════════════════════════════
 function showPanel(name){
-  var panels = ['dashboard','mis-pedidos'];
-  panels.forEach(function(p){
-    var el = document.getElementById('panel-'+p);
-    if(el) el.style.display = (p===name)?'flex':'none';
+  ['dashboard','mis-pedidos','mis-tareas','admin'].forEach(function(p){
+    var el=document.getElementById('panel-'+p);
+    if(el) el.style.display=(p===name)?'flex':'none';
   });
-  document.querySelectorAll('.topbar-tab').forEach(function(t,i){
-    t.classList.toggle('active', ['dashboard','mis-pedidos'][i]===name);
-  });
+  document.querySelectorAll('.topbar-tab').forEach(function(t){ t.classList.remove('active'); });
+  var map={'dashboard':0,'mis-pedidos':1,'mis-tareas':2,'admin':3};
+  var tabs=document.querySelectorAll('.topbar-tab');
+  if(map[name]!==undefined&&tabs[map[name]]) tabs[map[name]].classList.add('active');
   if(name==='mis-pedidos') renderMisPedidos();
+  if(name==='mis-tareas')  loadMisTareas();
+  if(name==='admin')       loadAdmin();
 }
 
-// ═════════════════════════════════════════════
+// ════════════════════════════════════════════
 //  DASHBOARD
-// ═════════════════════════════════════════════
+// ════════════════════════════════════════════
 async function loadDashboard(){
   if(!usuario) return;
   bar(true);
   try{
-    var r = await get('dashboard&email='+encodeURIComponent(usuario.email));
+    var r=await get('dashboard&email='+encodeURIComponent(usuario.email));
     bar(false);
     if(r.ok){ pedidos=r.pedidos||[]; renderAll(); }
   }catch(e){ bar(false); }
@@ -1130,34 +1180,29 @@ async function loadDashboard(){
 
 async function silentRefresh(){
   if(!usuario) return;
-  var rdot = document.getElementById('rdot');
-  rdot.className='refresh-dot loading';
+  var rdot=document.getElementById('rdot');
+  if(rdot) rdot.className='refresh-dot loading';
   try{
-    var r = await get('dashboard&email='+encodeURIComponent(usuario.email));
+    var r=await get('dashboard&email='+encodeURIComponent(usuario.email));
     if(r.ok){ pedidos=r.pedidos||[]; renderAll(); if(selectedTicket) refreshDetail(selectedTicket); }
   }catch(e){}
-  rdot.className='refresh-dot';
+  if(rdot) rdot.className='refresh-dot';
 }
 
 function renderAll(){
-  updateStats();
-  renderRundown();
-  var now = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
-  document.getElementById('dash-meta').textContent = pedidos.length+' pedidos · Actualizado '+now;
+  updateStats(); renderRundown();
+  var now=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('dash-meta').textContent=pedidos.length+' pedidos · Actualizado '+now;
 }
 
 function updateStats(){
-  var total=pedidos.length;
-  var pend=pedidos.filter(function(p){return p.estado==='PENDIENTE';}).length;
-  var enc =pedidos.filter(function(p){return p.estado==='EN CURSO';}).length;
-  var real=pedidos.filter(function(p){return p.estado==='REALIZADO';}).length;
-  document.getElementById('stat-total').textContent=total;
-  document.getElementById('stat-pendiente').textContent=pend;
-  document.getElementById('stat-encurso').textContent=enc;
-  document.getElementById('stat-realizado').textContent=real;
+  document.getElementById('stat-total').textContent=pedidos.length;
+  document.getElementById('stat-pendiente').textContent=pedidos.filter(function(p){return p.estado==='PENDIENTE';}).length;
+  document.getElementById('stat-encurso').textContent=pedidos.filter(function(p){return p.estado==='EN CURSO';}).length;
+  document.getElementById('stat-realizado').textContent=pedidos.filter(function(p){return p.estado==='REALIZADO';}).length;
 }
 
-function setFilter(f, el){
+function setFilter(f,el){
   filtro=f;
   document.querySelectorAll('.filter-chip').forEach(function(c){c.classList.remove('active');});
   if(el) el.classList.add('active');
@@ -1165,139 +1210,178 @@ function setFilter(f, el){
 }
 
 function renderRundown(){
-  var q = (document.getElementById('search-input').value||'').toLowerCase();
-  var lista = pedidos.filter(function(p){
-    if(filtro!=='todos' && filtro!=='P1' && filtro!=='P2' && filtro!=='P3' && filtro!=='P4'){
+  var q=(document.getElementById('search-input').value||'').toLowerCase();
+  var lista=pedidos.filter(function(p){
+    if(filtro!=='todos'&&filtro!=='P1'&&filtro!=='P2'&&filtro!=='P3'&&filtro!=='P4'){
       if(p.estado!==filtro) return false;
     }
-    if(filtro==='P1'||filtro==='P2'||filtro==='P3'||filtro==='P4'){
-      if(!p.prio.includes(filtro)) return false;
-    }
-    if(q){
-      var hay = (p.ticket+p.area+p.tipo+p.desc+p.nombre+p.email).toLowerCase().includes(q);
-      if(!hay) return false;
-    }
+    if(['P1','P2','P3','P4'].includes(filtro)){ if(!p.prio.includes(filtro)) return false; }
+    if(q&&!(p.ticket+p.area+p.tipo+p.desc+p.nombre+p.email).toLowerCase().includes(q)) return false;
     return true;
   });
 
-  var body = document.getElementById('rundown-body');
+  var body=document.getElementById('rundown-body');
   if(!lista.length){
     body.innerHTML='<div class="empty-state"><div class="empty-ico">📋</div><div class="empty-txt">No hay pedidos con esos filtros</div></div>';
     return;
   }
 
-  body.innerHTML = lista.map(function(p){
-    var pClass  = prioClass(p.prio);
-    var eClass  = estadoClass(p.estado);
-    var sel     = p.ticket===selectedTicket?' selected':'';
-    var dim     = p.estado==='REALIZADO'?' estado-realizado':'';
-    var pNum    = pClass==='p1'?'1':pClass==='p2'?'2':pClass==='p3'?'3':pClass==='p4'?'4':'·';
-    var archIco = p.archivos ? '📎' : '';
-    return '<div class="story-row'+sel+dim+'" onclick="selectStory(\''+p.ticket+'\')">' +
-      '<div class="s-prio"><div class="prio-badge '+pClass+'">'+pNum+'</div></div>' +
-      '<div class="s-ticket">'+p.ticket+'</div>' +
-      '<div class="s-estado"><span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span></div>' +
-      '<div class="s-area">'+p.area+'</div>' +
-      '<div class="s-tipo">'+p.tipo+'</div>' +
-      '<div class="s-desc">'+(archIco?'<span style="margin-right:4px;">'+archIco+'</span>':'')+esc(p.desc)+'</div>' +
-      '<div class="s-sol">'+esc(p.nombre)+'</div>' +
-      '<div class="s-time">'+fmtHora(p.fecha)+'</div>' +
+  body.innerHTML=lista.map(function(p){
+    var pClass=prioClass(p.prio); var eClass=estadoClass(p.estado);
+    var sel=p.ticket===selectedTicket?' selected':'';
+    var dim=p.estado==='REALIZADO'?' estado-realizado':'';
+    var pNum={p1:'1',p2:'2',p3:'3',p4:'4','p-':'·'}[pClass]||'·';
+    var archIco=p.archivos?'📎':'';
+    var editorBadge=p.editor?'<span style="font-size:9px;color:#52BE80;margin-left:4px;">▶'+esc(p.editor.split('@')[0])+'</span>':'';
+    return '<div class="story-row'+sel+dim+'" onclick="selectStory(\''+p.ticket+'\')">'+
+      '<div class="s-prio"><div class="prio-badge '+pClass+'">'+pNum+'</div></div>'+
+      '<div class="s-ticket">'+p.ticket+editorBadge+'</div>'+
+      '<div class="s-estado"><span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span></div>'+
+      '<div class="s-area">'+esc(p.area)+'</div>'+
+      '<div class="s-tipo">'+esc(p.tipo)+'</div>'+
+      '<div class="s-desc">'+(archIco?'<span style="margin-right:4px;">'+archIco+'</span>':'')+esc(p.desc)+'</div>'+
+      '<div class="s-sol">'+esc(p.nombre)+'</div>'+
+      '<div class="s-time">'+fmtHora(p.fecha)+'</div>'+
     '</div>';
   }).join('');
 }
 
-function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
 // ─── Detail panel ────────────────────────────
 function selectStory(ticket){
-  selectedTicket=ticket;
-  renderRundown(); // re-render para marcar selected
-  var p = pedidos.find(function(x){return x.ticket===ticket;});
+  selectedTicket=ticket; renderRundown();
+  var p=pedidos.find(function(x){return x.ticket===ticket;});
   if(p) showDetail(p);
   document.getElementById('detail-panel').classList.remove('hidden');
 }
-
 function closeDetail(){
   selectedTicket=null;
   document.getElementById('detail-panel').classList.add('hidden');
   renderRundown();
 }
 
-function showDetail(p){
-  var pClass = prioClass(p.prio);
-  var eClass = estadoClass(p.estado);
-  var archivos = p.archivos ? p.archivos.split(' | ') : [];
+async function showDetail(p){
+  var pClass=prioClass(p.prio); var eClass=estadoClass(p.estado);
+  document.getElementById('detail-inner').innerHTML=buildDetailHTML(p,pClass,eClass,'<div class="arch-empty">Cargando archivos...</div>');
+  try{
+    var r=await get('archivos&ticket='+encodeURIComponent(p.ticket));
+    var archHtml='';
+    if(r.ok&&r.archivos&&r.archivos.length){
+      archHtml=r.archivos.map(function(a){
+        return '<div class="arch-item">'+
+          '<div class="arch-ico">'+fileIco(a.nombre)+'</div>'+
+          '<div class="arch-name">'+esc(a.nombre)+'</div>'+
+          '<div class="arch-tipo">'+fmtSize(a.size||0)+'</div>'+
+          (a.url?'<a class="arch-link" href="'+a.url+'" target="_blank">Ver en Drive</a>':'')+
+          (a.dlUrl?'<a class="arch-link" href="'+a.dlUrl+'" target="_blank" style="margin-left:6px;">⬇ Descargar</a>':'')+
+        '</div>';
+      }).join('');
+    } else { archHtml='<div class="arch-empty">Sin archivos adjuntos</div>'; }
+    document.getElementById('detail-inner').innerHTML=buildDetailHTML(p,pClass,eClass,archHtml);
+  }catch(e){ /* mantener el html ya renderizado */ }
+}
 
-  var archHtml = archivos.length
-    ? archivos.map(function(a){
-        return '<div class="arch-item"><div class="arch-ico">'+fileIco(a)+'</div><div class="arch-name">'+esc(a)+'</div></div>';
-      }).join('')
-    : '<div class="arch-empty">Sin archivos adjuntos</div>';
+function buildDetailHTML(p,pClass,eClass,archHtml){
+  var esAdminUser=usuario&&usuario.rol==='admin';
+  var esEditorUser=usuario&&(usuario.rol==='editor'||usuario.rol==='admin');
 
-  document.getElementById('detail-inner').innerHTML =
-    '<div class="detail-ticket">'+
-      '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
-      '<span>'+p.ticket+'</span>'+
-    '</div>'+
-    '<div class="detail-title">'+esc(p.desc)+'</div>'+
-    '<div class="detail-pills">'+
-      '<span class="detail-pill '+pClass+'">'+p.prio+'</span>'+
-      '<span class="detail-pill">'+p.area+'</span>'+
-      '<span class="detail-pill">'+p.tipo+'</span>'+
-      (p.dur?'<span class="detail-pill">'+p.dur+'</span>':'')+
-    '</div>'+
+  var btnEstado='';
+  if(esAdminUser||esEditorUser){
+    btnEstado='<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">';
+    if(p.estado!=='EN CURSO')  btnEstado+='<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'EN CURSO\')" style="flex:1;background:rgba(174,214,241,0.15);border:1px solid var(--azul);color:var(--azul-t);border-radius:7px;padding:7px;font-size:11px;font-weight:600;cursor:pointer;min-width:80px;">▶ En curso</button>';
+    if(p.estado!=='REALIZADO') btnEstado+='<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'REALIZADO\')" style="flex:1;background:rgba(169,223,191,0.15);border:1px solid var(--verde);color:var(--verde-t);border-radius:7px;padding:7px;font-size:11px;font-weight:600;cursor:pointer;min-width:80px;">✓ Realizado</button>';
+    if(p.estado!=='PENDIENTE') btnEstado+='<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'PENDIENTE\')" style="flex:1;background:rgba(249,231,159,0.1);border:1px solid #7D6608;color:#7D6608;border-radius:7px;padding:7px;font-size:11px;font-weight:600;cursor:pointer;min-width:80px;">↩ Pendiente</button>';
+    btnEstado+='</div>';
+  }
 
+  var asignarHTML='';
+  if(esAdminUser&&editores.length){
+    asignarHTML='<div style="margin-top:12px;">'+
+      '<div style="font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Asignar editor</div>'+
+      '<div style="display:flex;gap:6px;">'+
+        '<select id="sel-ed-'+p.ticket+'" style="flex:1;background:var(--bg3);border:1px solid var(--borde2);border-radius:7px;padding:7px;font-size:12px;color:var(--txt);">'+
+          '<option value="">Elegí un editor...</option>'+
+          editores.map(function(ed){return '<option value="'+esc(ed.email)+'"'+(p.editor===ed.email?' selected':'')+'>'+esc(ed.nombre)+'</option>';}).join('')+
+        '</select>'+
+        '<button onclick="asignarEditorUI(\''+p.ticket+'\')" style="background:var(--rojo);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;">Asignar</button>'+
+      '</div>'+
+    '</div>';
+  }
+
+  return '<div class="detail-ticket">'+
+    '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
+    '<span>'+p.ticket+'</span>'+
+  '</div>'+
+  '<div class="detail-title">'+esc(p.desc)+'</div>'+
+  '<div class="detail-pills">'+
+    '<span class="detail-pill '+pClass+'">'+p.prio+'</span>'+
+    '<span class="detail-pill">'+esc(p.area)+'</span>'+
+    '<span class="detail-pill">'+esc(p.tipo)+'</span>'+
+    (p.dur?'<span class="detail-pill">'+esc(p.dur)+'</span>':'')+
+  '</div>'+
+  btnEstado+asignarHTML+
+  '<div class="detail-section">'+
+    '<div class="detail-section-label">Información</div>'+
+    mkRow('Solicitante',p.nombre)+mkRow('Email',p.email)+
+    mkRow('Deadline',p.deadline||'No especificado')+
+    (p.ubic?mkRow('Material en',p.ubic):'')+
+  '</div>'+
+  (p.editor?
     '<div class="detail-section">'+
-      '<div class="detail-section-label">Información</div>'+
-      mkRow('Solicitante', p.nombre)+
-      mkRow('Email', p.email)+
-      mkRow('Deadline', p.deadline||'No especificado')+
-      (p.ubic?mkRow('Material en', p.ubic):'')+
-    '</div>'+
-
-    (p.editor?
-      '<div class="detail-section">'+
-        '<div class="detail-section-label">Editor asignado</div>'+
-        '<div class="editor-box">'+
-          '<div class="editor-ava">'+p.editor.charAt(0).toUpperCase()+'</div>'+
-          '<div><div class="editor-name">'+esc(p.editor)+'</div><div class="editor-label">Editor de turno</div></div>'+
-        '</div>'+
-      '</div>'
-    :'')+
-
-    '<div class="detail-section">'+
-      '<div class="detail-section-label">Progreso</div>'+
-      '<div class="tl-row"><div class="tl-dot done"></div><div class="tl-label">Pedido recibido</div><div class="tl-time">'+fmtHora(p.fecha)+'</div></div>'+
-      '<div class="tl-row"><div class="tl-dot '+(p.inicio?'done':'wait')+'"></div><div class="tl-label">Edición iniciada</div><div class="tl-time">'+(p.inicio?fmtHora(p.inicio):'Esperando')+'</div></div>'+
-      '<div class="tl-row"><div class="tl-dot '+(p.fin?'done':'wait')+'"></div><div class="tl-label">Pedido realizado</div><div class="tl-time">'+(p.fin?fmtHora(p.fin):'Pendiente')+'</div></div>'+
-    '</div>'+
-
-    '<div class="detail-section">'+
-      '<div class="detail-section-label">Archivos adjuntos</div>'+
-      '<div class="arch-list">'+archHtml+'</div>'+
-    '</div>'+
-
-    '<button class="btn-refresh" onclick="silentRefresh()">↻ Actualizar estado</button>';
+      '<div class="detail-section-label">Editor asignado</div>'+
+      '<div class="editor-box">'+
+        '<div class="editor-ava">'+p.editor.charAt(0).toUpperCase()+'</div>'+
+        '<div><div class="editor-name">'+esc(p.editor.split('@')[0])+'</div>'+
+        '<div class="editor-label">'+esc(p.editor)+'</div></div>'+
+      '</div>'+
+    '</div>'
+  :'')+
+  '<div class="detail-section">'+
+    '<div class="detail-section-label">Progreso</div>'+
+    '<div class="tl-row"><div class="tl-dot done"></div><div class="tl-label">Pedido recibido</div><div class="tl-time">'+fmtHora(p.fecha)+'</div></div>'+
+    '<div class="tl-row"><div class="tl-dot '+(p.inicio?'done':'wait')+'"></div><div class="tl-label">Edición iniciada</div><div class="tl-time">'+(p.inicio?fmtHora(p.inicio):'Esperando')+'</div></div>'+
+    '<div class="tl-row"><div class="tl-dot '+(p.fin?'done':'wait')+'"></div><div class="tl-label">Pedido realizado</div><div class="tl-time">'+(p.fin?fmtHora(p.fin):'Pendiente')+'</div></div>'+
+  '</div>'+
+  '<div class="detail-section">'+
+    '<div class="detail-section-label">Archivos adjuntos</div>'+
+    '<div class="arch-list">'+archHtml+'</div>'+
+  '</div>'+
+  '<button class="btn-refresh" onclick="var pp=pedidos.find(function(x){return x.ticket===\''+p.ticket+'\';});if(pp)showDetail(pp);">↻ Actualizar estado</button>';
 }
 
 function mkRow(k,v){ return '<div class="detail-row"><span class="detail-row-key">'+k+'</span><span class="detail-row-val">'+esc(v)+'</span></div>'; }
+function refreshDetail(ticket){ var p=pedidos.find(function(x){return x.ticket===ticket;}); if(p) showDetail(p); }
 
-function refreshDetail(ticket){
-  var p = pedidos.find(function(x){return x.ticket===ticket;});
-  if(p) showDetail(p);
+async function cambiarEstadoUI(ticket,estado){
+  if(!usuario) return;
+  bar(true);
+  try{
+    var r=await post({accion:'cambiar_estado',email:usuario.email,ticket:ticket,estado:estado});
+    bar(false);
+    if(r.ok){ await silentRefresh(); }
+    else alert('Error: '+(r.error||'No se pudo cambiar el estado'));
+  }catch(e){ bar(false); alert('Error de conexión'); }
 }
 
-// ─── Mis pedidos ─────────────────────────────
+async function asignarEditorUI(ticket){
+  if(!usuario||usuario.rol!=='admin') return;
+  var sel=document.getElementById('sel-ed-'+ticket);
+  if(!sel||!sel.value){ alert('Elegí un editor primero'); return; }
+  bar(true);
+  try{
+    var r=await post({accion:'asignar_editor',emailAdmin:usuario.email,ticket:ticket,editor:sel.value});
+    bar(false);
+    if(r.ok){ await silentRefresh(); alert('✅ Editor asignado'); }
+    else alert('Error: '+(r.error||'No se pudo asignar'));
+  }catch(e){ bar(false); alert('Error de conexión'); }
+}
+
+// ─── Mis Pedidos ─────────────────────────────
 function renderMisPedidos(){
-  var mis = pedidos.filter(function(p){ return p.email===usuario.email; });
-  var el  = document.getElementById('mis-pedidos-list');
-  if(!mis.length){
-    el.innerHTML='<div class="empty-state"><div class="empty-ico">📭</div><div class="empty-txt">Todavía no hiciste ningún pedido</div></div>';
-    return;
-  }
-  el.innerHTML = mis.map(function(p){
-    var eClass = estadoClass(p.estado);
-    var pClass = prioClass(p.prio);
+  var mis=pedidos.filter(function(p){ return p.email===usuario.email; });
+  var el=document.getElementById('mis-pedidos-list');
+  if(!mis.length){ el.innerHTML='<div class="empty-state"><div class="empty-ico">📭</div><div class="empty-txt">Todavía no hiciste ningún pedido</div></div>'; return; }
+  el.innerHTML=mis.map(function(p){
+    var eClass=estadoClass(p.estado); var pClass=prioClass(p.prio);
     return '<div style="background:var(--bg2);border:1px solid var(--borde);border-radius:10px;padding:14px 16px;cursor:pointer;" onclick="showPanel(\'dashboard\');selectStory(\''+p.ticket+'\')">'+
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'+
         '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
@@ -1305,27 +1389,209 @@ function renderMisPedidos(){
         '<span class="detail-pill '+pClass+'" style="margin-left:auto;">'+p.prio+'</span>'+
       '</div>'+
       '<div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:3px;">'+esc(p.desc.substring(0,80))+(p.desc.length>80?'…':'')+'</div>'+
-      '<div style="font-size:11px;color:var(--txt3);">'+p.area+' · '+p.tipo+' · '+p.fecha+'</div>'+
+      '<div style="font-size:11px;color:var(--txt3);">'+esc(p.area)+' · '+esc(p.tipo)+' · '+p.fecha+(p.editor?' · <span style="color:#52BE80;">▶ '+esc(p.editor.split('@')[0])+'</span>':'')+'</div>'+
     '</div>';
   }).join('');
 }
 
-// ═════════════════════════════════════════════
+// ════════════════════════════════════════════
+//  PANEL EDITOR — MIS TAREAS
+// ════════════════════════════════════════════
+async function loadMisTareas(){
+  if(!usuario) return;
+  bar(true);
+  try{
+    var r=await get('mis_tareas&email='+encodeURIComponent(usuario.email));
+    bar(false);
+    if(!r.ok){
+      document.getElementById('mis-tareas-list').innerHTML='<div class="empty-state"><div class="empty-ico">🔒</div><div class="empty-txt">'+esc(r.error||'Sin permisos')+'</div></div>';
+      return;
+    }
+    var tareas=r.pedidos||[];
+    var activas=tareas.filter(function(p){return p.estado!=='REALIZADO';}).length;
+    var hechas=tareas.filter(function(p){return p.estado==='REALIZADO';}).length;
+    document.getElementById('tareas-meta').textContent=tareas.length+' tareas asignadas · '+activas+' activas · '+hechas+' realizadas';
+    document.getElementById('tareas-stats').innerHTML=
+      statBox(tareas.length,'Total','','var(--txt)')+
+      statBox(tareas.filter(function(p){return p.estado==='EN CURSO';}).length,'En curso','border-left:2px solid var(--azul)','var(--azul-t)')+
+      statBox(tareas.filter(function(p){return p.estado==='PENDIENTE';}).length,'Pendientes','border-left:2px solid #D4AC0D','#D4AC0D')+
+      statBox(hechas,'Realizadas','border-left:2px solid var(--verde-t)','var(--verde-t)');
+
+    var el=document.getElementById('mis-tareas-list');
+    if(!tareas.length){
+      el.innerHTML='<div class="empty-state"><div class="empty-ico">🎬</div><div class="empty-txt">No tenés tareas asignadas todavía</div></div>';
+      return;
+    }
+    el.innerHTML=tareas.map(function(p){
+      var eClass=estadoClass(p.estado); var pClass=prioClass(p.prio);
+      return '<div style="background:var(--bg2);border:1px solid var(--borde);border-radius:10px;padding:14px 16px;">'+
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'+
+          '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
+          '<span style="font-family:var(--mono);font-size:11px;color:var(--txt3);">'+p.ticket+'</span>'+
+          '<span class="detail-pill '+pClass+'">'+p.prio+'</span>'+
+          '<span style="margin-left:auto;font-size:11px;color:var(--txt2);">De: '+esc(p.nombre)+' ('+esc(p.area)+')</span>'+
+        '</div>'+
+        '<div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:5px;">'+esc(p.tipo)+' — '+esc(p.desc.substring(0,90))+(p.desc.length>90?'…':'')+'</div>'+
+        '<div style="font-size:11px;color:var(--txt3);margin-bottom:10px;">'+
+          (p.deadline?'⏰ '+esc(p.deadline)+' &nbsp;':'')+
+          (p.dur?'⏱ '+esc(p.dur)+' &nbsp;':'')+
+          (p.ubic?'📂 '+esc(p.ubic):'Sin ubicación especificada')+
+        '</div>'+
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;">'+
+          (p.estado!=='EN CURSO'?'<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'EN CURSO\');setTimeout(loadMisTareas,1500)" style="flex:1;background:rgba(174,214,241,0.15);border:1px solid var(--azul);color:var(--azul-t);border-radius:7px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;">▶ Iniciar edición</button>':'')+
+          (p.estado!=='REALIZADO'?'<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'REALIZADO\');setTimeout(loadMisTareas,1500)" style="flex:1;background:rgba(169,223,191,0.15);border:1px solid var(--verde);color:var(--verde-t);border-radius:7px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;">✓ Marcar como listo</button>':'')+
+          '<button onclick="showPanel(\'dashboard\');selectStory(\''+p.ticket+'\')" style="background:var(--bg3);border:1px solid var(--borde2);color:var(--txt2);border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;">Ver detalle y archivos</button>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+  }catch(e){ bar(false); console.error(e); }
+}
+
+function statBox(n,lbl,style,color){
+  return '<div class="stat-box" style="'+style+'">'+
+    '<div class="stat-label">'+lbl+'</div>'+
+    '<div class="stat-val" style="color:'+color+'">'+n+'</div>'+
+  '</div>';
+}
+
+// ════════════════════════════════════════════
+//  PANEL SUPERADMIN
+// ════════════════════════════════════════════
+async function loadAdmin(){
+  if(!usuario||usuario.rol!=='admin') return;
+  bar(true);
+  try{
+    var r=await get('admin_dashboard&email='+encodeURIComponent(usuario.email));
+    bar(false);
+    if(!r.ok){ alert('Error: '+r.error); return; }
+    adminPedidos=r.pedidos||[];
+    editores=r.editores||[];
+    var now=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('admin-meta').textContent=adminPedidos.length+' pedidos · '+editores.length+' editores activos · Actualizado '+now;
+    var sinAsig=adminPedidos.filter(function(p){return !p.editor&&p.estado!=='REALIZADO';}).length;
+    var enc=adminPedidos.filter(function(p){return p.estado==='EN CURSO';}).length;
+    var real=adminPedidos.filter(function(p){return p.estado==='REALIZADO';}).length;
+    document.getElementById('admin-stats').innerHTML=
+      statBox(adminPedidos.length,'Total','','var(--txt)')+
+      statBox(sinAsig,'⚠ Sin asignar','border-left:2px solid #E74C3C','#E74C3C')+
+      statBox(enc,'En curso','border-left:2px solid var(--azul-t)','var(--azul-t)')+
+      statBox(real,'Realizados','border-left:2px solid var(--verde-t)','var(--verde-t)');
+    renderAdminPedidos();
+
+    var ru=await get('admin_usuarios&email='+encodeURIComponent(usuario.email));
+    if(ru.ok) renderAdminUsuarios(ru.usuarios||[]);
+  }catch(e){ bar(false); console.error(e); }
+}
+
+function showAdminTab(tab){
+  document.getElementById('admin-tab-pedidos').style.display=tab==='pedidos'?'':'none';
+  document.getElementById('admin-tab-usuarios').style.display=tab==='usuarios'?'':'none';
+}
+
+function setAdminFilter(f,el){
+  adminFiltro=f;
+  document.querySelectorAll('#panel-admin .filter-chip').forEach(function(c){c.classList.remove('active');});
+  if(el) el.classList.add('active');
+  renderAdminPedidos();
+}
+
+function renderAdminPedidos(){
+  var q=((document.getElementById('admin-search')||{}).value||'').toLowerCase();
+  var lista=adminPedidos.filter(function(p){
+    if(adminFiltro==='sin-asignar') return !p.editor&&p.estado!=='REALIZADO';
+    if(['PENDIENTE','EN CURSO','REALIZADO'].includes(adminFiltro)) return p.estado===adminFiltro;
+    return true;
+  }).filter(function(p){
+    return !q||(p.ticket+p.area+p.tipo+p.desc+p.nombre+(p.editor||'')).toLowerCase().includes(q);
+  });
+
+  var el=document.getElementById('admin-pedidos-list');
+  if(!lista.length){ el.innerHTML='<div class="empty-state"><div class="empty-ico">📋</div><div class="empty-txt">No hay pedidos</div></div>'; return; }
+  el.innerHTML=lista.map(function(p){
+    var eClass=estadoClass(p.estado); var pClass=prioClass(p.prio);
+    var alerta=(!p.editor&&p.estado!=='REALIZADO')?'border-left:3px solid #E74C3C;':'';
+    return '<div style="background:var(--bg2);border:1px solid var(--borde);border-radius:10px;padding:12px 14px;'+alerta+'">'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'+
+        '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
+        '<span style="font-family:var(--mono);font-size:11px;color:var(--txt3);">'+p.ticket+'</span>'+
+        '<span class="detail-pill '+pClass+'">'+p.prio+'</span>'+
+        '<span style="font-size:11px;color:var(--txt2);">'+esc(p.area)+' — '+esc(p.tipo)+'</span>'+
+        '<span style="margin-left:auto;font-size:11px;color:var(--txt3);">'+esc(p.nombre)+' · '+fmtHora(p.fecha)+'</span>'+
+      '</div>'+
+      '<div style="font-size:12px;color:var(--txt2);margin-bottom:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(p.desc)+'</div>'+
+      '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">'+
+        '<select id="adm-ed-'+p.ticket+'" style="background:var(--bg3);border:1px solid var(--borde2);border-radius:7px;padding:5px 8px;font-size:11px;color:var(--txt);flex:1;min-width:140px;">'+
+          '<option value="">'+(p.editor?'Re-asignar...':'Asignar editor...')+'</option>'+
+          editores.map(function(ed){return '<option value="'+esc(ed.email)+'"'+(p.editor===ed.email?' selected':'')+'>'+esc(ed.nombre)+'</option>';}).join('')+
+        '</select>'+
+        '<button onclick="adminAsignar(\''+p.ticket+'\')" style="background:var(--rojo);color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;">✓ Asignar</button>'+
+        '<button onclick="adminCambiarEstado(\''+p.ticket+'\',\'EN CURSO\')" style="background:rgba(174,214,241,0.15);border:1px solid var(--azul);color:var(--azul-t);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">▶ En curso</button>'+
+        '<button onclick="adminCambiarEstado(\''+p.ticket+'\',\'REALIZADO\')" style="background:rgba(169,223,191,0.15);border:1px solid var(--verde);color:var(--verde-t);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">✓ Listo</button>'+
+        (p.editor
+          ?'<span style="font-size:11px;color:#52BE80;white-space:nowrap;">▶ '+esc(p.editor.split('@')[0])+'</span>'
+          :'<span style="font-size:11px;color:#E74C3C;">⚠ Sin asignar</span>')+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function adminAsignar(ticket){
+  var sel=document.getElementById('adm-ed-'+ticket);
+  if(!sel||!sel.value){ alert('Elegí un editor'); return; }
+  bar(true);
+  var r=await post({accion:'asignar_editor',emailAdmin:usuario.email,ticket:ticket,editor:sel.value});
+  bar(false);
+  if(r.ok) loadAdmin(); else alert('Error: '+r.error);
+}
+
+async function adminCambiarEstado(ticket,estado){
+  bar(true);
+  var r=await post({accion:'cambiar_estado',email:usuario.email,ticket:ticket,estado:estado});
+  bar(false);
+  if(r.ok) loadAdmin(); else alert('Error: '+r.error);
+}
+
+function renderAdminUsuarios(usuarios){
+  var el=document.getElementById('admin-usuarios-list');
+  if(!usuarios.length){ el.innerHTML='<div class="empty-state"><div class="empty-ico">👥</div><div class="empty-txt">No hay usuarios registrados</div></div>'; return; }
+  el.innerHTML=usuarios.map(function(u){
+    var rolColor={'admin':'#A78BFA','editor':'var(--azul-t)','solicitante':'var(--txt3)'}[u.rol]||'var(--txt3)';
+    return '<div style="display:grid;grid-template-columns:1fr 110px 110px 90px 140px;gap:0;padding:9px 12px;border-bottom:1px solid var(--borde);align-items:center;min-height:48px;">'+
+      '<div>'+
+        '<div style="font-size:12px;font-weight:600;color:var(--txt);">'+esc(u.nombre)+'</div>'+
+        '<div style="font-size:10px;color:var(--txt3);font-family:var(--mono);">'+esc(u.email)+'</div>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--txt2);">'+esc(u.area)+'</div>'+
+      '<div style="font-size:11px;font-weight:700;color:'+rolColor+';">'+u.rol+'</div>'+
+      '<div style="font-size:11px;color:'+(u.activo?'var(--verde-t)':'#E74C3C')+';">'+(u.activo?'✓ Activo':'✗ Inactivo')+'</div>'+
+      '<div style="display:flex;gap:4px;align-items:center;">'+
+        '<select onchange="adminCambiarRol(\''+esc(u.email)+'\',this.value)" style="background:var(--bg3);border:1px solid var(--borde2);border-radius:5px;padding:3px 5px;font-size:10px;color:var(--txt);">'+
+          ['solicitante','editor','admin'].map(function(r){return '<option value="'+r+'"'+(u.rol===r?' selected':'')+'>'+r+'</option>';}).join('')+
+        '</select>'+
+        '<button onclick="adminToggleUser(\''+esc(u.email)+'\','+(u.activo?'false':'true')+')" style="background:'+(u.activo?'rgba(231,76,60,0.15)':'rgba(39,174,96,0.15)')+';border:1px solid '+(u.activo?'#E74C3C':'var(--verde-t)')+';color:'+(u.activo?'#E74C3C':'var(--verde-t)')+';border-radius:5px;padding:3px 8px;font-size:10px;font-weight:600;cursor:pointer;">'+(u.activo?'Desactivar':'Activar')+'</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function adminCambiarRol(email,rol){
+  var r=await post({accion:'cambiar_rol',emailAdmin:usuario.email,email:email,rol:rol});
+  if(r.ok) loadAdmin(); else alert('Error: '+r.error);
+}
+async function adminToggleUser(email,activar){
+  var r=await post({accion:(activar==='true'||activar===true)?'activar_usuario':'desactivar_usuario',emailAdmin:usuario.email,email:email});
+  if(r.ok) loadAdmin(); else alert('Error: '+r.error);
+}
+
+// ════════════════════════════════════════════
 //  MODAL NUEVO PEDIDO
-// ═════════════════════════════════════════════
-function openModal(){
-  resetModal();
-  document.getElementById('modal-overlay').classList.add('open');
-}
-function closeModal(){
-  document.getElementById('modal-overlay').classList.remove('open');
-}
-document.getElementById('modal-overlay').addEventListener('click',function(e){
-  if(e.target===this) closeModal();
-});
+// ════════════════════════════════════════════
+function openModal(){ resetModal(); document.getElementById('modal-overlay').classList.add('open'); }
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+document.getElementById('modal-overlay').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
 
 function resetModal(){
-  mState={area:'',tipo:'',prio:'',dur:'',deadline:'',desc:'',ubic:'',files:[]};
+  mState={area:'',tipo:'',prio:'',dur:'',deadline:'',desc:'',ubic:'',files:[],uploadedFiles:[]};
   mStep=0;
   document.querySelectorAll('.m-step').forEach(function(s,i){s.classList.toggle('active',i===0);});
   document.querySelectorAll('[data-val]').forEach(function(b){b.classList.remove('sel');});
@@ -1342,50 +1608,22 @@ function resetModal(){
 
 function updateStepDots(){
   var dots='';
-  for(var i=0;i<TOTAL_STEPS;i++){
-    var cls = i<mStep?'done':i===mStep?'active':'';
-    dots+='<div class="step-dot '+cls+'"></div>';
-  }
+  for(var i=0;i<TOTAL_STEPS;i++){ var cls=i<mStep?'done':i===mStep?'active':''; dots+='<div class="step-dot '+cls+'"></div>'; }
   document.getElementById('step-dots').innerHTML=dots;
 }
 
-function mSel(field, el){
-  var parent=el.parentElement;
-  parent.querySelectorAll('[data-val]').forEach(function(b){b.classList.remove('sel');});
-  el.classList.add('sel');
-  mState[field]=el.dataset.val;
-}
-
+function mSel(field,el){ el.parentElement.querySelectorAll('[data-val]').forEach(function(b){b.classList.remove('sel');}); el.classList.add('sel'); mState[field]=el.dataset.val; }
 function showMErr(id,show){ document.getElementById(id).style.display=show?'block':'none'; }
 
 async function mNext(){
-  if(mStep===0){
-    if(!mState.area){showMErr('me-area',true);return;} showMErr('me-area',false);
-  }
-  if(mStep===1){
-    if(!mState.tipo){showMErr('me-tipo',true);return;} showMErr('me-tipo',false);
-  }
-  if(mStep===2){
-    if(!mState.prio){showMErr('me-prio',true);return;} showMErr('me-prio',false);
-    mState.dur=mState.dur||'No especificada';
-    mState.deadline=fmtDt(document.getElementById('m-deadline').value);
-  }
-  if(mStep===3){
-    mState.desc=document.getElementById('m-desc').value.trim();
-    mState.ubic=document.getElementById('m-ubic').value.trim();
-    if(!mState.desc){showMErr('me-desc',true);return;} showMErr('me-desc',false);
-    buildResumen();
-  }
-  if(mStep===4){
-    await enviarPedido(); return;
-  }
-
-  mStep++;
-  setMStep(mStep);
+  if(mStep===0){ if(!mState.area){showMErr('me-area',true);return;} showMErr('me-area',false); }
+  if(mStep===1){ if(!mState.tipo){showMErr('me-tipo',true);return;} showMErr('me-tipo',false); }
+  if(mStep===2){ if(!mState.prio){showMErr('me-prio',true);return;} showMErr('me-prio',false); mState.dur=mState.dur||'No especificada'; mState.deadline=fmtDt(document.getElementById('m-deadline').value); }
+  if(mStep===3){ mState.desc=document.getElementById('m-desc').value.trim(); mState.ubic=document.getElementById('m-ubic').value.trim(); if(!mState.desc){showMErr('me-desc',true);return;} showMErr('me-desc',false); buildResumen(); }
+  if(mStep===4){ await enviarPedido(); return; }
+  mStep++; setMStep(mStep);
 }
-function mBack(){
-  if(mStep>0){ mStep--; setMStep(mStep); }
-}
+function mBack(){ if(mStep>0){mStep--;setMStep(mStep);} }
 function setMStep(n){
   document.querySelectorAll('.m-step').forEach(function(s,i){s.classList.toggle('active',i===n);});
   document.getElementById('btn-m-back').style.display=n>0&&n<5?'':'none';
@@ -1396,12 +1634,6 @@ function setMStep(n){
   document.getElementById('modal-title').textContent=titles[n]||'Nuevo pedido';
 }
 
-function fmtDt(v){
-  if(!v)return '';
-  var d=new Date(v);
-  return d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-}
-
 function buildResumen(){
   document.getElementById('m-resumen').innerHTML=
     mRow('Área',mState.area)+mRow('Tipo',mState.tipo)+mRow('Prioridad',mState.prio)+
@@ -1410,89 +1642,89 @@ function buildResumen(){
     mRow('Solicitante',usuario?usuario.nombre:'—');
   var archHtml='';
   if(mState.files.length){
-    archHtml='<div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.5px;margin-top:10px;margin-bottom:5px;">Archivos ('+mState.files.length+')</div>'+
-      mState.files.map(function(f){return '<div class="file-item"><div class="file-item-ico">'+fileIco(f.name)+'</div><div class="file-item-name">'+esc(f.name)+'</div><div class="file-item-size">'+fmtSize(f.size)+'</div></div>';}).join('');
+    archHtml='<div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.5px;margin-top:10px;margin-bottom:5px;">'+mState.files.length+' archivos — se subirán a Drive ✓</div>'+
+      mState.files.map(function(f){ return '<div class="file-item"><div class="file-item-ico">'+fileIco(f)+'</div><div class="file-item-name">'+esc(f.name)+'</div><div class="file-item-size">'+fmtSize(f.size)+'</div></div>'; }).join('');
   }
   document.getElementById('m-arch-resumen').innerHTML=archHtml;
 }
-
 function mRow(k,v){ return '<div class="res-row"><span class="res-k">'+k+'</span><span class="res-v">'+esc(v)+'</span></div>'; }
 
+// ─── Envío con subida real a Drive ───────────
 async function enviarPedido(){
   var btn=document.getElementById('btn-m-next');
-  btn.disabled=true;
-  btn.innerHTML='<span class="spinner"></span> Guardando...';
-  bar(true);
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Guardando...'; bar(true);
   try{
     var r=await post({
-      accion:'nuevo_pedido',
-      email:usuario.email,
+      accion:'nuevo_pedido',email:usuario.email,
       area:mState.area,tipo:mState.tipo,prio:mState.prio,
       dur:mState.dur,deadline:mState.deadline,ubic:mState.ubic,
       desc:mState.desc,nombre:usuario.nombre
     });
-    bar(false);
-    if(!r.ok) throw new Error(r.error||'Error');
+    if(!r.ok) throw new Error(r.error||'Error al crear pedido');
     var ticket=r.ticket||'—';
 
-    // Nota sobre archivos: en una implementación completa se subirían a Drive
-    // aquí guardamos los nombres como metadata
     if(mState.files.length){
       for(var i=0;i<mState.files.length;i++){
         var f=mState.files[i];
-        await post({ accion:'adjuntar_archivo', email:usuario.email, ticket:ticket, nombre:f.name, tipo:getExt(f.name), url:'(adjunto local)' });
+        try{
+          btn.innerHTML='<span class="spinner"></span> Subiendo archivos '+(i+1)+'/'+mState.files.length+'...';
+          var b64=await fileToBase64(f);
+          var fr=await post({
+            accion:'subir_archivo',email:usuario.email,ticket:ticket,
+            nombre:f.name,mimeType:f.type||'application/octet-stream',
+            base64:b64,size:f.size
+          });
+          if(fr.ok) mState.uploadedFiles.push({nombre:f.name,url:fr.url});
+        }catch(fe){ console.warn('Error subiendo '+f.name,fe); }
       }
     }
 
+    bar(false);
     document.getElementById('ms-ticket-box').innerHTML=
       '<div class="ms-ticket-id">'+ticket+'</div>'+
-      '<div class="ms-ticket-info">'+mState.area+' → '+mState.tipo+'</div>'+
-      (mState.prio?'<div style="font-size:11px;color:var(--txt3);margin-top:3px;">'+mState.prio+'</div>':'')+
-      '<div style="font-size:11px;color:var(--txt3);margin-top:3px;">Solicitante: '+usuario.nombre+'</div>';
+      '<div class="ms-ticket-info">'+esc(mState.area)+' → '+esc(mState.tipo)+'</div>'+
+      (mState.prio?'<div style="font-size:11px;color:var(--txt3);margin-top:3px;">'+esc(mState.prio)+'</div>':'')+
+      '<div style="font-size:11px;color:var(--txt3);margin-top:3px;">Solicitante: '+esc(usuario.nombre)+'</div>'+
+      (mState.uploadedFiles.length?'<div style="font-size:11px;color:#52BE80;margin-top:3px;">📎 '+mState.uploadedFiles.length+' archivos subidos a Drive ✓</div>':'');
 
     mStep=5; setMStep(5);
-    // Guardar ticket en local
-    try{
-      var lista=JSON.parse(localStorage.getItem('c10_tickets')||'[]');
-      lista.unshift({ticket,area:mState.area,tipo:mState.tipo,nombre:usuario.nombre,ts:Date.now()});
-      localStorage.setItem('c10_tickets',JSON.stringify(lista.slice(0,10)));
-    }catch(e){}
-
-    // Refrescar dashboard
     silentRefresh();
   }catch(e){
-    bar(false);
-    btn.disabled=false; btn.textContent='Reintentar';
-    alert('❌ No se pudo guardar el pedido.\nVerificá la conexión e intentá de nuevo.');
+    bar(false); btn.disabled=false; btn.textContent='Reintentar';
+    alert('❌ Error: '+(e.message||'No se pudo guardar el pedido'));
   }
 }
 
+function fileToBase64(file){
+  return new Promise(function(resolve,reject){
+    var reader=new FileReader();
+    reader.onload=function(e){ resolve(e.target.result.split(',')[1]); };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 // ─── File handling ────────────────────────────
-function handleFiles(fileList){
-  var arr=Array.from(fileList);
-  arr.forEach(function(f){ if(mState.files.length<10) mState.files.push(f); });
-  renderFileList();
-}
-function handleDrop(e){
-  e.preventDefault();
-  document.getElementById('file-zone').classList.remove('drag');
-  handleFiles(e.dataTransfer.files);
-}
-function removeFile(i){
-  mState.files.splice(i,1);
-  renderFileList();
-}
+function handleFiles(fileList){ Array.from(fileList).forEach(function(f){ if(mState.files.length<10) mState.files.push(f); }); renderFileList(); }
+function handleDrop(e){ e.preventDefault(); document.getElementById('file-zone').classList.remove('drag'); handleFiles(e.dataTransfer.files); }
+function removeFile(i){ mState.files.splice(i,1); renderFileList(); }
 function renderFileList(){
-  document.getElementById('files-list').innerHTML=
-    mState.files.map(function(f,i){
-      return '<div class="file-item">'+
-        '<div class="file-item-ico">'+fileIco(f.name)+'</div>'+
-        '<div class="file-item-name">'+esc(f.name)+'</div>'+
-        '<div class="file-item-size">'+fmtSize(f.size)+'</div>'+
-        '<button class="file-item-del" onclick="removeFile('+i+')">✕</button>'+
-      '</div>';
-    }).join('');
+  document.getElementById('files-list').innerHTML=mState.files.map(function(f,i){
+    return '<div class="file-item">'+
+      '<div class="file-item-ico">'+fileIco(f)+'</div>'+
+      '<div class="file-item-name">'+esc(f.name)+'</div>'+
+      '<div class="file-item-size">'+fmtSize(f.size)+'</div>'+
+      '<button class="file-item-del" onclick="removeFile('+i+')">✕</button>'+
+    '</div>';
+  }).join('');
 }
+
+// ─── Estilos extra ───────────────────────────
+(function(){
+  var s=document.createElement('style');
+  s.textContent='.refresh-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#2ECC71;margin-left:3px;vertical-align:middle;}.refresh-dot.loading{background:#F39C12;animation:blink 0.8s ease infinite;}';
+  document.head.appendChild(s);
+})();
 </script>
 
 </body>
