@@ -165,7 +165,7 @@ function registrarUsuario(datos) {
       return jsonOut({ok:true,accion:"login",nombre:rows[i][1],area:rows[i][2],rol:rows[i][3]});
     }
   }
-  sh.appendRow([email, nombre, area, rolFinal, ahoraAR(), true]);
+  sh.appendRow([email, nombre, area, datos.rol||"solicitante", ahoraAR(), true]);
   return jsonOut({ok:true,accion:"registro",nombre:nombre,area:area,rol:rolFinal});
 }
 
