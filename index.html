@@ -942,13 +942,30 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
         </div>
         <div class="m-err" id="me-prio">Indicá la urgencia.</div>
         <div class="m-field">
-          <label class="m-label">Duración estimada</label>
-          <div class="dur-grid">
-            <div class="dur-btn" data-val="menos de 1 min" onclick="mSel('dur',this)">−1 min</div>
-            <div class="dur-btn" data-val="1 a 3 min"      onclick="mSel('dur',this)">1–3 min</div>
-            <div class="dur-btn" data-val="3 a 10 min"     onclick="mSel('dur',this)">3–10 min</div>
-            <div class="dur-btn" data-val="más de 10 min"  onclick="mSel('dur',this)">+10 min</div>
+          <label class="m-label">Duración del material a editar</label>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:70px;">
+              <input type="number" id="dur-hs" min="0" max="23" placeholder="0"
+                style="width:100%;background:var(--bg3);border:1px solid var(--borde2);border-radius:var(--radio);padding:10px;font-size:18px;font-weight:700;color:var(--txt);text-align:center;font-family:var(--mono);"
+                oninput="calcDur()"/>
+              <span style="font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.7px;">horas</span>
+            </div>
+            <div style="font-size:22px;color:var(--txt3);padding-bottom:18px;">:</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:70px;">
+              <input type="number" id="dur-min" min="0" max="59" placeholder="0"
+                style="width:100%;background:var(--bg3);border:1px solid var(--borde2);border-radius:var(--radio);padding:10px;font-size:18px;font-weight:700;color:var(--txt);text-align:center;font-family:var(--mono);"
+                oninput="calcDur()"/>
+              <span style="font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.7px;">minutos</span>
+            </div>
+            <div style="font-size:22px;color:var(--txt3);padding-bottom:18px;">:</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:70px;">
+              <input type="number" id="dur-seg" min="0" max="59" placeholder="0"
+                style="width:100%;background:var(--bg3);border:1px solid var(--borde2);border-radius:var(--radio);padding:10px;font-size:18px;font-weight:700;color:var(--txt);text-align:center;font-family:var(--mono);"
+                oninput="calcDur()"/>
+              <span style="font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.7px;">segundos</span>
+            </div>
           </div>
+          <div id="dur-preview" style="font-size:12px;color:var(--txt3);margin-top:6px;min-height:18px;text-align:center;"></div>
         </div>
         <div class="m-field">
           <label class="m-label">Deadline (opcional)</label>
@@ -956,31 +973,37 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
         </div>
       </div>
 
-      <!-- PASO 3: Descripción + archivos -->
+      <!-- PASO 3: Descripción + material -->
       <div class="m-step" id="ms-3">
         <div class="m-step-title">Descripción y material</div>
-        <div class="m-step-hint">Detallá el pedido y adjuntá lo que necesites</div>
+        <div class="m-step-hint">Detallá el pedido e indicá dónde está el material</div>
         <div class="m-field">
           <label class="m-label">Descripción del pedido *</label>
           <textarea class="m-textarea" id="m-desc" placeholder="Ej: Clip de la entrevista de las 10:15 de EntreNos. Cortar desde que entra el invitado hasta el cierre. Con zócalo del nombre." rows="4"></textarea>
           <div class="m-err" id="me-desc">Escribí una descripción.</div>
         </div>
         <div class="m-field">
-          <label class="m-label">Ubicación del material (opcional)</label>
-          <input type="text" class="m-input" id="m-ubic" placeholder="Servidor A / carpeta EntreNos / link de descarga..."/>
+          <label class="m-label">🔗 Link o ubicación del material *</label>
+          <input type="text" class="m-input" id="m-ubic"
+            placeholder="https://drive.google.com/... o Servidor A / carpeta EntreNos / Disco externo..."
+            style="font-size:13px;"/>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+            <div style="font-size:11px;color:var(--txt3);padding:4px 10px;background:var(--bg3);border:1px solid var(--borde);border-radius:20px;cursor:pointer;" onclick="setUbicPrefix('https://drive.google.com/')">📁 Drive</div>
+            <div style="font-size:11px;color:var(--txt3);padding:4px 10px;background:var(--bg3);border:1px solid var(--borde);border-radius:20px;cursor:pointer;" onclick="setUbicPrefix('Servidor A / ')">🖥 Servidor A</div>
+            <div style="font-size:11px;color:var(--txt3);padding:4px 10px;background:var(--bg3);border:1px solid var(--borde);border-radius:20px;cursor:pointer;" onclick="setUbicPrefix('Servidor B / ')">🖥 Servidor B</div>
+            <div style="font-size:11px;color:var(--txt3);padding:4px 10px;background:var(--bg3);border:1px solid var(--borde);border-radius:20px;cursor:pointer;" onclick="setUbicPrefix('Disco externo / ')">💾 Disco externo</div>
+            <div style="font-size:11px;color:var(--txt3);padding:4px 10px;background:var(--bg3);border:1px solid var(--borde);border-radius:20px;cursor:pointer;" onclick="setUbicPrefix('https://www.youtube.com/')">▶ YouTube</div>
+          </div>
+          <div id="ubic-preview" style="margin-top:8px;display:none;">
+            <a id="ubic-link" href="#" target="_blank"
+              style="font-size:12px;color:var(--azul-t);word-break:break-all;text-decoration:underline;">
+            </a>
+          </div>
+          <div class="m-err" id="me-ubic">Indicá dónde está el material.</div>
         </div>
         <div class="m-field">
-          <label class="m-label">Archivos adjuntos — se suben a Google Drive 📁</label>
-          <div class="file-zone" id="file-zone" onclick="document.getElementById('file-input').click()"
-               ondragover="event.preventDefault();this.classList.add('drag')"
-               ondragleave="this.classList.remove('drag')"
-               ondrop="handleDrop(event)">
-            <div class="file-zone-ico">📎</div>
-            <div class="file-zone-txt">Hacé clic o arrastrá archivos acá</div>
-            <div class="file-zone-sub">Word, Excel, PPT, PDF, MP3, MP4, imágenes · Máx. 10 archivos · Se suben automáticamente a Drive</div>
-          </div>
-          <input type="file" id="file-input" multiple accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,.pdf,.mp3,.mp4,.wav,.jpg,.jpeg,.png,.txt,.zip" onchange="handleFiles(this.files)"/>
-          <div class="files-list" id="files-list"></div>
+          <label class="m-label">📝 Referencias o instrucciones adicionales (opcional)</label>
+          <textarea class="m-textarea" id="m-refs" placeholder="Ej: Usar tipografía del manual de marca. El logo está en la carpeta /logos del servidor." rows="2"></textarea>
         </div>
       </div>
 
@@ -1439,9 +1462,10 @@ async function loadMisTareas(){
           (p.ubic?'📂 '+esc(p.ubic):'Sin ubicación especificada')+
         '</div>'+
         '<div style="display:flex;gap:6px;flex-wrap:wrap;">'+
-          (p.estado!=='EN CURSO'?'<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'EN CURSO\');setTimeout(loadMisTareas,1500)" style="flex:1;background:rgba(174,214,241,0.15);border:1px solid var(--azul);color:var(--azul-t);border-radius:7px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;">▶ Iniciar edición</button>':'')+
-          (p.estado!=='REALIZADO'?'<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'REALIZADO\');setTimeout(loadMisTareas,1500)" style="flex:1;background:rgba(169,223,191,0.15);border:1px solid var(--verde);color:var(--verde-t);border-radius:7px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;">✓ Marcar como listo</button>':'')+
-          '<button onclick="showPanel(\'dashboard\');selectStory(\''+p.ticket+'\')" style="background:var(--bg3);border:1px solid var(--borde2);color:var(--txt2);border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;">Ver detalle y archivos</button>'+
+          (p.estado==='PENDIENTE'?'<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'EN CURSO\');setTimeout(loadMisTareas,1500)" style="flex:1;background:rgba(93,173,226,0.2);border:1px solid var(--azul);color:var(--azul-t);border-radius:7px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">▶ Iniciar edición</button>':'')+
+          (p.estado==='EN CURSO'?'<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'REALIZADO\');setTimeout(loadMisTareas,1500)" style="flex:1;background:rgba(39,174,96,0.2);border:1px solid var(--verde-t);color:var(--verde-t);border-radius:7px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">✅ Marcar como listo</button>':'')+
+          (p.estado==='REALIZADO'?'<div style="flex:1;text-align:center;padding:10px;font-size:13px;font-weight:700;color:var(--verde-t);">✅ Completado</div>':'')+
+          '<button onclick="showPanel(\'dashboard\');selectStory(\''+p.ticket+'\')" style="background:var(--bg3);border:1px solid var(--borde2);color:var(--txt2);border-radius:7px;padding:10px 14px;font-size:12px;cursor:pointer;">🔍 Ver detalle</button>'+
         '</div>'+
       '</div>';
     }).join('');
@@ -1528,6 +1552,7 @@ function renderAdminPedidos(){
         '<button onclick="adminAsignar(\''+p.ticket+'\')" style="background:var(--rojo);color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;">✓ Asignar</button>'+
         '<button onclick="adminCambiarEstado(\''+p.ticket+'\',\'EN CURSO\')" style="background:rgba(174,214,241,0.15);border:1px solid var(--azul);color:var(--azul-t);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">▶ En curso</button>'+
         '<button onclick="adminCambiarEstado(\''+p.ticket+'\',\'REALIZADO\')" style="background:rgba(169,223,191,0.15);border:1px solid var(--verde);color:var(--verde-t);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">✓ Listo</button>'+
+        '<button onclick="archivarPedido(\''+p.ticket+'\')" style="background:rgba(255,255,255,0.05);border:1px solid var(--borde2);color:var(--txt3);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;" title="Archivar pedido">📦 Archivar</button>'+
         (p.editor
           ?'<span style="font-size:11px;color:#52BE80;white-space:nowrap;">▶ '+esc(p.editor.split('@')[0])+'</span>'
           :'<span style="font-size:11px;color:#E74C3C;">⚠ Sin asignar</span>')+
@@ -1592,14 +1617,19 @@ function closeModal(){ document.getElementById('modal-overlay').classList.remove
 document.getElementById('modal-overlay').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
 
 function resetModal(){
-  mState={area:'',tipo:'',prio:'',dur:'',deadline:'',desc:'',ubic:'',files:[],uploadedFiles:[]};
+  mState={area:'',tipo:'',prio:'',dur:'',deadline:'',desc:'',ubic:'',refs:'',files:[],uploadedFiles:[]};
   mStep=0;
   document.querySelectorAll('.m-step').forEach(function(s,i){s.classList.toggle('active',i===0);});
   document.querySelectorAll('[data-val]').forEach(function(b){b.classList.remove('sel');});
   document.getElementById('m-deadline').value='';
   document.getElementById('m-desc').value='';
   document.getElementById('m-ubic').value='';
-  document.getElementById('files-list').innerHTML='';
+  var refs=document.getElementById('m-refs'); if(refs) refs.value='';
+  var hs=document.getElementById('dur-hs'); if(hs) hs.value='';
+  var mn=document.getElementById('dur-min'); if(mn) mn.value='';
+  var sg=document.getElementById('dur-seg'); if(sg) sg.value='';
+  var dp=document.getElementById('dur-preview'); if(dp) dp.textContent='';
+  var up=document.getElementById('ubic-preview'); if(up) up.style.display='none';
   document.getElementById('btn-m-next').textContent='Continuar →';
   document.getElementById('btn-m-next').disabled=false;
   document.getElementById('btn-m-back').style.display='none';
@@ -1619,8 +1649,15 @@ function showMErr(id,show){ document.getElementById(id).style.display=show?'bloc
 async function mNext(){
   if(mStep===0){ if(!mState.area){showMErr('me-area',true);return;} showMErr('me-area',false); }
   if(mStep===1){ if(!mState.tipo){showMErr('me-tipo',true);return;} showMErr('me-tipo',false); }
-  if(mStep===2){ if(!mState.prio){showMErr('me-prio',true);return;} showMErr('me-prio',false); mState.dur=mState.dur||'No especificada'; mState.deadline=fmtDt(document.getElementById('m-deadline').value); }
-  if(mStep===3){ mState.desc=document.getElementById('m-desc').value.trim(); mState.ubic=document.getElementById('m-ubic').value.trim(); if(!mState.desc){showMErr('me-desc',true);return;} showMErr('me-desc',false); buildResumen(); }
+  if(mStep===2){ if(!mState.prio){showMErr('me-prio',true);return;} showMErr('me-prio',false); calcDur(); mState.deadline=fmtDt(document.getElementById('m-deadline').value); }
+  if(mStep===3){
+    mState.desc=document.getElementById('m-desc').value.trim();
+    mState.ubic=document.getElementById('m-ubic').value.trim();
+    mState.refs=(document.getElementById('m-refs')||{value:''}).value.trim();
+    if(!mState.desc){showMErr('me-desc',true);return;} showMErr('me-desc',false);
+    if(!mState.ubic){showMErr('me-ubic',true);return;} showMErr('me-ubic',false);
+    buildResumen();
+  }
   if(mStep===4){ await enviarPedido(); return; }
   mStep++; setMStep(mStep);
 }
@@ -1638,15 +1675,11 @@ function setMStep(n){
 function buildResumen(){
   document.getElementById('m-resumen').innerHTML=
     mRow('Área',mState.area)+mRow('Tipo',mState.tipo)+mRow('Prioridad',mState.prio)+
-    mRow('Duración',mState.dur)+mRow('Deadline',mState.deadline||'No especificado')+
-    (mState.ubic?mRow('Material en',mState.ubic):'')+mRow('Descripción',mState.desc)+
+    mRow('Duración',mState.dur||'No especificada')+mRow('Deadline',mState.deadline||'No especificado')+
+    mRow('Material en',mState.ubic)+mRow('Descripción',mState.desc)+
+    (mState.refs?mRow('Referencias',mState.refs):'')+
     mRow('Solicitante',usuario?usuario.nombre:'—');
-  var archHtml='';
-  if(mState.files.length){
-    archHtml='<div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.5px;margin-top:10px;margin-bottom:5px;">'+mState.files.length+' archivos — se subirán a Drive ✓</div>'+
-      mState.files.map(function(f){ return '<div class="file-item"><div class="file-item-ico">'+fileIco(f)+'</div><div class="file-item-name">'+esc(f.name)+'</div><div class="file-item-size">'+fmtSize(f.size)+'</div></div>'; }).join('');
-  }
-  document.getElementById('m-arch-resumen').innerHTML=archHtml;
+  document.getElementById('m-arch-resumen').innerHTML='';
 }
 function mRow(k,v){ return '<div class="res-row"><span class="res-k">'+k+'</span><span class="res-v">'+esc(v)+'</span></div>'; }
 
@@ -1658,36 +1691,19 @@ async function enviarPedido(){
     var r=await post({
       accion:'nuevo_pedido',email:usuario.email,
       area:mState.area,tipo:mState.tipo,prio:mState.prio,
-      dur:mState.dur,deadline:mState.deadline,ubic:mState.ubic,
+      dur:mState.dur,deadline:mState.deadline,
+      ubic:mState.ubic+(mState.refs?' | Refs: '+mState.refs:''),
       desc:mState.desc,nombre:usuario.nombre
     });
     if(!r.ok) throw new Error(r.error||'Error al crear pedido');
     var ticket=r.ticket||'—';
-
-    if(mState.files.length){
-      for(var i=0;i<mState.files.length;i++){
-        var f=mState.files[i];
-        try{
-          btn.innerHTML='<span class="spinner"></span> Subiendo archivos '+(i+1)+'/'+mState.files.length+'...';
-          var b64=await fileToBase64(f);
-          var fr=await post({
-            accion:'subir_archivo',email:usuario.email,ticket:ticket,
-            nombre:f.name,mimeType:f.type||'application/octet-stream',
-            base64:b64,size:f.size
-          });
-          if(fr.ok) mState.uploadedFiles.push({nombre:f.name,url:fr.url});
-        }catch(fe){ console.warn('Error subiendo '+f.name,fe); }
-      }
-    }
-
     bar(false);
     document.getElementById('ms-ticket-box').innerHTML=
       '<div class="ms-ticket-id">'+ticket+'</div>'+
       '<div class="ms-ticket-info">'+esc(mState.area)+' → '+esc(mState.tipo)+'</div>'+
       (mState.prio?'<div style="font-size:11px;color:var(--txt3);margin-top:3px;">'+esc(mState.prio)+'</div>':'')+
       '<div style="font-size:11px;color:var(--txt3);margin-top:3px;">Solicitante: '+esc(usuario.nombre)+'</div>'+
-      (mState.uploadedFiles.length?'<div style="font-size:11px;color:#52BE80;margin-top:3px;">📎 '+mState.uploadedFiles.length+' archivos subidos a Drive ✓</div>':'');
-
+      '<div style="font-size:11px;color:var(--azul-t);margin-top:3px;">📎 Material: '+esc(mState.ubic.substring(0,60))+'</div>';
     mStep=5; setMStep(5);
     silentRefresh();
   }catch(e){
@@ -1705,20 +1721,55 @@ function fileToBase64(file){
   });
 }
 
-// ─── File handling ────────────────────────────
-function handleFiles(fileList){ Array.from(fileList).forEach(function(f){ if(mState.files.length<10) mState.files.push(f); }); renderFileList(); }
-function handleDrop(e){ e.preventDefault(); document.getElementById('file-zone').classList.remove('drag'); handleFiles(e.dataTransfer.files); }
-function removeFile(i){ mState.files.splice(i,1); renderFileList(); }
-function renderFileList(){
-  document.getElementById('files-list').innerHTML=mState.files.map(function(f,i){
-    return '<div class="file-item">'+
-      '<div class="file-item-ico">'+fileIco(f)+'</div>'+
-      '<div class="file-item-name">'+esc(f.name)+'</div>'+
-      '<div class="file-item-size">'+fmtSize(f.size)+'</div>'+
-      '<button class="file-item-del" onclick="removeFile('+i+')">✕</button>'+
-    '</div>';
-  }).join('');
+function calcDur(){
+  var hs  = parseInt(document.getElementById('dur-hs').value)||0;
+  var min = parseInt(document.getElementById('dur-min').value)||0;
+  var seg = parseInt(document.getElementById('dur-seg').value)||0;
+  var total = hs*3600 + min*60 + seg;
+  var prev = document.getElementById('dur-preview');
+  if(total===0){ mState.dur='No especificada'; prev.textContent=''; return; }
+  var partes=[];
+  if(hs)  partes.push(hs+(hs===1?' hora':' horas'));
+  if(min) partes.push(min+(min===1?' minuto':' minutos'));
+  if(seg) partes.push(seg+(seg===1?' segundo':' segundos'));
+  mState.dur = partes.join(' ');
+  // también mostrar en formato HH:MM:SS
+  var hh=String(hs).padStart(2,'0');
+  var mm=String(min).padStart(2,'0');
+  var ss=String(seg).padStart(2,'0');
+  prev.textContent = '⏱ Duración: '+mState.dur+' ('+hh+':'+mm+':'+ss+')';
+  prev.style.color = 'var(--azul-t)';
 }
+
+function setUbicPrefix(prefix){
+  var inp = document.getElementById('m-ubic');
+  if(!inp.value.startsWith(prefix)) inp.value = prefix;
+  inp.focus();
+  // mover cursor al final
+  var len = inp.value.length;
+  inp.setSelectionRange(len,len);
+  // preview de link
+  checkUbicLink();
+}
+
+function checkUbicLink(){
+  var val = (document.getElementById('m-ubic').value||'').trim();
+  var prev = document.getElementById('ubic-preview');
+  var link = document.getElementById('ubic-link');
+  if(val.startsWith('http')){
+    prev.style.display='';
+    link.href=val;
+    link.textContent='🔗 '+val.substring(0,60)+(val.length>60?'…':'');
+  } else {
+    prev.style.display='none';
+  }
+}
+
+// Agregar listener al input de ubicación
+document.addEventListener('DOMContentLoaded',function(){
+  var inp=document.getElementById('m-ubic');
+  if(inp) inp.addEventListener('input', checkUbicLink);
+});
 
 // ─── Estilos extra ───────────────────────────
 (function(){
