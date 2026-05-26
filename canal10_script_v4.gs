@@ -20,7 +20,7 @@ var ENCABEZADOS_PEDIDOS = [
   "N° Ticket","Fecha y hora","Área","Tipo de pieza","Prioridad",
   "Duración","Deadline","Material / Ubicación","Descripción",
   "Solicitante","Email","Estado","Editor asignado","Inicio edición",
-  "Fin edición","Archivos adjuntos"
+  "Fin edición","Archivos adjuntos","Link material entregado"
 ];
 var ENCABEZADOS_USUARIOS = ["Email","Nombre","Área","Rol","Fecha registro","Activo"];
 var ENCABEZADOS_ARCHIVOS = ["Ticket","Nombre archivo","Tipo","URL Drive","Tamaño","Fecha subida"];
@@ -28,7 +28,7 @@ var ENCABEZADOS_ARCHIVOS = ["Ticket","Nombre archivo","Tipo","URL Drive","Tamañ
 var COL = {
   TICKET:1,FECHA:2,AREA:3,TIPO:4,PRIO:5,DUR:6,DEADLINE:7,
   UBIC:8,DESC:9,NOMBRE:10,EMAIL:11,ESTADO:12,EDITOR:13,
-  INICIO:14,FIN:15,ARCHIVOS:16
+  INICIO:14,FIN:15,ARCHIVOS:16,RESPUESTA:17
 };
 
 var ROLES = { SOLICITANTE:"solicitante", EDITOR:"editor", ADMIN:"admin" };
@@ -117,6 +117,7 @@ function doPost(e) {
     if (a==="activar_usuario")    return activarDesactivar(datos, true);
     if (a==="desactivar_usuario") return activarDesactivar(datos, false);
     if (a==="cambiar_rol")        return cambiarRol(datos);
+    if (a==="responder_pedido")   return responderPedido(datos);
     return jsonOut({ok:false,error:"Acción desconocida"});
   } catch(err) {
     return jsonOut({ok:false,error:err.toString()});
@@ -433,7 +434,8 @@ function todosLosPedidos() {
       editor:  r[COL.EDITOR-1]||"",
       inicio:  r[COL.INICIO-1]?r[COL.INICIO-1].toString():"",
       fin:     r[COL.FIN-1]?r[COL.FIN-1].toString():"",
-      archivos:r[COL.ARCHIVOS-1]||""
+      archivos:r[COL.ARCHIVOS-1]||"",
+      respuesta:r[COL.RESPUESTA-1]||""
     });
   }
   var po = {P1:1,P2:2,P3:3,P4:4};
@@ -505,6 +507,28 @@ function crearTrigger() {
 function instalarTrigger() {
   crearTrigger();
   SpreadsheetApp.getUi().alert("✅ Trigger instalado correctamente.");
+}
+
+// ─── Responder pedido con link de material entregado ────
+function responderPedido(datos) {
+  if (!esAdmin(datos.email)) return jsonOut({ok:false,error:"Sin permisos"});
+  if (!datos.ticket)         return jsonOut({ok:false,error:"Falta ticket"});
+  if (!datos.linkRespuesta)  return jsonOut({ok:false,error:"Falta el link de respuesta"});
+
+  var sh   = getSheet(SHEET_PEDIDOS);
+  var rows = sh.getDataRange().getValues();
+  for (var i=1; i<rows.length; i++) {
+    if (rows[i][COL.TICKET-1] === datos.ticket) {
+      sh.getRange(i+1, COL.RESPUESTA).setValue(datos.linkRespuesta);
+      // Asegurar col existe con encabezado
+      if (!sh.getRange(1, COL.RESPUESTA).getValue()) {
+        sh.getRange(1, COL.RESPUESTA).setValue("Link material entregado");
+        sh.setColumnWidth(COL.RESPUESTA, 280);
+      }
+      return jsonOut({ok:true});
+    }
+  }
+  return jsonOut({ok:false,error:"Ticket no encontrado"});
 }
 
 // ─── Función para crear el primer admin ─────────────────

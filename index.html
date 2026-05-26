@@ -1331,6 +1331,43 @@ function buildDetailHTML(p,pClass,eClass,archHtml){
     '</div>';
   }
 
+  // Sección respuesta admin
+  var respuestaHTML = '';
+  if (p.respuesta) {
+    respuestaHTML =
+      '<div class="detail-section" style="border:1px solid rgba(82,190,128,0.3);border-radius:10px;padding:12px;background:rgba(82,190,128,0.05);">'+
+        '<div class="detail-section-label" style="color:var(--verde-t);">✅ Material entregado</div>'+
+        '<div style="font-size:12px;color:var(--txt2);margin-bottom:8px;">El administrador entregó el material terminado:</div>'+
+        '<a href="'+p.respuesta+'" target="_blank" style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid rgba(82,190,128,0.4);border-radius:8px;padding:10px 12px;text-decoration:none;">'+
+          '<span style="font-size:18px;">📁</span>'+
+          '<div style="flex:1;overflow:hidden;">'+
+            '<div style="font-size:12px;font-weight:600;color:var(--verde-t);">Abrir material terminado</div>'+
+            '<div style="font-size:10px;color:var(--txt3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(p.respuesta)+'</div>'+
+          '</div>'+
+          '<span style="font-size:11px;color:var(--verde-t);font-weight:700;flex-shrink:0;">↗ Abrir</span>'+
+        '</a>'+
+      '</div>';
+  }
+
+  // Campo para que el admin responda (solo visible para admin y solo si no hay respuesta aún o quiere editar)
+  var responderHTML = '';
+  if (esAdminUser) {
+    responderHTML =
+      '<div class="detail-section">'+
+        '<div class="detail-section-label">'+( p.respuesta ? '✏ Editar respuesta' : '📤 Entregar material terminado' )+'</div>'+
+        '<div style="font-size:12px;color:var(--txt2);margin-bottom:8px;">Pegá el link de Drive con el material listo para que el solicitante lo descargue:</div>'+
+        '<div style="display:flex;gap:6px;">'+
+          '<input id="resp-link-'+p.ticket+'" type="text" placeholder="https://drive.google.com/..." '+
+            'value="'+esc(p.respuesta||'')+'" '+
+            'style="flex:1;background:var(--bg3);border:1px solid var(--borde2);border-radius:7px;padding:9px 12px;font-size:12px;color:var(--txt);min-width:0;"/>'+
+          '<button onclick="enviarRespuesta(\''+p.ticket+'\')" '+
+            'style="background:var(--verde-t);color:#fff;border:none;border-radius:7px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">'+
+            '✓ Enviar'+
+          '</button>'+
+        '</div>'+
+      '</div>';
+  }
+
   return '<div class="detail-ticket">'+
     '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
     '<span>'+p.ticket+'</span>'+
@@ -1369,6 +1406,8 @@ function buildDetailHTML(p,pClass,eClass,archHtml){
     '<div class="detail-section-label">Archivos adjuntos</div>'+
     '<div class="arch-list">'+archHtml+'</div>'+
   '</div>'+
+  respuestaHTML+
+  responderHTML+
   '<button class="btn-refresh" onclick="var pp=pedidos.find(function(x){return x.ticket===\''+p.ticket+'\';});if(pp)showDetail(pp);">↻ Actualizar estado</button>';
 }
 
@@ -1384,6 +1423,27 @@ async function cambiarEstadoUI(ticket,estado){
     if(r.ok){ await silentRefresh(); }
     else alert('Error: '+(r.error||'No se pudo cambiar el estado'));
   }catch(e){ bar(false); alert('Error de conexión'); }
+}
+
+async function enviarRespuesta(ticket){
+  if(!usuario||usuario.rol!=='admin') return;
+  var inp = document.getElementById('resp-link-'+ticket);
+  if(!inp||!inp.value.trim()){ alert('Pegá el link del material terminado'); return; }
+  var link = inp.value.trim();
+  if(!link.startsWith('http')){ alert('El link debe comenzar con http:// o https://'); return; }
+  bar(true);
+  try{
+    var r = await post({ accion:'responder_pedido', email:usuario.email, ticket:ticket, linkRespuesta:link });
+    bar(false);
+    if(r.ok){
+      toast('✅ Respuesta enviada correctamente','success');
+      await silentRefresh();
+      var p = pedidos.find(function(x){ return x.ticket===ticket; });
+      if(p) showDetail(p);
+    } else {
+      toast('Error: '+(r.error||'No se pudo guardar'),'error');
+    }
+  }catch(e){ bar(false); toast('Error de conexión','error'); }
 }
 
 async function asignarEditorUI(ticket){
@@ -1406,7 +1466,18 @@ function renderMisPedidos(){
   if(!mis.length){ el.innerHTML='<div class="empty-state"><div class="empty-ico">📭</div><div class="empty-txt">Todavía no hiciste ningún pedido</div></div>'; return; }
   el.innerHTML=mis.map(function(p){
     var eClass=estadoClass(p.estado); var pClass=prioClass(p.prio);
-    return '<div style="background:var(--bg2);border:1px solid var(--borde);border-radius:10px;padding:14px 16px;cursor:pointer;" onclick="showPanel(\'dashboard\');selectStory(\''+p.ticket+'\')">'+
+    var respBadge = p.respuesta
+      ? '<div style="margin-top:8px;display:flex;align-items:center;gap:8px;background:rgba(30,132,73,0.12);border:1px solid rgba(30,132,73,0.35);border-radius:8px;padding:8px 12px;">'+
+          '<span style="font-size:16px;">📁</span>'+
+          '<div style="flex:1;overflow:hidden;">'+
+            '<div style="font-size:11px;font-weight:700;color:var(--verde-t);">✅ Material listo para descargar</div>'+
+            '<div style="font-size:10px;color:var(--txt3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(p.respuesta)+'</div>'+
+          '</div>'+
+          '<a href="'+p.respuesta+'" target="_blank" onclick="event.stopPropagation()" '+
+            'style="background:var(--verde-t);color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;text-decoration:none;flex-shrink:0;">Abrir ↗</a>'+
+        '</div>'
+      : '';
+    return '<div style="background:var(--bg2);border:1px solid '+(p.respuesta?'rgba(30,132,73,0.4)':'var(--borde)')+';border-radius:10px;padding:14px 16px;cursor:pointer;" onclick="showPanel(\'dashboard\');selectStory(\''+p.ticket+'\')">'+
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'+
         '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
         '<span style="font-family:var(--mono);font-size:11px;color:var(--txt3);">'+p.ticket+'</span>'+
@@ -1414,6 +1485,7 @@ function renderMisPedidos(){
       '</div>'+
       '<div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:3px;">'+esc(p.desc.substring(0,80))+(p.desc.length>80?'…':'')+'</div>'+
       '<div style="font-size:11px;color:var(--txt3);">'+esc(p.area)+' · '+esc(p.tipo)+' · '+p.fecha+(p.editor?' · <span style="color:#52BE80;">▶ '+esc(p.editor.split('@')[0])+'</span>':'')+'</div>'+
+      respBadge+
     '</div>';
   }).join('');
 }
