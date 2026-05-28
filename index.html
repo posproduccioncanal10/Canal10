@@ -702,6 +702,9 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
       <button class="topbar-tab" onclick="showPanel('mis-pedidos')">
         <span class="tab-dot" style="background:var(--azul-t)"></span>Mis pedidos
       </button>
+      <button class="topbar-tab" onclick="showPanel('realizados')">
+        <span class="tab-dot" style="background:#52BE80"></span>Realizados <span id="badge-realizados" style="display:none;background:#52BE80;color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;margin-left:3px;font-family:var(--mono);"></span>
+      </button>
       <button class="topbar-tab" id="tab-mis-tareas" style="display:none;" onclick="showPanel('mis-tareas')">
         <span class="tab-dot" style="background:var(--verde-t)"></span>Mis tareas
       </button>
@@ -806,6 +809,21 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
       <div class="dashboard-title" style="margin-bottom:4px;">Mis pedidos</div>
       <div class="dashboard-meta">Solo tus pedidos registrados</div>
       <div id="mis-pedidos-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
+    </div>
+
+    <!-- ── REALIZADOS PANEL ── -->
+    <div id="panel-realizados" style="display:none;flex:1;overflow-y:auto;padding:1.25rem;flex-direction:column;gap:1rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div class="dashboard-title" style="color:#52BE80;">✅ Pedidos Realizados</div>
+          <div class="dashboard-meta" id="realizados-meta">Archivo de pedidos completados</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input class="filter-search" type="text" placeholder="Buscar en realizados..." id="realizados-search" oninput="renderRealizados()" style="width:200px;"/>
+          <button class="btn-nuevo-pedido" style="background:var(--verde-t);" onclick="renderRealizados()">↻ Actualizar</button>
+        </div>
+      </div>
+      <div id="realizados-list" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
 
     <!-- ── MIS TAREAS (EDITOR) PANEL ── -->
@@ -1053,6 +1071,7 @@ var adminPedidos = [];
 var selectedTicket = null;
 var refreshInterval = null;
 var mState = { area:'', tipo:'', prio:'', dur:'', deadline:'', desc:'', ubic:'', files:[], uploadedFiles:[] };
+var pedidosArchivados = []; // pedidos marcados REALIZADO (separados del rundown activo)
 var mStep    = 0;
 var TOTAL_STEPS = 5;
 
@@ -1176,15 +1195,16 @@ window.addEventListener('load',function(){
 //  PANELS
 // ════════════════════════════════════════════
 function showPanel(name){
-  ['dashboard','mis-pedidos','mis-tareas','admin'].forEach(function(p){
+  ['dashboard','mis-pedidos','realizados','mis-tareas','admin'].forEach(function(p){
     var el=document.getElementById('panel-'+p);
     if(el) el.style.display=(p===name)?'flex':'none';
   });
   document.querySelectorAll('.topbar-tab').forEach(function(t){ t.classList.remove('active'); });
-  var map={'dashboard':0,'mis-pedidos':1,'mis-tareas':2,'admin':3};
+  var map={'dashboard':0,'mis-pedidos':1,'realizados':2,'mis-tareas':3,'admin':4};
   var tabs=document.querySelectorAll('.topbar-tab');
   if(map[name]!==undefined&&tabs[map[name]]) tabs[map[name]].classList.add('active');
   if(name==='mis-pedidos') renderMisPedidos();
+  if(name==='realizados')  renderRealizados();
   if(name==='mis-tareas')  loadMisTareas();
   if(name==='admin')       loadAdmin();
 }
@@ -1221,6 +1241,10 @@ function renderAll(){
 
 function updateStats(){
   document.getElementById('stat-total').textContent=pedidos.length;
+  // Update realizados badge
+  var realCount=pedidos.filter(function(p){return p.estado==='REALIZADO';}).length;
+  var badge=document.getElementById('badge-realizados');
+  if(badge){ badge.textContent=realCount; badge.style.display=realCount?'':'none'; }
   document.getElementById('stat-pendiente').textContent=pedidos.filter(function(p){return p.estado==='PENDIENTE';}).length;
   document.getElementById('stat-encurso').textContent=pedidos.filter(function(p){return p.estado==='EN CURSO';}).length;
   document.getElementById('stat-realizado').textContent=pedidos.filter(function(p){return p.estado==='REALIZADO';}).length;
@@ -1265,7 +1289,7 @@ function renderRundown(){
       '<div class="s-tipo">'+esc(p.tipo)+'</div>'+
       '<div class="s-desc">'+(archIco?'<span style="margin-right:4px;">'+archIco+'</span>':'')+esc(p.desc)+'</div>'+
       '<div class="s-sol">'+esc(p.nombre)+'</div>'+
-      '<div class="s-time">'+fmtHora(p.fecha)+'</div>'+
+      '<div class="s-time" title="'+esc(p.fecha)+'">'+(esReciente(p.fecha,4)?'<span style="color:#C0392B;font-weight:700;">NUEVO</span> ':'')+fmtHora(p.fecha)+'</div>'+
     '</div>';
   }).join('');
 }
@@ -1679,6 +1703,132 @@ async function adminCambiarRol(email,rol){
 async function adminToggleUser(email,activar){
   var r=await post({accion:(activar==='true'||activar===true)?'activar_usuario':'desactivar_usuario',emailAdmin:usuario.email,email:email});
   if(r.ok) loadAdmin(); else alert('Error: '+r.error);
+}
+
+// ════════════════════════════════════════════
+//  REALIZADOS (ARCHIVO)
+// ════════════════════════════════════════════
+function renderRealizados(){
+  // Tomar de todos los pedidos los que están REALIZADOS + los archivados manualmente
+  var todosRealizados = pedidos.filter(function(p){ return p.estado==='REALIZADO'; });
+  // También los de adminPedidos si el usuario es admin
+  if(usuario && usuario.rol==='admin'){
+    adminPedidos.forEach(function(p){
+      if(p.estado==='REALIZADO' && !todosRealizados.find(function(x){return x.ticket===p.ticket;}))
+        todosRealizados.push(p);
+    });
+  }
+  // Ordenar del más nuevo al más viejo
+  todosRealizados.sort(function(a,b){
+    var da=parseFecha(a.fin||a.fecha), db=parseFecha(b.fin||b.fecha);
+    return db-da;
+  });
+
+  var q=((document.getElementById('realizados-search')||{}).value||'').toLowerCase();
+  if(q) todosRealizados=todosRealizados.filter(function(p){
+    return (p.ticket+p.area+p.tipo+p.desc+p.nombre+(p.editor||'')).toLowerCase().includes(q);
+  });
+
+  // Actualizar badge
+  var badge=document.getElementById('badge-realizados');
+  var total=pedidos.filter(function(p){return p.estado==='REALIZADO';}).length;
+  if(badge){ badge.textContent=total; badge.style.display=total?'':'none'; }
+
+  var meta=document.getElementById('realizados-meta');
+  if(meta) meta.textContent=todosRealizados.length+' pedidos completados';
+
+  var el=document.getElementById('realizados-list');
+  if(!el) return;
+  if(!todosRealizados.length){
+    el.innerHTML='<div class="empty-state"><div class="empty-ico">📦</div><div class="empty-txt">No hay pedidos realizados todavía</div></div>';
+    return;
+  }
+
+  // Agrupar por fecha de fin (día)
+  var grupos={};
+  todosRealizados.forEach(function(p){
+    var dstr=getDia(p.fin||p.fecha);
+    if(!grupos[dstr]) grupos[dstr]=[];
+    grupos[dstr].push(p);
+  });
+
+  var html='';
+  Object.keys(grupos).forEach(function(dia){
+    html+='<div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;padding:4px 0 4px 2px;border-bottom:1px solid var(--borde);margin-bottom:4px;">'+dia+'</div>';
+    grupos[dia].forEach(function(p){
+      var pClass=prioClass(p.prio);
+      var esNuevo=esReciente(p.fin||p.fecha, 24);
+      var nuevoBadge=esNuevo?'<span style="background:#C0392B;color:#fff;border-radius:4px;font-size:9px;font-weight:700;padding:1px 5px;margin-left:6px;">NUEVO</span>':'';
+      html+='<div style="background:var(--bg2);border:1px solid rgba(82,190,128,0.2);border-radius:10px;padding:12px 14px;cursor:pointer;transition:background 0.1s;" onclick="showPanel(\'dashboard\');selectStory(\''+p.ticket+'\')">'+
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'+
+          '<span class="estado-pill realizado"><span class="estado-dot"></span>REALIZADO</span>'+
+          '<span style="font-family:var(--mono);font-size:11px;color:var(--txt3);">'+p.ticket+'</span>'+
+          '<span class="detail-pill '+pClass+'">'+p.prio+'</span>'+
+          nuevoBadge+
+          '<span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--verde-t);font-weight:600;">'+
+            '✓ '+(p.fin?fmtFechaCompleta(p.fin):fmtFechaCompleta(p.fecha))+
+          '</span>'+
+        '</div>'+
+        '<div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:4px;">'+esc(p.desc.substring(0,90))+(p.desc.length>90?'…':'')+'</div>'+
+        '<div style="font-size:11px;color:var(--txt2);display:flex;gap:12px;flex-wrap:wrap;">'+
+          '<span>'+esc(p.area)+'</span>'+
+          '<span>'+esc(p.tipo)+'</span>'+
+          '<span style="color:var(--txt3);">Por: '+esc(p.nombre)+'</span>'+
+          (p.editor?'<span style="color:#52BE80;">▶ '+esc(p.editor.split('@')[0])+'</span>':'')+
+          (p.inicio?'<span style="color:var(--txt3);">Inicio: '+fmtFechaCompleta(p.inicio)+'</span>':'')+
+        '</div>'+
+        (p.respuesta?
+          '<div style="margin-top:8px;"><a href="'+p.respuesta+'" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:5px;background:rgba(30,132,73,0.12);border:1px solid rgba(30,132,73,0.35);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;color:var(--verde-t);text-decoration:none;">📁 Ver material entregado ↗</a></div>'
+          :'')+
+      '</div>';
+    });
+    html+='<div style="height:6px;"></div>';
+  });
+  el.innerHTML=html;
+}
+
+function parseFecha(str){
+  if(!str) return new Date(0);
+  // Formato dd/MM/yyyy HH:mm
+  var m=str.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
+  if(m) return new Date(m[3],parseInt(m[2])-1,m[1],m[4],m[5]);
+  return new Date(str);
+}
+
+function getDia(str){
+  if(!str) return 'Sin fecha';
+  var d=parseFecha(str);
+  var hoy=new Date(); hoy.setHours(0,0,0,0);
+  var ayer=new Date(hoy); ayer.setDate(ayer.getDate()-1);
+  var dd=new Date(d); dd.setHours(0,0,0,0);
+  if(dd.getTime()===hoy.getTime()) return 'Hoy';
+  if(dd.getTime()===ayer.getTime()) return 'Ayer';
+  return d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+function fmtFechaCompleta(str){
+  if(!str) return '—';
+  var d=parseFecha(str);
+  if(isNaN(d)) return str;
+  return d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+function esReciente(str, horas){
+  if(!str) return false;
+  var d=parseFecha(str);
+  return (new Date()-d) < horas*3600000;
+}
+
+async function archivarPedido(ticket){
+  if(!usuario||usuario.rol!=='admin') return;
+  if(!confirm('¿Marcar el pedido '+ticket+' como REALIZADO y moverlo al archivo?')) return;
+  bar(true);
+  var r=await post({accion:'cambiar_estado',email:usuario.email,ticket:ticket,estado:'REALIZADO'});
+  bar(false);
+  if(r.ok){
+    toast('📦 Pedido archivado correctamente','success');
+    await loadAdmin();
+  } else alert('Error: '+r.error);
 }
 
 // ════════════════════════════════════════════
