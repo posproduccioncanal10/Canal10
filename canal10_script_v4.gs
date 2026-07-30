@@ -366,7 +366,7 @@ function asignarEditor(datos) {
 //  ESTADOS
 // ════════════════════════════════════════════════════════
 function cambiarEstado(datos) {
-  // Admin puede cambiar cualquier estado; editor solo los suyos
+  // Admin puede cambiar cualquier estado; editor solo los suyos (o los que todavía no tienen editor asignado)
   var v = validarUsuario(datos.email);
   if (!v.ok) return jsonOut({ok:false,error:v.error});
   var validos = ["PENDIENTE","EN CURSO","REALIZADO"];
@@ -376,11 +376,15 @@ function cambiarEstado(datos) {
   var rows = sh.getDataRange().getValues();
   for (var i=1; i<rows.length; i++) {
     if (rows[i][COL.TICKET-1]===datos.ticket) {
-      // Editor solo puede cambiar si está asignado a él
+      var editorAsig = (rows[i][COL.EDITOR-1]||"").toString().toLowerCase().trim();
+      // Editor solo puede cambiar si está asignado a él, o si el pedido todavía no tiene editor (lo puede tomar)
       if (v.rol===ROLES.EDITOR) {
-        var editorAsig = (rows[i][COL.EDITOR-1]||"").toString().toLowerCase().trim();
         if (editorAsig && editorAsig!==datos.email.toLowerCase().trim())
-          return jsonOut({ok:false,error:"No tenés permiso sobre este pedido"});
+          return jsonOut({ok:false,error:"Ese pedido ya lo tomó otro editor"});
+        // Auto-asignación: el editor que mueve un pedido sin dueño pasa a ser su editor asignado
+        if (!editorAsig) {
+          sh.getRange(i+1,COL.EDITOR).setValue(datos.email);
+        }
       }
       sh.getRange(i+1,COL.ESTADO).setValue(datos.estado);
       var ahora = ahoraAR();

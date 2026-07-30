@@ -1641,10 +1641,16 @@ function kbCardHtml(p){
   var pClass=prioClass(p.prio);
   var pNum={p1:'1',p2:'2',p3:'3',p4:'4','p-':'·'}[pClass]||'·';
   var sel=p.ticket===selectedTicket?' selected':'';
-  var editorTag=p.editor?'<span class="kb-card-editor">▶ '+esc(p.editor.split('@')[0])+'</span>':'';
+  var esSoloEditor=usuario&&usuario.rol==='editor';
+  var sinAsignar=!p.editor;
+  var editorTag=p.editor?'<span class="kb-card-editor">▶ '+esc(p.editor.split('@')[0])+'</span>':
+    (sinAsignar&&p.estado!=='REALIZADO'?'<span class="kb-card-editor" style="color:var(--txt3);">Sin asignar</span>':'');
   var nuevo=esReciente(p.fecha,4)?'<span class="kb-card-nuevo">NUEVO</span>':'';
   var arch=p.archivos?'<span>📎</span>':'';
   var puede=puedeMoverTarjeta(p);
+  var tomarBtn = (esSoloEditor&&sinAsignar&&p.estado!=='REALIZADO')
+    ? '<button onclick="event.stopPropagation();tomarTarea(\''+p.ticket+'\')" style="width:100%;margin-top:7px;background:rgba(174,214,241,0.15);border:1px solid var(--azul);color:var(--azul-t);border-radius:6px;padding:6px;font-size:10.5px;font-weight:700;cursor:pointer;">🖐 Tomar tarea</button>'
+    : '';
   return '<div class="kb-card '+pClass+sel+'" '+
     'draggable="'+(puede?'true':'false')+'" data-ticket="'+p.ticket+'" '+
     (puede?'ondragstart="kbDragStart(event,\''+p.ticket+'\')" ondragend="kbDragEnd(event)"':'')+
@@ -1659,7 +1665,19 @@ function kbCardHtml(p){
       '<span class="kb-card-time" title="'+esc(p.fecha)+'">'+fmtFechaCompleta(p.fecha)+'</span>'+
       editorTag+
     '</div>'+
+    tomarBtn+
   '</div>';
+}
+
+async function tomarTarea(ticket){
+  if(!usuario||usuario.rol!=='editor') return;
+  bar(true);
+  try{
+    var r=await post({accion:'cambiar_estado',email:usuario.email,ticket:ticket,estado:'EN CURSO'});
+    bar(false);
+    if(r.ok){ toast('🖐 Tarea tomada — ¡a editar!','success'); await silentRefresh(); }
+    else { toast('Error: '+(r.error||'No se pudo tomar la tarea'),'error'); await silentRefresh(); }
+  }catch(e){ bar(false); toast('Error de conexión','error'); }
 }
 
 function kbDragStart(e,ticket){
@@ -1728,15 +1746,25 @@ async function showDetail(p){
 
 function buildDetailHTML(p,pClass,eClass,archHtml){
   var esAdminUser=usuario&&usuario.rol==='admin';
+  var esSoloEditor=usuario&&usuario.rol==='editor';
   var esEditorUser=usuario&&(usuario.rol==='editor'||usuario.rol==='admin');
+  var noAsignado=!p.editor;
+  var esMio=p.editor&&usuario&&p.editor.toLowerCase().trim()===usuario.email.toLowerCase().trim();
+  // Un editor solo puede tocar los pedidos sin dueño (los toma) o los que ya son suyos
+  var puedeInteractuar = esAdminUser || (esSoloEditor && (noAsignado||esMio));
 
   var btnEstado='';
-  if(esAdminUser||esEditorUser){
+  if(puedeInteractuar){
     btnEstado='<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">';
-    if(p.estado!=='EN CURSO')  btnEstado+='<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'EN CURSO\')" style="flex:1;background:rgba(174,214,241,0.15);border:1px solid var(--azul);color:var(--azul-t);border-radius:7px;padding:7px;font-size:11px;font-weight:600;cursor:pointer;min-width:80px;">▶ En curso</button>';
+    if(p.estado!=='EN CURSO'){
+      var labelCurso = (esSoloEditor&&noAsignado) ? '🖐 Tomar y empezar' : '▶ En curso';
+      btnEstado+='<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'EN CURSO\')" style="flex:1;background:rgba(174,214,241,0.15);border:1px solid var(--azul);color:var(--azul-t);border-radius:7px;padding:7px;font-size:11px;font-weight:600;cursor:pointer;min-width:80px;">'+labelCurso+'</button>';
+    }
     if(p.estado!=='REALIZADO') btnEstado+='<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'REALIZADO\')" style="flex:1;background:rgba(169,223,191,0.15);border:1px solid var(--verde);color:var(--verde-t);border-radius:7px;padding:7px;font-size:11px;font-weight:600;cursor:pointer;min-width:80px;">✓ Realizado</button>';
     if(p.estado!=='PENDIENTE') btnEstado+='<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'PENDIENTE\')" style="flex:1;background:rgba(249,231,159,0.1);border:1px solid #7D6608;color:#7D6608;border-radius:7px;padding:7px;font-size:11px;font-weight:600;cursor:pointer;min-width:80px;">↩ Pendiente</button>';
     btnEstado+='</div>';
+  } else if(esSoloEditor){
+    btnEstado='<div style="margin-top:8px;font-size:11px;color:var(--txt3);">🔒 Este pedido ya lo tomó otro editor.</div>';
   }
 
   var asignarHTML='';
