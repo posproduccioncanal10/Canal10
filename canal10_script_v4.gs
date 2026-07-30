@@ -12,26 +12,31 @@
 
 var DRIVE_FOLDER_ID = "1JslwxmipJQ9t88PZeIkozaoXit6wVp3p";  // ← carpeta de adjuntos
 
-var SHEET_PEDIDOS  = "Pedidos";
-var SHEET_USUARIOS = "Usuarios";
-var SHEET_ARCHIVOS = "Archivos";
+var SHEET_PEDIDOS   = "Pedidos";
+var SHEET_USUARIOS  = "Usuarios";
+var SHEET_ARCHIVOS  = "Archivos";
+var SHEET_PROYECTOS = "Proyectos";
 
 var ENCABEZADOS_PEDIDOS = [
   "N° Ticket","Fecha y hora","Área","Tipo de pieza","Prioridad",
   "Duración","Deadline","Material / Ubicación","Descripción",
   "Solicitante","Email","Estado","Editor asignado","Inicio edición",
-  "Fin edición","Archivos adjuntos","Link material entregado"
+  "Fin edición","Archivos adjuntos","Link material entregado","ID Proyecto"
 ];
-var ENCABEZADOS_USUARIOS = ["Email","Nombre","Área","Rol","Fecha registro","Activo"];
+var ENCABEZADOS_USUARIOS = ["Email","Nombre","Área","Rol","Fecha registro","Activo","Proyectos"];
 var ENCABEZADOS_ARCHIVOS = ["Ticket","Nombre archivo","Tipo","URL Drive","Tamaño","Fecha subida"];
+var ENCABEZADOS_PROYECTOS = ["ID Proyecto","Nombre","Descripción","Color","Activo","Fecha creación"];
 
 var COL = {
   TICKET:1,FECHA:2,AREA:3,TIPO:4,PRIO:5,DUR:6,DEADLINE:7,
   UBIC:8,DESC:9,NOMBRE:10,EMAIL:11,ESTADO:12,EDITOR:13,
-  INICIO:14,FIN:15,ARCHIVOS:16,RESPUESTA:17
+  INICIO:14,FIN:15,ARCHIVOS:16,RESPUESTA:17,PROYECTO:18
 };
+var COL_USU = { EMAIL:1,NOMBRE:2,AREA:3,ROL:4,FECHA:5,ACTIVO:6,PROYECTOS:7 };
+var COL_PRJ = { ID:1,NOMBRE:2,DESC:3,COLOR:4,ACTIVO:5,FECHA:6 };
 
 var ROLES = { SOLICITANTE:"solicitante", EDITOR:"editor", ADMIN:"admin" };
+var PROYECTO_ALL = "ALL"; // valor especial: acceso a todos los proyectos (superadmin)
 
 // ─── Helpers ─────────────────────────────────────────────
 function ss()  { return SpreadsheetApp.getActiveSpreadsheet(); }
@@ -48,9 +53,10 @@ function getSheet(name) {
   var sh = ss().getSheetByName(name);
   if (!sh) {
     sh = ss().insertSheet(name);
-    if (name===SHEET_PEDIDOS)  { sh.appendRow(ENCABEZADOS_PEDIDOS);  fmtH(sh,ENCABEZADOS_PEDIDOS.length);  setWidths(sh); }
-    if (name===SHEET_USUARIOS) { sh.appendRow(ENCABEZADOS_USUARIOS); fmtH(sh,ENCABEZADOS_USUARIOS.length); }
-    if (name===SHEET_ARCHIVOS) { sh.appendRow(ENCABEZADOS_ARCHIVOS); fmtH(sh,ENCABEZADOS_ARCHIVOS.length); }
+    if (name===SHEET_PEDIDOS)   { sh.appendRow(ENCABEZADOS_PEDIDOS);   fmtH(sh,ENCABEZADOS_PEDIDOS.length);   setWidths(sh); }
+    if (name===SHEET_USUARIOS)  { sh.appendRow(ENCABEZADOS_USUARIOS);  fmtH(sh,ENCABEZADOS_USUARIOS.length); }
+    if (name===SHEET_ARCHIVOS)  { sh.appendRow(ENCABEZADOS_ARCHIVOS);  fmtH(sh,ENCABEZADOS_ARCHIVOS.length); }
+    if (name===SHEET_PROYECTOS) { sh.appendRow(ENCABEZADOS_PROYECTOS); fmtH(sh,ENCABEZADOS_PROYECTOS.length); }
   }
   return sh;
 }
@@ -63,7 +69,7 @@ function fmtH(sh, len) {
 }
 
 function setWidths(sh) {
-  [120,140,110,140,140,100,140,180,320,140,200,120,160,140,140,220]
+  [120,140,110,140,140,100,140,180,320,140,200,120,160,140,140,220,220,120]
     .forEach(function(w,i){ sh.setColumnWidth(i+1,w); });
 }
 
@@ -83,10 +89,47 @@ function validarUsuario(email) {
     if (data[i][0].toString().toLowerCase().trim()===email.toLowerCase().trim()) {
       if (data[i][5]===false||data[i][5]==="FALSE"||data[i][5]==="")
         return {ok:false,error:"Usuario desactivado"};
-      return {ok:true, nombre:data[i][1], area:data[i][2], rol:data[i][3]};
+      return {
+        ok:true, nombre:data[i][1], area:data[i][2], rol:data[i][3],
+        proyectos: parseProyectosUsuario(data[i][COL_USU.PROYECTOS-1], data[i][3])
+      };
     }
   }
   return {ok:false,error:"not_registered"};
+}
+
+// ─── Proyectos: helpers ──────────────────────────────────
+// Devuelve array de IDs de proyecto del usuario, o ["ALL"] si tiene acceso total
+function parseProyectosUsuario(raw, rol) {
+  var s = (raw||"").toString().trim();
+  if (s.toUpperCase()===PROYECTO_ALL || rol===ROLES.ADMIN) return [PROYECTO_ALL];
+  if (!s) return [];
+  return s.split(",").map(function(x){ return x.trim(); }).filter(function(x){ return x; });
+}
+
+function tieneAccesoProyecto(proyectosUsuario, proyectoId) {
+  // Usuario sin proyectos asignados (compatibilidad con datos previos a esta funcionalidad):
+  // solo ve pedidos que tampoco tengan proyecto asignado.
+  if (!proyectosUsuario || !proyectosUsuario.length) return !proyectoId;
+  if (proyectosUsuario.indexOf(PROYECTO_ALL)!==-1) return true;
+  return proyectosUsuario.indexOf(proyectoId)!==-1;
+}
+
+function getProyectosSheet() {
+  var sh = getSheet(SHEET_PROYECTOS);
+  var rows = sh.getDataRange().getValues();
+  var out = [];
+  for (var i=1; i<rows.length; i++) {
+    if (!rows[i][COL_PRJ.ID-1]) continue;
+    out.push({
+      id: rows[i][COL_PRJ.ID-1],
+      nombre: rows[i][COL_PRJ.NOMBRE-1]||"",
+      desc: rows[i][COL_PRJ.DESC-1]||"",
+      color: rows[i][COL_PRJ.COLOR-1]||"#C0392B",
+      activo: rows[i][COL_PRJ.ACTIVO-1]!==false && rows[i][COL_PRJ.ACTIVO-1]!=="FALSE" && rows[i][COL_PRJ.ACTIVO-1]!==""
+    });
+  }
+  return out;
 }
 
 function esAdmin(email) {
@@ -118,6 +161,9 @@ function doPost(e) {
     if (a==="desactivar_usuario") return activarDesactivar(datos, false);
     if (a==="cambiar_rol")        return cambiarRol(datos);
     if (a==="responder_pedido")   return responderPedido(datos);
+    if (a==="crear_proyecto")     return crearProyecto(datos);
+    if (a==="editar_proyecto")    return editarProyecto(datos);
+    if (a==="asignar_proyecto")   return asignarProyecto(datos);
     return jsonOut({ok:false,error:"Acción desconocida"});
   } catch(err) {
     return jsonOut({ok:false,error:err.toString()});
@@ -132,11 +178,13 @@ function doGet(e) {
     return ContentService.createTextOutput("Canal 10 API v4.0 ✓").setMimeType(ContentService.MimeType.TEXT);
   var a = e.parameter.action;
   if (a==="check_user")       return checkUser(e.parameter.email);
-  if (a==="dashboard")        return getDashboard(e.parameter.email);
-  if (a==="mis_tareas")       return getMisTareas(e.parameter.email);
+  if (a==="dashboard")        return getDashboard(e.parameter.email, e.parameter.proyecto);
+  if (a==="mis_tareas")       return getMisTareas(e.parameter.email, e.parameter.proyecto);
   if (a==="archivos")         return getArchivos(e.parameter.ticket);
-  if (a==="admin_dashboard")  return getAdminDashboard(e.parameter.email);
+  if (a==="admin_dashboard")  return getAdminDashboard(e.parameter.email, e.parameter.proyecto);
   if (a==="admin_usuarios")   return getAdminUsuarios(e.parameter.email);
+  if (a==="proyectos")        return getProyectosUsuario(e.parameter.email);
+  if (a==="proyectos_todos")  return jsonOut({ok:true, proyectos: getProyectosSheet().filter(function(p){return p.activo;}) });
   return jsonOut({ok:false,error:"Acción desconocida"});
 }
 
@@ -163,11 +211,13 @@ function registrarUsuario(datos) {
     if (rows[i][0].toString().toLowerCase()===email) {
       if (rows[i][5]===false||rows[i][5]==="FALSE"||rows[i][5]==="")
         return jsonOut({ok:false,error:"Usuario desactivado"});
-      return jsonOut({ok:true,accion:"login",nombre:rows[i][1],area:rows[i][2],rol:rows[i][3]});
+      return jsonOut({ok:true,accion:"login",nombre:rows[i][1],area:rows[i][2],rol:rows[i][3],
+        proyectos:parseProyectosUsuario(rows[i][COL_USU.PROYECTOS-1], rows[i][3])});
     }
   }
-  sh.appendRow([email, nombre, area, datos.rol||"solicitante", ahoraAR(), true]);
-  return jsonOut({ok:true,accion:"registro",nombre:nombre,area:area,rol:rolFinal});
+  var proyectosVal = Array.isArray(datos.proyectos) ? datos.proyectos.join(",") : (datos.proyectos||"");
+  sh.appendRow([email, nombre, area, datos.rol||"solicitante", ahoraAR(), true, proyectosVal]);
+  return jsonOut({ok:true,accion:"registro",nombre:nombre,area:area,rol:rolFinal,proyectos:parseProyectosUsuario(proyectosVal, rolFinal)});
 }
 
 // ════════════════════════════════════════════════════════
@@ -176,6 +226,10 @@ function registrarUsuario(datos) {
 function nuevoPedido(datos) {
   var v = validarUsuario(datos.email);
   if (!v.ok) return jsonOut({ok:false,error:v.error});
+
+  var proyecto = datos.proyecto || "";
+  if (proyecto && !tieneAccesoProyecto(v.proyectos, proyecto))
+    return jsonOut({ok:false,error:"No tenés acceso a ese proyecto"});
 
   var sh = getSheet(SHEET_PEDIDOS);
   var anio = new Date().getFullYear();
@@ -186,7 +240,7 @@ function nuevoPedido(datos) {
     datos.area||"", datos.tipo||"", datos.prio||"",
     datos.dur||"", datos.deadline||"", datos.ubic||"",
     datos.desc||"", datos.nombre||"", datos.email||"",
-    "PENDIENTE","","","",""
+    "PENDIENTE","","","","","",proyecto
   ]);
 
   var nf = sh.getLastRow();
@@ -348,17 +402,104 @@ function marcarFin(datos) {
 }
 
 // ════════════════════════════════════════════════════════
-//  QUERIES
+//  PROYECTOS
 // ════════════════════════════════════════════════════════
-function getDashboard(email) {
+
+// doGet: lista de proyectos visibles para el usuario (con flag de acceso)
+function getProyectosUsuario(email) {
   var v = validarUsuario(email);
   if (!v.ok) return jsonOut({ok:false,error:v.error});
-  return jsonOut({ok:true, pedidos:todosLosPedidos(), usuario:v});
+  var todos = getProyectosSheet();
+  var esAll = v.proyectos.indexOf(PROYECTO_ALL)!==-1;
+  var propios = todos.filter(function(p){
+    return esAll || tieneAccesoProyecto(v.proyectos, p.id);
+  });
+  return jsonOut({ok:true, proyectos:propios, todos: esAll?todos:[], esAdmin:esAll});
 }
 
-function getMisTareas(email) {
-  if (!esEditor(email)) return jsonOut({ok:false,error:"Sin permisos"});
-  var todos = todosLosPedidos();
+function siguienteIdProyecto() {
+  var sh = getSheet(SHEET_PROYECTOS);
+  var rows = sh.getDataRange().getValues();
+  var max = 0;
+  for (var i=1; i<rows.length; i++) {
+    var id = (rows[i][COL_PRJ.ID-1]||"").toString();
+    var m = id.match(/PRJ-(\d+)/);
+    if (m) max = Math.max(max, parseInt(m[1]));
+  }
+  return "PRJ-" + String(max+1).padStart(3,"0");
+}
+
+function crearProyecto(datos) {
+  if (!esAdmin(datos.emailAdmin)) return jsonOut({ok:false,error:"Sin permisos"});
+  if (!datos.nombre) return jsonOut({ok:false,error:"Falta el nombre del proyecto"});
+  var sh = getSheet(SHEET_PROYECTOS);
+  var id = siguienteIdProyecto();
+  sh.appendRow([id, datos.nombre, datos.desc||"", datos.color||"#C0392B", true, ahoraAR()]);
+  return jsonOut({ok:true, id:id});
+}
+
+function editarProyecto(datos) {
+  if (!esAdmin(datos.emailAdmin)) return jsonOut({ok:false,error:"Sin permisos"});
+  if (!datos.id) return jsonOut({ok:false,error:"Falta el ID del proyecto"});
+  var sh = getSheet(SHEET_PROYECTOS);
+  var rows = sh.getDataRange().getValues();
+  for (var i=1; i<rows.length; i++) {
+    if (rows[i][COL_PRJ.ID-1]===datos.id) {
+      if (datos.nombre!==undefined) sh.getRange(i+1,COL_PRJ.NOMBRE).setValue(datos.nombre);
+      if (datos.desc!==undefined)   sh.getRange(i+1,COL_PRJ.DESC).setValue(datos.desc);
+      if (datos.color!==undefined)  sh.getRange(i+1,COL_PRJ.COLOR).setValue(datos.color);
+      if (datos.activo!==undefined) sh.getRange(i+1,COL_PRJ.ACTIVO).setValue(datos.activo);
+      return jsonOut({ok:true});
+    }
+  }
+  return jsonOut({ok:false,error:"Proyecto no encontrado"});
+}
+
+// Asigna la lista completa de proyectos de un usuario (reemplaza el valor de la columna 7)
+function asignarProyecto(datos) {
+  if (!esAdmin(datos.emailAdmin)) return jsonOut({ok:false,error:"Sin permisos"});
+  if (!datos.email) return jsonOut({ok:false,error:"Falta el email del usuario"});
+  var valor = Array.isArray(datos.proyectos) ? datos.proyectos.join(",") : (datos.proyectos||"");
+  var sh = getSheet(SHEET_USUARIOS);
+  var rows = sh.getDataRange().getValues();
+  for (var i=1; i<rows.length; i++) {
+    if (rows[i][0].toString().toLowerCase()===datos.email.toLowerCase()) {
+      sh.getRange(i+1,COL_USU.PROYECTOS).setValue(valor);
+      return jsonOut({ok:true});
+    }
+  }
+  return jsonOut({ok:false,error:"Usuario no encontrado"});
+}
+
+// ════════════════════════════════════════════════════════
+//  QUERIES
+// ════════════════════════════════════════════════════════
+
+// Filtra una lista de pedidos según los proyectos a los que tiene acceso el usuario,
+// y opcionalmente por un proyecto activo puntual (proyectoFiltro).
+function filtrarPorProyecto(pedidosLista, proyectosUsuario, proyectoFiltro) {
+  var esAll = proyectosUsuario.indexOf(PROYECTO_ALL)!==-1;
+  return pedidosLista.filter(function(p){
+    // "Ver todos" (admin sin filtro puntual) => no filtra
+    if (esAll && (!proyectoFiltro || proyectoFiltro==="ALL")) return true;
+    var proyectoPedido = p.proyecto || "";
+    if (proyectoFiltro && proyectoFiltro!=="ALL") return proyectoPedido===proyectoFiltro;
+    // Sin filtro puntual, no-admin: solo lo que tenga acceso
+    return tieneAccesoProyecto(proyectosUsuario, proyectoPedido);
+  });
+}
+
+function getDashboard(email, proyecto) {
+  var v = validarUsuario(email);
+  if (!v.ok) return jsonOut({ok:false,error:v.error});
+  var pedidos = filtrarPorProyecto(todosLosPedidos(), v.proyectos, proyecto);
+  return jsonOut({ok:true, pedidos:pedidos, usuario:v});
+}
+
+function getMisTareas(email, proyecto) {
+  var v = validarUsuario(email);
+  if (!v.ok || (v.rol!==ROLES.EDITOR && v.rol!==ROLES.ADMIN)) return jsonOut({ok:false,error:"Sin permisos"});
+  var todos = filtrarPorProyecto(todosLosPedidos(), v.proyectos, proyecto);
   var emailLow = email.toLowerCase().trim();
   var mias = todos.filter(function(p){
     return (p.editor||"").toLowerCase().trim()===emailLow;
@@ -366,9 +507,10 @@ function getMisTareas(email) {
   return jsonOut({ok:true,pedidos:mias});
 }
 
-function getAdminDashboard(email) {
+function getAdminDashboard(email, proyecto) {
   if (!esAdmin(email)) return jsonOut({ok:false,error:"Sin permisos admin"});
-  var pedidos = todosLosPedidos();
+  var v = validarUsuario(email);
+  var pedidos = filtrarPorProyecto(todosLosPedidos(), v.proyectos, proyecto);
   var editores = getEditoresList();
   return jsonOut({ok:true,pedidos:pedidos,editores:editores});
 }
@@ -383,7 +525,8 @@ function getAdminUsuarios(email) {
     users.push({
       email:rows[i][0]||"", nombre:rows[i][1]||"", area:rows[i][2]||"",
       rol:rows[i][3]||"", fecha:rows[i][4]?rows[i][4].toString():"",
-      activo:rows[i][5]!==false && rows[i][5]!=="FALSE" && rows[i][5]!==""
+      activo:rows[i][5]!==false && rows[i][5]!=="FALSE" && rows[i][5]!=="",
+      proyectos: parseProyectosUsuario(rows[i][COL_USU.PROYECTOS-1], rows[i][3])
     });
   }
   return jsonOut({ok:true,usuarios:users});
@@ -435,7 +578,8 @@ function todosLosPedidos() {
       inicio:  r[COL.INICIO-1]?r[COL.INICIO-1].toString():"",
       fin:     r[COL.FIN-1]?r[COL.FIN-1].toString():"",
       archivos:r[COL.ARCHIVOS-1]||"",
-      respuesta:r[COL.RESPUESTA-1]||""
+      respuesta:r[COL.RESPUESTA-1]||"",
+      proyecto:r[COL.PROYECTO-1]||""
     });
   }
   var po = {P1:1,P2:2,P3:3,P4:4};
