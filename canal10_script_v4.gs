@@ -102,7 +102,7 @@ function validarUsuario(email) {
 // Devuelve array de IDs de proyecto del usuario, o ["ALL"] si tiene acceso total
 function parseProyectosUsuario(raw, rol) {
   var s = (raw||"").toString().trim();
-  if (s.toUpperCase()===PROYECTO_ALL || rol===ROLES.ADMIN) return [PROYECTO_ALL];
+  if (s.toUpperCase()===PROYECTO_ALL || rol===ROLES.ADMIN || rol===ROLES.EDITOR) return [PROYECTO_ALL];
   if (!s) return [];
   return s.split(",").map(function(x){ return x.trim(); }).filter(function(x){ return x; });
 }
