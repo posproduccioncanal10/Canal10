@@ -479,7 +479,7 @@ button,input,textarea,select{font-family:var(--sans);}
   position:fixed;inset:0;
   background:rgba(0,0,0,0.7);
   display:none;align-items:center;justify-content:center;
-  z-index:500;padding:1rem;
+  z-index:700;padding:1rem;
   backdrop-filter:blur(4px);
 }
 .modal-overlay.open{display:flex;}
@@ -747,7 +747,7 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
 
   /* Panel de detalle: pantalla completa en vez de columna lateral */
   .detail-panel{
-    position:fixed;inset:0;z-index:550;
+    position:fixed;inset:0;z-index:650;
     width:100%!important;min-width:0!important;
     transform:translateX(0);transition:transform 0.2s ease;
   }
@@ -1830,10 +1830,12 @@ function selectStory(ticket){
 function closeDetail(){
   selectedTicket=null;
   document.getElementById('detail-panel').classList.add('hidden');
-  renderRundown();
+  var mbn=document.getElementById('mobile-bottom-nav'); if(mbn) mbn.style.display='';
+  renderAll();
 }
 
 async function showDetail(p){
+  var mbn=document.getElementById('mobile-bottom-nav'); if(mbn) mbn.style.display='none';
   var pClass=prioClass(p.prio); var eClass=estadoClass(p.estado);
   document.getElementById('detail-inner').innerHTML=buildDetailHTML(p,pClass,eClass,'<div class="arch-empty">Cargando archivos...</div>');
   try{
@@ -2472,8 +2474,16 @@ async function archivarPedido(ticket){
 // ════════════════════════════════════════════
 //  MODAL NUEVO PEDIDO
 // ════════════════════════════════════════════
-function openModal(){ resetModal(); renderModalProyectoField(); document.getElementById('modal-overlay').classList.add('open'); }
-function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+function openModal(){
+  resetModal(); renderModalProyectoField();
+  document.getElementById('modal-overlay').classList.add('open');
+  var mbn=document.getElementById('mobile-bottom-nav'); if(mbn) mbn.style.display='none';
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  var mbn=document.getElementById('mobile-bottom-nav');
+  if(mbn) mbn.style.display='';
+}
 document.getElementById('modal-overlay').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
 
 // ─── Grabación de audio ───────────────────────
