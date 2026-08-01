@@ -876,7 +876,6 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
         <button class="filter-chip" onclick="setFilter('PENDIENTE',this)">🟡 Pendientes</button>
         <button class="filter-chip" onclick="setFilter('EN CURSO',this)">🔵 En curso</button>
         <button class="filter-chip" onclick="setFilter('REALIZADO',this)">🟢 Realizados</button>
-        <button class="filter-chip" onclick="setFilter('P1',this)">🔴 P1 Urgente</button>
         <input class="filter-search" type="text" placeholder="Buscar ticket, área, descripción..." id="search-input" oninput="renderRundown()"/>
       </div>
 
@@ -1069,7 +1068,6 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
           <div class="m-err" id="me-proyecto">Elegí el proyecto.</div>
         </div>
         <div class="m-step-title">¿De qué área sos?</div>
-        <div class="m-step-hint">Tocá para seleccionar</div>
         <div class="sel-grid">
           <div class="sel-card" data-val="Informativo"   onclick="mSel('area',this)"><div class="ic">📺</div><div class="nm">Informativo</div></div>
           <div class="sel-card" data-val="Redes"         onclick="mSel('area',this)"><div class="ic">📱</div><div class="nm">Redes</div></div>
@@ -1083,12 +1081,8 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
           <div class="sel-card" data-val="Técnica"        onclick="mSel('area',this)"><div class="ic">🔧</div><div class="nm">Técnica</div></div>
         </div>
         <div class="m-err" id="me-area">Seleccioná tu área.</div>
-      </div>
 
-      <!-- PASO 1: Tipo -->
-      <div class="m-step" id="ms-1">
-        <div class="m-step-title">¿Qué necesitás?</div>
-        <div class="m-step-hint">Elegí el tipo de pieza</div>
+        <div class="m-step-title" style="margin-top:1.2rem;">¿Qué tipo de pieza es?</div>
         <div class="sel-grid">
           <div class="sel-card" data-val="Clip / recorte"      onclick="mSel('tipo',this)"><div class="ic">✂️</div><div class="nm">Clip / recorte</div></div>
           <div class="sel-card" data-val="Nota editada"        onclick="mSel('tipo',this)"><div class="ic">🎬</div><div class="nm">Nota editada</div></div>
@@ -1100,64 +1094,13 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
           <div class="sel-card" data-val="PNT / publicidad"    onclick="mSel('tipo',this)"><div class="ic">📺</div><div class="nm">PNT / publicidad</div></div>
           <div class="sel-card" data-val="Otro"                onclick="mSel('tipo',this)"><div class="ic">💬</div><div class="nm">Otro</div></div>
         </div>
-        <div class="m-err" id="me-tipo">Seleccioná el tipo.</div>
+        <div class="m-err" id="me-tipo">Elegí el tipo de pieza.</div>
       </div>
 
-      <!-- PASO 2: Urgencia -->
-      <div class="m-step" id="ms-2">
-        <div class="m-step-title">¿Cuándo lo necesitás?</div>
-        <div class="m-step-hint">Prioridad y duración</div>
-        <div class="prio-grid">
-          <div class="prio-card p1" data-val="🔴 P1 — Sale al aire" onclick="mSel('prio',this)">
-            <div class="prio-num">1</div><div class="prio-lbl">Sale al aire</div><div class="prio-desc">Tiene hora de emisión hoy</div>
-          </div>
-          <div class="prio-card p2" data-val="🟠 P2 — Mismo día" onclick="mSel('prio',this)">
-            <div class="prio-num">2</div><div class="prio-lbl">Mismo día</div><div class="prio-desc">Redes, clips del día</div>
-          </div>
-          <div class="prio-card p3" data-val="🟡 P3 — Con fecha" onclick="mSel('prio',this)">
-            <div class="prio-num">3</div><div class="prio-lbl">Tiene fecha</div><div class="prio-desc">Deadline planificable</div>
-          </div>
-          <div class="prio-card p4" data-val="🟢 P4 — Sin urgencia" onclick="mSel('prio',this)">
-            <div class="prio-num">4</div><div class="prio-lbl">Sin urgencia</div><div class="prio-desc">Cuando haya tiempo</div>
-          </div>
-        </div>
-        <div class="m-err" id="me-prio">Indicá la urgencia.</div>
-        <div class="m-field">
-          <label class="m-label">Duración del material a editar</label>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:70px;">
-              <input type="number" id="dur-hs" min="0" max="23" placeholder="0"
-                style="width:100%;background:var(--bg3);border:1px solid var(--borde2);border-radius:var(--radio);padding:10px;font-size:18px;font-weight:700;color:var(--txt);text-align:center;font-family:var(--mono);"
-                oninput="calcDur()"/>
-              <span style="font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.7px;">horas</span>
-            </div>
-            <div style="font-size:22px;color:var(--txt3);padding-bottom:18px;">:</div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:70px;">
-              <input type="number" id="dur-min" min="0" max="59" placeholder="0"
-                style="width:100%;background:var(--bg3);border:1px solid var(--borde2);border-radius:var(--radio);padding:10px;font-size:18px;font-weight:700;color:var(--txt);text-align:center;font-family:var(--mono);"
-                oninput="calcDur()"/>
-              <span style="font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.7px;">minutos</span>
-            </div>
-            <div style="font-size:22px;color:var(--txt3);padding-bottom:18px;">:</div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:70px;">
-              <input type="number" id="dur-seg" min="0" max="59" placeholder="0"
-                style="width:100%;background:var(--bg3);border:1px solid var(--borde2);border-radius:var(--radio);padding:10px;font-size:18px;font-weight:700;color:var(--txt);text-align:center;font-family:var(--mono);"
-                oninput="calcDur()"/>
-              <span style="font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.7px;">segundos</span>
-            </div>
-          </div>
-          <div id="dur-preview" style="font-size:12px;color:var(--txt3);margin-top:6px;min-height:18px;text-align:center;"></div>
-        </div>
-        <div class="m-field">
-          <label class="m-label">Deadline (opcional)</label>
-          <input type="datetime-local" class="m-input" id="m-deadline"/>
-        </div>
-      </div>
-
-      <!-- PASO 3: Descripción + material -->
-      <div class="m-step" id="ms-3">
-        <div class="m-step-title">Descripción y material</div>
-        <div class="m-step-hint">Detallá el pedido e indicá dónde está el material</div>
+      <!-- PASO 1: Descripción, material, deadline -->
+      <div class="m-step" id="ms-1">
+        <div class="m-step-title">Contanos qué necesitás</div>
+        <div class="m-step-hint">Descripción, material y fecha límite</div>
         <div class="m-field">
           <label class="m-label">Descripción del pedido *</label>
           <textarea class="m-textarea" id="m-desc" placeholder="Ej: Clip de la entrevista de las 10:15 de EntreNos. Cortar desde que entra el invitado hasta el cierre. Con zócalo del nombre." rows="4"></textarea>
@@ -1182,22 +1125,32 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
           </div>
           <div class="m-err" id="me-ubic">Indicá dónde está el material.</div>
         </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div class="m-field" style="flex:1;min-width:160px;">
+            <label class="m-label">Deadline (opcional)</label>
+            <input type="datetime-local" class="m-input" id="m-deadline"/>
+          </div>
+          <div class="m-field" style="flex:1;min-width:160px;">
+            <label class="m-label">Duración estimada (opcional)</label>
+            <input type="text" class="m-input" id="m-dur" placeholder="Ej: 2 min 30 seg"/>
+          </div>
+        </div>
         <div class="m-field">
           <label class="m-label">📝 Referencias o instrucciones adicionales (opcional)</label>
           <textarea class="m-textarea" id="m-refs" placeholder="Ej: Usar tipografía del manual de marca. El logo está en la carpeta /logos del servidor." rows="2"></textarea>
         </div>
       </div>
 
-      <!-- PASO 4: Resumen -->
-      <div class="m-step" id="ms-4">
+      <!-- PASO 2: Resumen -->
+      <div class="m-step" id="ms-2">
         <div class="m-step-title">Revisá tu pedido</div>
         <div class="m-step-hint">Confirmá antes de enviar</div>
         <div class="resumen-box" id="m-resumen"></div>
         <div id="m-arch-resumen" style="margin-top:10px;"></div>
       </div>
 
-      <!-- PASO 5: Success -->
-      <div class="m-step" id="ms-5">
+      <!-- PASO 3: Success -->
+      <div class="m-step" id="ms-3">
         <div class="modal-success">
           <div class="ms-ico">✅</div>
           <div class="ms-title">¡Pedido enviado!</div>
@@ -1236,7 +1189,7 @@ var refreshInterval = null;
 var mState = { area:'', tipo:'', prio:'', dur:'', deadline:'', desc:'', ubic:'', proyecto:'', files:[], uploadedFiles:[] };
 var pedidosArchivados = []; // pedidos marcados REALIZADO (separados del rundown activo)
 var mStep    = 0;
-var TOTAL_STEPS = 5;
+var TOTAL_STEPS = 3;
 
 // ─── Estado de proyectos ───────────────────────
 var proyectoActivo     = null;   // ID del proyecto activo, o "ALL"
@@ -1265,6 +1218,26 @@ function fileIco(name){
 }
 function fmtSize(b){ if(b<1024)return b+'B'; if(b<1048576)return (b/1024).toFixed(0)+'KB'; return (b/1048576).toFixed(1)+'MB'; }
 function prioClass(p){ if(!p)return 'p-'; if(p.includes('P1'))return 'p1'; if(p.includes('P2'))return 'p2'; if(p.includes('P3'))return 'p3'; return 'p4'; }
+
+// ─── Colores por área (reemplaza el color por urgencia) ───
+var AREA_COLORS = {
+  'Informativo':'#E74C3C', 'Redes':'#9B59B6', 'Administración':'#95A5A6',
+  'Ventas':'#16A085', 'Comercial':'#F39C12', 'Programación':'#3498DB',
+  'Operaciones':'#34495E', 'Edición':'#E91E8C', 'Posproducción':'#F1C40F',
+  'Técnica':'#1ABC9C'
+};
+function areaColor(area){ return AREA_COLORS[area]||'#7F8C8D'; }
+function areaPillHtml(area){
+  var c=areaColor(area);
+  return '<span class="detail-pill" style="background:'+c+'22;color:'+c+';border:1px solid '+c+'66;">'+esc(area||'—')+'</span>';
+}
+// Convierte "dd/MM/yyyy HH:mm" a timestamp comparable (0 si vacío) — para ordenar por más reciente
+function parseFechaOrden(s){
+  if(!s) return 0;
+  var m=s.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
+  if(!m) return 0;
+  return new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]).getTime();
+}
 function estadoClass(e){ return e==='EN CURSO'?'en-curso':e==='REALIZADO'?'realizado':'pendiente'; }
 function fmtHora(f){ if(!f)return '—'; var parts=(f+'').split(' '); return parts[1]||parts[0]; }
 function fmtDt(v){ if(!v)return ''; var d=new Date(v); return d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
@@ -1572,10 +1545,7 @@ function setFilter(f,el){
 function renderRundown(){
   var q=(document.getElementById('search-input').value||'').toLowerCase();
   var lista=pedidos.filter(function(p){
-    if(filtro!=='todos'&&filtro!=='P1'&&filtro!=='P2'&&filtro!=='P3'&&filtro!=='P4'){
-      if(p.estado!==filtro) return false;
-    }
-    if(['P1','P2','P3','P4'].includes(filtro)){ if(!p.prio.includes(filtro)) return false; }
+    if(filtro!=='todos'){ if(p.estado!==filtro) return false; }
     if(q&&!(p.ticket+p.area+p.tipo+p.desc+p.nombre+p.email).toLowerCase().includes(q)) return false;
     return true;
   });
@@ -1587,14 +1557,14 @@ function renderRundown(){
   }
 
   body.innerHTML=lista.map(function(p){
-    var pClass=prioClass(p.prio); var eClass=estadoClass(p.estado);
+    var eClass=estadoClass(p.estado);
+    var aColor=areaColor(p.area);
     var sel=p.ticket===selectedTicket?' selected':'';
     var dim=p.estado==='REALIZADO'?' estado-realizado':'';
-    var pNum={p1:'1',p2:'2',p3:'3',p4:'4','p-':'·'}[pClass]||'·';
     var archIco=p.archivos?'📎':'';
     var editorBadge=p.editor?'<span style="font-size:9px;color:#52BE80;margin-left:4px;">▶'+esc(p.editor.split('@')[0])+'</span>':'';
     return '<div class="story-row'+sel+dim+'" onclick="selectStory(\''+p.ticket+'\')">'+
-      '<div class="s-prio"><div class="prio-badge '+pClass+'">'+pNum+'</div></div>'+
+      '<div class="s-prio"><div style="width:12px;height:12px;border-radius:50%;background:'+aColor+';margin:auto;"></div></div>'+
       '<div class="s-ticket">'+p.ticket+editorBadge+'</div>'+
       '<div class="s-estado"><span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span></div>'+
       '<div class="s-area">'+esc(p.area)+'</div>'+
@@ -1612,12 +1582,14 @@ function renderRundown(){
 function renderKanban(){
   var q=(document.getElementById('search-input').value||'').toLowerCase();
   var lista=pedidos.filter(function(p){
-    if(['P1','P2','P3','P4'].includes(filtro)){ if(!p.prio.includes(filtro)) return false; }
     if(q&&!(p.ticket+p.area+p.tipo+p.desc+p.nombre+p.email).toLowerCase().includes(q)) return false;
     return true;
   });
   var cols={PENDIENTE:[],'EN CURSO':[],REALIZADO:[]};
   lista.forEach(function(p){ (cols[p.estado]||cols.PENDIENTE).push(p); });
+  // Lo más reciente arriba: en curso por inicio, entregado por fin, pendientes por fecha de creación
+  cols['EN CURSO'].sort(function(a,b){ return parseFechaOrden(b.inicio)-parseFechaOrden(a.inicio); });
+  cols.REALIZADO.sort(function(a,b){ return parseFechaOrden(b.fin)-parseFechaOrden(a.fin); });
   renderKbCol('kb-col-pendiente','kb-count-pendiente',cols.PENDIENTE);
   renderKbCol('kb-col-encurso','kb-count-encurso',cols['EN CURSO']);
   renderKbCol('kb-col-realizado','kb-count-realizado',cols.REALIZADO);
@@ -1638,11 +1610,12 @@ function puedeMoverTarjeta(p){
 }
 
 function kbCardHtml(p){
-  var pClass=prioClass(p.prio);
-  var pNum={p1:'1',p2:'2',p3:'3',p4:'4','p-':'·'}[pClass]||'·';
+  var aColor=areaColor(p.area);
   var sel=p.ticket===selectedTicket?' selected':'';
   var esSoloEditor=usuario&&usuario.rol==='editor';
+  var esAdminUser=usuario&&usuario.rol==='admin';
   var sinAsignar=!p.editor;
+  var esMio=p.editor&&usuario&&p.editor.toLowerCase().trim()===usuario.email.toLowerCase().trim();
   var editorTag=p.editor?'<span class="kb-card-editor">▶ '+esc(p.editor.split('@')[0])+'</span>':
     (sinAsignar&&p.estado!=='REALIZADO'?'<span class="kb-card-editor" style="color:var(--txt3);">Sin asignar</span>':'');
   var nuevo=esReciente(p.fecha,4)?'<span class="kb-card-nuevo">NUEVO</span>':'';
@@ -1651,21 +1624,27 @@ function kbCardHtml(p){
   var tomarBtn = (esSoloEditor&&sinAsignar&&p.estado!=='REALIZADO')
     ? '<button onclick="event.stopPropagation();tomarTarea(\''+p.ticket+'\')" style="width:100%;margin-top:7px;background:rgba(174,214,241,0.15);border:1px solid var(--azul);color:var(--azul-t);border-radius:6px;padding:6px;font-size:10.5px;font-weight:700;cursor:pointer;">🖐 Tomar tarea</button>'
     : '';
-  return '<div class="kb-card '+pClass+sel+'" '+
+  var dejarBtn = (p.estado==='EN CURSO'&&(esMio||esAdminUser))
+    ? '<button onclick="event.stopPropagation();dejarTareaUI(\''+p.ticket+'\')" style="width:100%;margin-top:7px;background:rgba(249,231,159,0.1);border:1px solid #7D6608;color:#B7950B;border-radius:6px;padding:6px;font-size:10.5px;font-weight:700;cursor:pointer;">↩ Dejar tarea</button>'
+    : '';
+  var borrarBtn = (p.estado==='REALIZADO'&&esAdminUser)
+    ? '<button onclick="event.stopPropagation();borrarPedidoUI(\''+p.ticket+'\')" style="width:100%;margin-top:7px;background:rgba(231,76,60,0.1);border:1px solid #E74C3C;color:#E74C3C;border-radius:6px;padding:6px;font-size:10.5px;font-weight:700;cursor:pointer;">🗑 Borrar</button>'
+    : '';
+  return '<div class="kb-card'+sel+'" style="border-left-color:'+aColor+';" '+
     'draggable="'+(puede?'true':'false')+'" data-ticket="'+p.ticket+'" '+
     (puede?'ondragstart="kbDragStart(event,\''+p.ticket+'\')" ondragend="kbDragEnd(event)"':'')+
     ' onclick="showDetail(pedidos.find(function(x){return x.ticket===\''+p.ticket+'\';}));selectedTicket=\''+p.ticket+'\';document.getElementById(\'detail-panel\').classList.remove(\'hidden\');renderKanban();">'+
     '<div class="kb-card-top">'+
-      '<span class="prio-badge '+pClass+'" style="width:16px;height:16px;font-size:8px;">'+pNum+'</span>'+
+      '<span style="width:9px;height:9px;border-radius:50%;background:'+aColor+';flex-shrink:0;"></span>'+
       '<span class="kb-card-ticket">'+p.ticket+'</span>'+nuevo+
     '</div>'+
     '<div class="kb-card-desc">'+esc(p.desc)+'</div>'+
-    '<div class="kb-card-meta"><span>'+esc(p.area)+'</span><span>'+esc(p.tipo)+'</span>'+arch+'</div>'+
+    '<div class="kb-card-meta"><span style="color:'+aColor+';font-weight:700;">'+esc(p.area)+'</span><span>'+esc(p.tipo)+'</span>'+arch+'</div>'+
     '<div class="kb-card-foot">'+
       '<span class="kb-card-time" title="'+esc(p.fecha)+'">'+fmtFechaCompleta(p.fecha)+'</span>'+
       editorTag+
     '</div>'+
-    tomarBtn+
+    tomarBtn+dejarBtn+borrarBtn+
   '</div>';
 }
 
@@ -1677,6 +1656,29 @@ async function tomarTarea(ticket){
     bar(false);
     if(r.ok){ toast('🖐 Tarea tomada — ¡a editar!','success'); await silentRefresh(); }
     else { toast('Error: '+(r.error||'No se pudo tomar la tarea'),'error'); await silentRefresh(); }
+  }catch(e){ bar(false); toast('Error de conexión','error'); }
+}
+
+async function dejarTareaUI(ticket){
+  if(!confirm('¿Dejar esta tarea? Va a volver a la columna de Pedidos para que la tome otro editor.')) return;
+  bar(true);
+  try{
+    var r=await post({accion:'soltar_tarea',email:usuario.email,ticket:ticket});
+    bar(false);
+    if(r.ok){ toast('↩ Tarea liberada','success'); if(selectedTicket===ticket){ closeDetail(); } await silentRefresh(); }
+    else toast('Error: '+(r.error||'No se pudo dejar la tarea'),'error');
+  }catch(e){ bar(false); toast('Error de conexión','error'); }
+}
+
+async function borrarPedidoUI(ticket){
+  if(!usuario||usuario.rol!=='admin') return;
+  if(!confirm('¿Borrar definitivamente el pedido '+ticket+'? Esta acción no se puede deshacer.')) return;
+  bar(true);
+  try{
+    var r=await post({accion:'eliminar_pedido',emailAdmin:usuario.email,ticket:ticket});
+    bar(false);
+    if(r.ok){ toast('🗑 Pedido borrado','success'); if(selectedTicket===ticket){ closeDetail(); } await silentRefresh(); }
+    else toast('Error: '+(r.error||'No se pudo borrar'),'error');
   }catch(e){ bar(false); toast('Error de conexión','error'); }
 }
 
@@ -1763,8 +1765,14 @@ function buildDetailHTML(p,pClass,eClass,archHtml){
     if(p.estado!=='REALIZADO') btnEstado+='<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'REALIZADO\')" style="flex:1;background:rgba(169,223,191,0.15);border:1px solid var(--verde);color:var(--verde-t);border-radius:7px;padding:7px;font-size:11px;font-weight:600;cursor:pointer;min-width:80px;">✓ Realizado</button>';
     if(p.estado!=='PENDIENTE') btnEstado+='<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'PENDIENTE\')" style="flex:1;background:rgba(249,231,159,0.1);border:1px solid #7D6608;color:#7D6608;border-radius:7px;padding:7px;font-size:11px;font-weight:600;cursor:pointer;min-width:80px;">↩ Pendiente</button>';
     btnEstado+='</div>';
+    if((esMio||esAdminUser)&&!noAsignado){
+      btnEstado+='<button onclick="dejarTareaUI(\''+p.ticket+'\')" style="width:100%;margin-top:6px;background:rgba(249,231,159,0.1);border:1px solid #7D6608;color:#B7950B;border-radius:7px;padding:7px;font-size:11px;font-weight:600;cursor:pointer;">↩ Dejar esta tarea (que la tome otro editor)</button>';
+    }
   } else if(esSoloEditor){
     btnEstado='<div style="margin-top:8px;font-size:11px;color:var(--txt3);">🔒 Este pedido ya lo tomó otro editor.</div>';
+  }
+  if(esAdminUser&&p.estado==='REALIZADO'){
+    btnEstado+='<button onclick="borrarPedidoUI(\''+p.ticket+'\')" style="width:100%;margin-top:6px;background:rgba(231,76,60,0.1);border:1px solid #E74C3C;color:#E74C3C;border-radius:7px;padding:7px;font-size:11px;font-weight:600;cursor:pointer;">🗑 Borrar este pedido</button>';
   }
 
   var asignarHTML='';
@@ -1824,8 +1832,7 @@ function buildDetailHTML(p,pClass,eClass,archHtml){
   '</div>'+
   '<div class="detail-title">'+esc(p.desc)+'</div>'+
   '<div class="detail-pills">'+
-    '<span class="detail-pill '+pClass+'">'+p.prio+'</span>'+
-    '<span class="detail-pill">'+esc(p.area)+'</span>'+
+    areaPillHtml(p.area)+
     '<span class="detail-pill">'+esc(p.tipo)+'</span>'+
     (p.dur?'<span class="detail-pill">'+esc(p.dur)+'</span>':'')+
   '</div>'+
@@ -1915,7 +1922,7 @@ function renderMisPedidos(){
   var el=document.getElementById('mis-pedidos-list');
   if(!mis.length){ el.innerHTML='<div class="empty-state"><div class="empty-ico">📭</div><div class="empty-txt">Todavía no hiciste ningún pedido</div></div>'; return; }
   el.innerHTML=mis.map(function(p){
-    var eClass=estadoClass(p.estado); var pClass=prioClass(p.prio);
+    var eClass=estadoClass(p.estado);
     var respBadge = p.respuesta
       ? '<div style="margin-top:8px;display:flex;align-items:center;gap:8px;background:rgba(30,132,73,0.12);border:1px solid rgba(30,132,73,0.35);border-radius:8px;padding:8px 12px;">'+
           '<span style="font-size:16px;">📁</span>'+
@@ -1931,7 +1938,7 @@ function renderMisPedidos(){
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'+
         '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
         '<span style="font-family:var(--mono);font-size:11px;color:var(--txt3);">'+p.ticket+'</span>'+
-        '<span class="detail-pill '+pClass+'" style="margin-left:auto;">'+p.prio+'</span>'+
+        '<span style="margin-left:auto;">'+areaPillHtml(p.area)+'</span>'+
       '</div>'+
       '<div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:3px;">'+esc(p.desc.substring(0,80))+(p.desc.length>80?'…':'')+'</div>'+
       '<div style="font-size:11px;color:var(--txt3);">'+esc(p.area)+' · '+esc(p.tipo)+' · '+p.fecha+(p.editor?' · <span style="color:#52BE80;">▶ '+esc(p.editor.split('@')[0])+'</span>':'')+'</div>'+
@@ -1954,6 +1961,14 @@ async function loadMisTareas(){
       return;
     }
     var tareas=r.pedidos||[];
+    // Orden: primero lo que está EN CURSO (más reciente arriba), después pendientes, al final lo realizado
+    var ordenEstado={'EN CURSO':0,'PENDIENTE':1,'REALIZADO':2};
+    tareas.sort(function(a,b){
+      var oa=ordenEstado[a.estado]!==undefined?ordenEstado[a.estado]:1;
+      var ob=ordenEstado[b.estado]!==undefined?ordenEstado[b.estado]:1;
+      if(oa!==ob) return oa-ob;
+      return parseFechaOrden(b.inicio||b.fecha)-parseFechaOrden(a.inicio||a.fecha);
+    });
     var activas=tareas.filter(function(p){return p.estado!=='REALIZADO';}).length;
     var hechas=tareas.filter(function(p){return p.estado==='REALIZADO';}).length;
     document.getElementById('tareas-meta').textContent=tareas.length+' tareas asignadas · '+activas+' activas · '+hechas+' realizadas';
@@ -1969,13 +1984,13 @@ async function loadMisTareas(){
       return;
     }
     el.innerHTML=tareas.map(function(p){
-      var eClass=estadoClass(p.estado); var pClass=prioClass(p.prio);
+      var eClass=estadoClass(p.estado);
       return '<div style="background:var(--bg2);border:1px solid var(--borde);border-radius:10px;padding:14px 16px;">'+
         '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'+
           '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
           '<span style="font-family:var(--mono);font-size:11px;color:var(--txt3);">'+p.ticket+'</span>'+
-          '<span class="detail-pill '+pClass+'">'+p.prio+'</span>'+
-          '<span style="margin-left:auto;font-size:11px;color:var(--txt2);">De: '+esc(p.nombre)+' ('+esc(p.area)+')</span>'+
+          areaPillHtml(p.area)+
+          '<span style="margin-left:auto;font-size:11px;color:var(--txt2);">De: '+esc(p.nombre)+'</span>'+
         '</div>'+
         '<div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:5px;">'+esc(p.tipo)+' — '+esc(p.desc.substring(0,90))+(p.desc.length>90?'…':'')+'</div>'+
         '<div style="font-size:11px;color:var(--txt3);margin-bottom:10px;">'+
@@ -1986,6 +2001,7 @@ async function loadMisTareas(){
         '<div style="display:flex;gap:6px;flex-wrap:wrap;">'+
           (p.estado==='PENDIENTE'?'<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'EN CURSO\');setTimeout(loadMisTareas,1500)" style="flex:1;background:rgba(93,173,226,0.2);border:1px solid var(--azul);color:var(--azul-t);border-radius:7px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">▶ Iniciar edición</button>':'')+
           (p.estado==='EN CURSO'?'<button onclick="cambiarEstadoUI(\''+p.ticket+'\',\'REALIZADO\');setTimeout(loadMisTareas,1500)" style="flex:1;background:rgba(39,174,96,0.2);border:1px solid var(--verde-t);color:var(--verde-t);border-radius:7px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">✅ Marcar como listo</button>':'')+
+          (p.estado==='EN CURSO'?'<button onclick="dejarTareaUI(\''+p.ticket+'\');setTimeout(loadMisTareas,1500)" style="background:rgba(249,231,159,0.1);border:1px solid #7D6608;color:#B7950B;border-radius:7px;padding:10px 12px;font-size:12px;font-weight:700;cursor:pointer;">↩ Dejar</button>':'')+
           (p.estado==='REALIZADO'?'<div style="flex:1;text-align:center;padding:10px;font-size:13px;font-weight:700;color:var(--verde-t);">✅ Completado</div>':'')+
           '<button onclick="showPanel(\'dashboard\');selectStory(\''+p.ticket+'\')" style="background:var(--bg3);border:1px solid var(--borde2);color:var(--txt2);border-radius:7px;padding:10px 14px;font-size:12px;cursor:pointer;">🔍 Ver detalle</button>'+
         '</div>'+
@@ -2057,14 +2073,14 @@ function renderAdminPedidos(){
   var el=document.getElementById('admin-pedidos-list');
   if(!lista.length){ el.innerHTML='<div class="empty-state"><div class="empty-ico">📋</div><div class="empty-txt">No hay pedidos</div></div>'; return; }
   el.innerHTML=lista.map(function(p){
-    var eClass=estadoClass(p.estado); var pClass=prioClass(p.prio);
+    var eClass=estadoClass(p.estado);
     var alerta=(!p.editor&&p.estado!=='REALIZADO')?'border-left:3px solid #E74C3C;':'';
     return '<div style="background:var(--bg2);border:1px solid var(--borde);border-radius:10px;padding:12px 14px;'+alerta+'">'+
       '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'+
         '<span class="estado-pill '+eClass+'"><span class="estado-dot"></span>'+p.estado+'</span>'+
         '<span style="font-family:var(--mono);font-size:11px;color:var(--txt3);">'+p.ticket+'</span>'+
-        '<span class="detail-pill '+pClass+'">'+p.prio+'</span>'+
-        '<span style="font-size:11px;color:var(--txt2);">'+esc(p.area)+' — '+esc(p.tipo)+'</span>'+
+        areaPillHtml(p.area)+
+        '<span style="font-size:11px;color:var(--txt2);">'+esc(p.tipo)+'</span>'+
         '<span style="margin-left:auto;font-size:11px;color:var(--txt3);">'+esc(p.nombre)+' · '+fmtHora(p.fecha)+'</span>'+
       '</div>'+
       '<div style="font-size:12px;color:var(--txt2);margin-bottom:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(p.desc)+'</div>'+
@@ -2077,6 +2093,7 @@ function renderAdminPedidos(){
         '<button onclick="adminCambiarEstado(\''+p.ticket+'\',\'EN CURSO\')" style="background:rgba(174,214,241,0.15);border:1px solid var(--azul);color:var(--azul-t);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">▶ En curso</button>'+
         '<button onclick="adminCambiarEstado(\''+p.ticket+'\',\'REALIZADO\')" style="background:rgba(169,223,191,0.15);border:1px solid var(--verde);color:var(--verde-t);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">✓ Listo</button>'+
         '<button onclick="archivarPedido(\''+p.ticket+'\')" style="background:rgba(255,255,255,0.05);border:1px solid var(--borde2);color:var(--txt3);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;" title="Archivar pedido">📦 Archivar</button>'+
+        (p.estado==='REALIZADO'?'<button onclick="borrarPedidoUI(\''+p.ticket+'\');setTimeout(loadAdmin,1500)" style="background:rgba(231,76,60,0.1);border:1px solid #E74C3C;color:#E74C3C;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;" title="Borrar definitivamente">🗑 Borrar</button>':'')+
         (p.editor
           ?'<span style="font-size:11px;color:#52BE80;white-space:nowrap;">▶ '+esc(p.editor.split('@')[0])+'</span>'
           :'<span style="font-size:11px;color:#E74C3C;">⚠ Sin asignar</span>')+
@@ -2265,20 +2282,20 @@ function renderRealizados(){
   Object.keys(grupos).forEach(function(dia){
     html+='<div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;padding:4px 0 4px 2px;border-bottom:1px solid var(--borde);margin-bottom:4px;">'+dia+'</div>';
     grupos[dia].forEach(function(p){
-      var pClass=prioClass(p.prio);
       var esNuevo=esReciente(p.fin||p.fecha, 24);
+      var esAdminUser=usuario&&usuario.rol==='admin';
       var nuevoBadge=esNuevo?'<span style="background:#C0392B;color:#fff;border-radius:4px;font-size:9px;font-weight:700;padding:1px 5px;margin-left:6px;">NUEVO</span>':'';
-      html+='<div style="background:var(--bg2);border:1px solid rgba(82,190,128,0.2);border-radius:10px;padding:12px 14px;cursor:pointer;transition:background 0.1s;" onclick="showPanel(\'dashboard\');selectStory(\''+p.ticket+'\')">'+
-        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'+
+      html+='<div style="background:var(--bg2);border:1px solid rgba(82,190,128,0.2);border-radius:10px;padding:12px 14px;transition:background 0.1s;">'+
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;cursor:pointer;" onclick="showPanel(\'dashboard\');selectStory(\''+p.ticket+'\')">'+
           '<span class="estado-pill realizado"><span class="estado-dot"></span>REALIZADO</span>'+
           '<span style="font-family:var(--mono);font-size:11px;color:var(--txt3);">'+p.ticket+'</span>'+
-          '<span class="detail-pill '+pClass+'">'+p.prio+'</span>'+
+          areaPillHtml(p.area)+
           nuevoBadge+
           '<span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--verde-t);font-weight:600;">'+
             '✓ '+(p.fin?fmtFechaCompleta(p.fin):fmtFechaCompleta(p.fecha))+
           '</span>'+
         '</div>'+
-        '<div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:4px;">'+esc(p.desc.substring(0,90))+(p.desc.length>90?'…':'')+'</div>'+
+        '<div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:4px;cursor:pointer;" onclick="showPanel(\'dashboard\');selectStory(\''+p.ticket+'\')">'+esc(p.desc.substring(0,90))+(p.desc.length>90?'…':'')+'</div>'+
         '<div style="font-size:11px;color:var(--txt2);display:flex;gap:12px;flex-wrap:wrap;">'+
           '<span>'+esc(p.area)+'</span>'+
           '<span>'+esc(p.tipo)+'</span>'+
@@ -2288,6 +2305,9 @@ function renderRealizados(){
         '</div>'+
         (p.respuesta?
           '<div style="margin-top:8px;"><a href="'+p.respuesta+'" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:5px;background:rgba(30,132,73,0.12);border:1px solid rgba(30,132,73,0.35);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;color:var(--verde-t);text-decoration:none;">📁 Ver material entregado ↗</a></div>'
+          :'')+
+        (esAdminUser?
+          '<div style="margin-top:8px;"><button onclick="borrarPedidoUI(\''+p.ticket+'\');setTimeout(renderRealizados,1500)" style="background:rgba(231,76,60,0.1);border:1px solid #E74C3C;color:#E74C3C;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;">🗑 Borrar definitivamente</button></div>'
           :'')+
       '</div>';
     });
@@ -2348,7 +2368,7 @@ function closeModal(){ document.getElementById('modal-overlay').classList.remove
 document.getElementById('modal-overlay').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
 
 function resetModal(){
-  mState={area:'',tipo:'',prio:'',dur:'',deadline:'',desc:'',ubic:'',refs:'',
+  mState={area:'',tipo:'',dur:'',deadline:'',desc:'',ubic:'',refs:'',
     proyecto:(proyectoActivo&&proyectoActivo!=='ALL')?proyectoActivo:'',files:[],uploadedFiles:[]};
   mStep=0;
   document.querySelectorAll('.m-step').forEach(function(s,i){s.classList.toggle('active',i===0);});
@@ -2356,11 +2376,8 @@ function resetModal(){
   document.getElementById('m-deadline').value='';
   document.getElementById('m-desc').value='';
   document.getElementById('m-ubic').value='';
+  var dur=document.getElementById('m-dur'); if(dur) dur.value='';
   var refs=document.getElementById('m-refs'); if(refs) refs.value='';
-  var hs=document.getElementById('dur-hs'); if(hs) hs.value='';
-  var mn=document.getElementById('dur-min'); if(mn) mn.value='';
-  var sg=document.getElementById('dur-seg'); if(sg) sg.value='';
-  var dp=document.getElementById('dur-preview'); if(dp) dp.textContent='';
   var up=document.getElementById('ubic-preview'); if(up) up.style.display='none';
   document.getElementById('btn-m-next').textContent='Continuar →';
   document.getElementById('btn-m-next').disabled=false;
@@ -2400,28 +2417,29 @@ async function mNext(){
     var pf=document.getElementById('m-proyecto-field');
     if(pf && pf.style.display!=='none'){ if(!mState.proyecto){showMErr('me-proyecto',true);return;} showMErr('me-proyecto',false); }
     if(!mState.area){showMErr('me-area',true);return;} showMErr('me-area',false);
+    if(!mState.tipo){showMErr('me-tipo',true);return;} showMErr('me-tipo',false);
   }
-  if(mStep===1){ if(!mState.tipo){showMErr('me-tipo',true);return;} showMErr('me-tipo',false); }
-  if(mStep===2){ if(!mState.prio){showMErr('me-prio',true);return;} showMErr('me-prio',false); calcDur(); mState.deadline=fmtDt(document.getElementById('m-deadline').value); }
-  if(mStep===3){
+  if(mStep===1){
     mState.desc=document.getElementById('m-desc').value.trim();
     mState.ubic=document.getElementById('m-ubic').value.trim();
     mState.refs=(document.getElementById('m-refs')||{value:''}).value.trim();
+    mState.dur=(document.getElementById('m-dur')||{value:''}).value.trim();
+    mState.deadline=fmtDt(document.getElementById('m-deadline').value);
     if(!mState.desc){showMErr('me-desc',true);return;} showMErr('me-desc',false);
     if(!mState.ubic){showMErr('me-ubic',true);return;} showMErr('me-ubic',false);
     buildResumen();
   }
-  if(mStep===4){ await enviarPedido(); return; }
+  if(mStep===2){ await enviarPedido(); return; }
   mStep++; setMStep(mStep);
 }
 function mBack(){ if(mStep>0){mStep--;setMStep(mStep);} }
 function setMStep(n){
   document.querySelectorAll('.m-step').forEach(function(s,i){s.classList.toggle('active',i===n);});
-  document.getElementById('btn-m-back').style.display=n>0&&n<5?'':'none';
-  document.getElementById('btn-m-next').textContent=n===4?'Enviar pedido ✓':'Continuar →';
-  document.getElementById('modal-foot').style.display=n===5?'none':'';
+  document.getElementById('btn-m-back').style.display=n>0&&n<3?'':'none';
+  document.getElementById('btn-m-next').textContent=n===2?'Enviar pedido ✓':'Continuar →';
+  document.getElementById('modal-foot').style.display=n===3?'none':'';
   updateStepDots();
-  var titles=['¿De qué área?','¿Qué necesitás?','Urgencia','Descripción y archivos','Revisá tu pedido',''];
+  var titles=['Área y tipo de pieza','Descripción y material','Revisá tu pedido',''];
   document.getElementById('modal-title').textContent=titles[n]||'Nuevo pedido';
 }
 
@@ -2430,7 +2448,7 @@ function buildResumen(){
   var pr = lista.find(function(x){return x.id===mState.proyecto;});
   document.getElementById('m-resumen').innerHTML=
     (mState.proyecto?mRow('Proyecto',pr?pr.nombre:mState.proyecto):'')+
-    mRow('Área',mState.area)+mRow('Tipo',mState.tipo)+mRow('Prioridad',mState.prio)+
+    mRow('Área',mState.area)+mRow('Tipo',mState.tipo)+
     mRow('Duración',mState.dur||'No especificada')+mRow('Deadline',mState.deadline||'No especificado')+
     mRow('Material en',mState.ubic)+mRow('Descripción',mState.desc)+
     (mState.refs?mRow('Referencias',mState.refs):'')+
@@ -2446,7 +2464,7 @@ async function enviarPedido(){
   try{
     var r=await post({
       accion:'nuevo_pedido',email:usuario.email,
-      area:mState.area,tipo:mState.tipo,prio:mState.prio,
+      area:mState.area,tipo:mState.tipo,prio:'',
       dur:mState.dur,deadline:mState.deadline,
       ubic:mState.ubic+(mState.refs?' | Refs: '+mState.refs:''),
       desc:mState.desc,nombre:usuario.nombre,
@@ -2458,10 +2476,9 @@ async function enviarPedido(){
     document.getElementById('ms-ticket-box').innerHTML=
       '<div class="ms-ticket-id">'+ticket+'</div>'+
       '<div class="ms-ticket-info">'+esc(mState.area)+' → '+esc(mState.tipo)+'</div>'+
-      (mState.prio?'<div style="font-size:11px;color:var(--txt3);margin-top:3px;">'+esc(mState.prio)+'</div>':'')+
       '<div style="font-size:11px;color:var(--txt3);margin-top:3px;">Solicitante: '+esc(usuario.nombre)+'</div>'+
       '<div style="font-size:11px;color:var(--azul-t);margin-top:3px;">📎 Material: '+esc(mState.ubic.substring(0,60))+'</div>';
-    mStep=5; setMStep(5);
+    mStep=3; setMStep(3);
     silentRefresh();
   }catch(e){
     bar(false); btn.disabled=false; btn.textContent='Reintentar';
@@ -2476,26 +2493,6 @@ function fileToBase64(file){
     reader.onerror=reject;
     reader.readAsDataURL(file);
   });
-}
-
-function calcDur(){
-  var hs  = parseInt(document.getElementById('dur-hs').value)||0;
-  var min = parseInt(document.getElementById('dur-min').value)||0;
-  var seg = parseInt(document.getElementById('dur-seg').value)||0;
-  var total = hs*3600 + min*60 + seg;
-  var prev = document.getElementById('dur-preview');
-  if(total===0){ mState.dur='No especificada'; prev.textContent=''; return; }
-  var partes=[];
-  if(hs)  partes.push(hs+(hs===1?' hora':' horas'));
-  if(min) partes.push(min+(min===1?' minuto':' minutos'));
-  if(seg) partes.push(seg+(seg===1?' segundo':' segundos'));
-  mState.dur = partes.join(' ');
-  // también mostrar en formato HH:MM:SS
-  var hh=String(hs).padStart(2,'0');
-  var mm=String(min).padStart(2,'0');
-  var ss=String(seg).padStart(2,'0');
-  prev.textContent = '⏱ Duración: '+mState.dur+' ('+hh+':'+mm+':'+ss+')';
-  prev.style.color = 'var(--azul-t)';
 }
 
 function setUbicPrefix(prefix){

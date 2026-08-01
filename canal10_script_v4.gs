@@ -161,6 +161,8 @@ function doPost(e) {
     if (a==="desactivar_usuario") return activarDesactivar(datos, false);
     if (a==="cambiar_rol")        return cambiarRol(datos);
     if (a==="responder_pedido")   return responderPedido(datos);
+    if (a==="soltar_tarea")       return soltarTarea(datos);
+    if (a==="eliminar_pedido")    return eliminarPedido(datos);
     if (a==="crear_proyecto")     return crearProyecto(datos);
     if (a==="editar_proyecto")    return editarProyecto(datos);
     if (a==="asignar_proyecto")   return asignarProyecto(datos);
@@ -371,6 +373,7 @@ function cambiarEstado(datos) {
   if (!v.ok) return jsonOut({ok:false,error:v.error});
   var validos = ["PENDIENTE","EN CURSO","REALIZADO"];
   if (!validos.includes(datos.estado)) return jsonOut({ok:false,error:"Estado inválido"});
+  var rolActual = (v.rol||"").toString().trim().toLowerCase();
 
   var sh = getSheet(SHEET_PEDIDOS);
   var rows = sh.getDataRange().getValues();
@@ -378,7 +381,7 @@ function cambiarEstado(datos) {
     if (rows[i][COL.TICKET-1]===datos.ticket) {
       var editorAsig = (rows[i][COL.EDITOR-1]||"").toString().toLowerCase().trim();
       // Editor solo puede cambiar si está asignado a él, o si el pedido todavía no tiene editor (lo puede tomar)
-      if (v.rol===ROLES.EDITOR) {
+      if (rolActual===ROLES.EDITOR) {
         if (editorAsig && editorAsig!==datos.email.toLowerCase().trim())
           return jsonOut({ok:false,error:"Ese pedido ya lo tomó otro editor"});
         // Auto-asignación: el editor que mueve un pedido sin dueño pasa a ser su editor asignado
@@ -403,6 +406,44 @@ function marcarInicio(datos) {
 }
 function marcarFin(datos) {
   return cambiarEstado({email:datos.email,ticket:datos.ticket,estado:"REALIZADO"});
+}
+
+// El editor deja una tarea que había tomado: vuelve al pool sin dueño, en PENDIENTE
+function soltarTarea(datos) {
+  var v = validarUsuario(datos.email);
+  if (!v.ok) return jsonOut({ok:false,error:v.error});
+  var rolActual = (v.rol||"").toString().trim().toLowerCase();
+
+  var sh = getSheet(SHEET_PEDIDOS);
+  var rows = sh.getDataRange().getValues();
+  for (var i=1; i<rows.length; i++) {
+    if (rows[i][COL.TICKET-1]===datos.ticket) {
+      var editorAsig = (rows[i][COL.EDITOR-1]||"").toString().toLowerCase().trim();
+      if (rolActual!==ROLES.ADMIN && editorAsig!==datos.email.toLowerCase().trim())
+        return jsonOut({ok:false,error:"Esta tarea no te pertenece"});
+      sh.getRange(i+1,COL.EDITOR).setValue("");
+      sh.getRange(i+1,COL.ESTADO).setValue("PENDIENTE");
+      sh.getRange(i+1,COL.INICIO).setValue("");
+      sh.getRange(i+1,COL.FIN).setValue("");
+      colorEstado(sh,i+1,"PENDIENTE");
+      return jsonOut({ok:true});
+    }
+  }
+  return jsonOut({ok:false,error:"Ticket no encontrado"});
+}
+
+// El admin borra un pedido definitivamente (pensado para REALIZADOS que ya no hacen falta)
+function eliminarPedido(datos) {
+  if (!esAdmin(datos.emailAdmin)) return jsonOut({ok:false,error:"Sin permisos"});
+  var sh = getSheet(SHEET_PEDIDOS);
+  var rows = sh.getDataRange().getValues();
+  for (var i=1; i<rows.length; i++) {
+    if (rows[i][COL.TICKET-1]===datos.ticket) {
+      sh.deleteRow(i+1);
+      return jsonOut({ok:true});
+    }
+  }
+  return jsonOut({ok:false,error:"Ticket no encontrado"});
 }
 
 // ════════════════════════════════════════════════════════
