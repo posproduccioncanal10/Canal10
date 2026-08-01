@@ -687,19 +687,85 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
 }
 .refresh-dot.loading{background:var(--amarillo-t);animation:blink 0.6s linear infinite;}
 
+.btn-grabar-audio{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;background:var(--bg3);border:1px solid var(--borde2);
+  color:var(--txt);border-radius:var(--radio);padding:12px;
+  font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;
+}
+.btn-grabar-audio:hover{border-color:var(--rojo);}
+.btn-grabar-audio.recording{
+  background:rgba(192,57,43,0.15);border-color:var(--rojo);color:#F1948A;
+  animation:recPulse 1.2s ease-in-out infinite;
+}
+@keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0.4);}50%{box-shadow:0 0 0 8px rgba(192,57,43,0);}}
+#audio-preview audio{width:100%;height:36px;border-radius:8px;}
+.btn-audio-descartar{
+  margin-top:8px;background:rgba(231,76,60,0.1);border:1px solid #E74C3C;color:#E74C3C;
+  border-radius:7px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;
+}
+
+/* ─── Navegación inferior mobile ──────────────── */
+.mobile-bottom-nav{
+  display:none;
+  position:fixed;left:0;right:0;bottom:0;z-index:600;
+  background:var(--bg2);border-top:1px solid var(--borde);
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));
+  align-items:center;justify-content:space-around;
+  box-shadow:0 -4px 16px rgba(0,0,0,0.25);
+}
+.mbn-btn{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:none;border:none;color:var(--txt3);
+  font-size:9.5px;font-weight:600;padding:4px 6px;cursor:pointer;
+  flex:1;min-width:0;
+}
+.mbn-btn .mbn-ico{font-size:18px;line-height:1;}
+.mbn-btn.active{color:var(--rojo);}
+.mbn-lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.mbn-fab{
+  flex:0 0 auto;background:var(--rojo)!important;color:#fff;
+  width:46px;height:46px;border-radius:50%;
+  align-items:center;justify-content:center;
+  margin-top:-20px;box-shadow:0 4px 12px rgba(192,57,43,0.5);
+}
+.mbn-fab-ico{font-size:26px;font-weight:400;line-height:1;}
+
 /* ─── Responsive ──────────────────────────────── */
 @media(max-width:900px){
-  .detail-panel{display:none;}
   .stats-row{grid-template-columns:repeat(2,1fr);}
   .rundown-head,.story-row{grid-template-columns:36px 100px 100px 1fr 80px;}
   .rh-cell:nth-child(4),.rh-cell:nth-child(5),
   .s-area,.s-tipo{display:none;}
 }
+@media(max-width:768px){
+  /* Kanban apilado: Pedidos, En proceso y Entregado uno debajo del otro */
+  #vista-kanban{overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;}
+  .kanban-board{flex-direction:column;height:auto;padding:8px;gap:14px;}
+  .kanban-col{width:100%;max-height:none;}
+  .kanban-col-body{max-height:56vh;}
+
+  /* Panel de detalle: pantalla completa en vez de columna lateral */
+  .detail-panel{
+    position:fixed;inset:0;z-index:550;
+    width:100%!important;min-width:0!important;
+    transform:translateX(0);transition:transform 0.2s ease;
+  }
+  .detail-panel.hidden{transform:translateX(100%);}
+  .detail-inner{padding-bottom:2rem;}
+
+  /* Menú superior se reemplaza por la barra inferior */
+  .topbar-tabs{display:none;}
+  .mobile-bottom-nav{display:flex;}
+  .main{padding-bottom:70px;}
+  #panel-dashboard,#panel-mis-pedidos,#panel-realizados,#panel-mis-tareas,#panel-admin{padding-bottom:70px;}
+}
 @media(max-width:600px){
   .stats-row{grid-template-columns:repeat(2,1fr);}
-  .topbar-tabs{display:none;}
   .prio-grid{grid-template-columns:1fr;}
   .filter-search{width:100%;}
+  .topbar-uname{display:none;}
+  #topbar-proyecto-nombre{max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 }
 </style>
 </head>
@@ -931,8 +997,13 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
 
     <!-- ── MIS PEDIDOS PANEL ── -->
     <div id="panel-mis-pedidos" style="display:none;flex:1;overflow-y:auto;padding:1.25rem;flex-direction:column;gap:1rem;">
-      <div class="dashboard-title" style="margin-bottom:4px;">Mis pedidos</div>
-      <div class="dashboard-meta">Solo tus pedidos registrados</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div class="dashboard-title" style="margin-bottom:4px;">Mis pedidos</div>
+          <div class="dashboard-meta">Solo tus pedidos registrados</div>
+        </div>
+        <button class="btn-nuevo-pedido" style="background:var(--azul-t);" onclick="repetirUltimoPedido()">🔁 Repetir mi último pedido</button>
+      </div>
       <div id="mis-pedidos-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
     </div>
 
@@ -1043,6 +1114,28 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
     </div>
 
   </div><!-- /main -->
+
+  <!-- Navegación inferior (solo mobile) -->
+  <div class="mobile-bottom-nav" id="mobile-bottom-nav">
+    <button class="mbn-btn active" data-panel="dashboard" onclick="showPanel('dashboard')">
+      <span class="mbn-ico">🗂</span><span class="mbn-lbl">Rundown</span>
+    </button>
+    <button class="mbn-btn" data-panel="mis-pedidos" onclick="showPanel('mis-pedidos')">
+      <span class="mbn-ico">📋</span><span class="mbn-lbl">Mis pedidos</span>
+    </button>
+    <button class="mbn-btn mbn-fab" onclick="openModal()">
+      <span class="mbn-fab-ico">+</span>
+    </button>
+    <button class="mbn-btn" data-panel="realizados" onclick="showPanel('realizados')">
+      <span class="mbn-ico">✅</span><span class="mbn-lbl">Hechos</span>
+    </button>
+    <button class="mbn-btn" id="mbn-mis-tareas" data-panel="mis-tareas" style="display:none;" onclick="showPanel('mis-tareas')">
+      <span class="mbn-ico">🎬</span><span class="mbn-lbl">Tareas</span>
+    </button>
+    <button class="mbn-btn" id="mbn-admin" data-panel="admin" style="display:none;" onclick="showPanel('admin')">
+      <span class="mbn-ico">⚡</span><span class="mbn-lbl">Admin</span>
+    </button>
+  </div>
 </div><!-- /app -->
 
 
@@ -1069,7 +1162,7 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
         </div>
 
         <div class="m-step-title">¿Qué tipo de pieza es?</div>
-        <div class="sel-grid">
+        <div class="sel-grid" id="tipo-grid">
           <div class="sel-card" data-val="Clip / recorte"      onclick="mSel('tipo',this)"><div class="ic">✂️</div><div class="nm">Clip / recorte</div></div>
           <div class="sel-card" data-val="Nota editada"        onclick="mSel('tipo',this)"><div class="ic">🎬</div><div class="nm">Nota editada</div></div>
           <div class="sel-card" data-val="Promo / spot"        onclick="mSel('tipo',this)"><div class="ic">📣</div><div class="nm">Promo / spot</div></div>
@@ -1125,6 +1218,13 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
           <label class="m-label">📝 Referencias o instrucciones adicionales (opcional)</label>
           <textarea class="m-textarea" id="m-refs" placeholder="Ej: Usar tipografía del manual de marca. El logo está en la carpeta /logos del servidor." rows="2"></textarea>
         </div>
+        <div class="m-field">
+          <label class="m-label">🎤 O mandá la indicación por audio (opcional)</label>
+          <button type="button" id="btn-grabar" onclick="toggleGrabacion()" class="btn-grabar-audio">
+            <span id="btn-grabar-ico">🎤</span> <span id="btn-grabar-txt">Grabar audio</span>
+          </button>
+          <div id="audio-preview" style="display:none;margin-top:8px;"></div>
+        </div>
       </div>
 
       <!-- PASO 2: Resumen -->
@@ -1173,6 +1273,9 @@ var adminPedidos = [];
 var selectedTicket = null;
 var refreshInterval = null;
 var mState = { area:'', tipo:'', prio:'', dur:'', deadline:'', desc:'', ubic:'', proyecto:'', files:[], uploadedFiles:[] };
+
+// ─── Grabación de audio (indicaciones por voz) ───
+var audioRecorder=null, audioChunks=[], audioBlob=null, audioMime='', recStream=null, recTimer=null, recSeconds=0;
 var pedidosArchivados = []; // pedidos marcados REALIZADO (separados del rundown activo)
 var mStep    = 0;
 var TOTAL_STEPS = 3;
@@ -1335,6 +1438,10 @@ async function enterApp(u){
   var tabAdmin=document.getElementById('tab-admin');
   if((u.rol==='editor'||u.rol==='admin')&&tabMisTareas) tabMisTareas.style.display='';
   if(u.rol==='admin'&&tabAdmin) tabAdmin.style.display='';
+  var mbnMisTareas=document.getElementById('mbn-mis-tareas');
+  var mbnAdmin=document.getElementById('mbn-admin');
+  if((u.rol==='editor'||u.rol==='admin')&&mbnMisTareas) mbnMisTareas.style.display='';
+  if(u.rol==='admin'&&mbnAdmin) mbnAdmin.style.display='';
 
   bar(true);
   try{
@@ -1473,6 +1580,7 @@ function showPanel(name){
   var map={'dashboard':0,'mis-pedidos':1,'realizados':2,'mis-tareas':3,'admin':4};
   var tabs=document.querySelectorAll('.topbar-tab');
   if(map[name]!==undefined&&tabs[map[name]]) tabs[map[name]].classList.add('active');
+  document.querySelectorAll('.mbn-btn[data-panel]').forEach(function(b){ b.classList.toggle('active', b.dataset.panel===name); });
   if(name==='mis-pedidos') renderMisPedidos();
   if(name==='realizados')  renderRealizados();
   if(name==='mis-tareas')  loadMisTareas();
@@ -2368,7 +2476,114 @@ function openModal(){ resetModal(); renderModalProyectoField(); document.getElem
 function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
 document.getElementById('modal-overlay').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
 
+// ─── Grabación de audio ───────────────────────
+function pickAudioMime(){
+  var candidatos=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'];
+  if(!window.MediaRecorder) return '';
+  for(var i=0;i<candidatos.length;i++){ if(MediaRecorder.isTypeSupported(candidatos[i])) return candidatos[i]; }
+  return '';
+}
+
+async function toggleGrabacion(){
+  if(audioRecorder && audioRecorder.state==='recording'){ stopRecording(); return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    toast('Este navegador no permite grabar audio','error'); return;
+  }
+  try{
+    recStream = await navigator.mediaDevices.getUserMedia({audio:true});
+  }catch(e){
+    toast('No pudimos acceder al micrófono. Revisá los permisos del navegador.','error');
+    return;
+  }
+  audioMime = pickAudioMime();
+  try{
+    audioRecorder = audioMime ? new MediaRecorder(recStream,{mimeType:audioMime}) : new MediaRecorder(recStream);
+  }catch(e){
+    audioRecorder = new MediaRecorder(recStream);
+    audioMime = '';
+  }
+  audioChunks=[];
+  audioRecorder.ondataavailable=function(e){ if(e.data && e.data.size>0) audioChunks.push(e.data); };
+  audioRecorder.onstop=function(){
+    audioBlob=new Blob(audioChunks,{type:audioMime||'audio/webm'});
+    recStream.getTracks().forEach(function(t){t.stop();});
+    mostrarPreviewAudio();
+  };
+  audioRecorder.start();
+  recSeconds=0;
+  var btn=document.getElementById('btn-grabar');
+  btn.classList.add('recording');
+  document.getElementById('btn-grabar-ico').textContent='⏹';
+  document.getElementById('btn-grabar-txt').textContent='Detener — 00:00';
+  document.getElementById('audio-preview').style.display='none';
+  recTimer=setInterval(function(){
+    recSeconds++;
+    var mm=String(Math.floor(recSeconds/60)).padStart(2,'0');
+    var ss=String(recSeconds%60).padStart(2,'0');
+    document.getElementById('btn-grabar-txt').textContent='Detener — '+mm+':'+ss;
+  },1000);
+}
+
+function stopRecording(){
+  if(audioRecorder && audioRecorder.state==='recording') audioRecorder.stop();
+  clearInterval(recTimer);
+  var btn=document.getElementById('btn-grabar');
+  btn.classList.remove('recording');
+  document.getElementById('btn-grabar-ico').textContent='🎤';
+  document.getElementById('btn-grabar-txt').textContent='Grabar audio';
+}
+
+function mostrarPreviewAudio(){
+  if(!audioBlob) return;
+  var url=URL.createObjectURL(audioBlob);
+  var prev=document.getElementById('audio-preview');
+  prev.innerHTML='<audio controls src="'+url+'"></audio>'+
+    '<div><button type="button" class="btn-audio-descartar" onclick="descartarAudio()">🗑 Descartar y grabar de nuevo</button></div>';
+  prev.style.display='block';
+  document.getElementById('btn-grabar').style.display='none';
+}
+
+function descartarAudio(){
+  audioBlob=null; audioChunks=[];
+  var prev=document.getElementById('audio-preview');
+  if(prev){ prev.style.display='none'; prev.innerHTML=''; }
+  var btn=document.getElementById('btn-grabar');
+  if(btn) btn.style.display='';
+}
+
+function pararGrabacionSiActiva(){
+  if(audioRecorder && audioRecorder.state==='recording'){
+    try{ audioRecorder.stop(); }catch(e){}
+  }
+  if(recStream){ try{ recStream.getTracks().forEach(function(t){t.stop();}); }catch(e){} }
+  clearInterval(recTimer);
+}
+
+function repetirUltimoPedido(){
+  var mis=pedidos.filter(function(p){ return p.email===usuario.email; });
+  if(!mis.length){ toast('Todavía no hiciste ningún pedido para repetir','error'); return; }
+  mis.sort(function(a,b){ return parseFechaOrden(b.fecha)-parseFechaOrden(a.fecha); });
+  var u=mis[0];
+  openModal();
+  var ubicPartes=(u.ubic||'').split(' | Refs: ');
+  mState.proyecto=u.proyecto||mState.proyecto;
+  mState.tipo=u.tipo||'';
+  mState.ubic=ubicPartes[0]||'';
+  mState.refs=ubicPartes[1]||'';
+  mState.dur=u.dur||'';
+  renderModalProyectoField();
+  var tg=document.getElementById('tipo-grid');
+  if(tg) tg.querySelectorAll('[data-val]').forEach(function(el){ el.classList.toggle('sel', el.dataset.val===mState.tipo); });
+  document.getElementById('m-ubic').value=mState.ubic;
+  var refsEl=document.getElementById('m-refs'); if(refsEl) refsEl.value=mState.refs;
+  var durEl=document.getElementById('m-dur'); if(durEl) durEl.value=mState.dur;
+  toast('🔁 Cargamos los datos de tu último pedido — revisá y completá la descripción','success');
+}
+
+
 function resetModal(){
+  pararGrabacionSiActiva();
+  descartarAudio();
   mState={area:'',tipo:'',dur:'',deadline:'',desc:'',ubic:'',refs:'',
     proyecto:(proyectoActivo&&proyectoActivo!=='ALL')?proyectoActivo:'',files:[],uploadedFiles:[]};
   mStep=0;
@@ -2458,8 +2673,18 @@ function buildResumen(){
 function mRow(k,v){ return '<div class="res-row"><span class="res-k">'+k+'</span><span class="res-v">'+esc(v)+'</span></div>'; }
 
 // ─── Envío con subida real a Drive ───────────
+function esperarStopGrabacion(){
+  return new Promise(function(resolve){
+    if(!audioRecorder || audioRecorder.state!=='recording'){ resolve(); return; }
+    var prevOnStop=audioRecorder.onstop;
+    audioRecorder.onstop=function(){ if(prevOnStop) prevOnStop(); resolve(); };
+    stopRecording();
+  });
+}
+
 async function enviarPedido(){
   var btn=document.getElementById('btn-m-next');
+  await esperarStopGrabacion();
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Guardando...'; bar(true);
   try{
     var r=await post({
@@ -2472,6 +2697,22 @@ async function enviarPedido(){
     });
     if(!r.ok) throw new Error(r.error||'Error al crear pedido');
     var ticket=r.ticket||'—';
+
+    // Si grabó un audio, lo subimos y lo adjuntamos al ticket recién creado
+    var audioAdjuntado=false;
+    if(audioBlob){
+      try{
+        var b64=await fileToBase64(audioBlob);
+        var ext=(audioMime&&audioMime.indexOf('mp4')!==-1)?'m4a':'webm';
+        var ru=await post({
+          accion:'subir_archivo',email:usuario.email,ticket:ticket,
+          nombre:'indicacion_audio.'+ext,base64:b64,
+          mimeType:audioMime||'audio/webm',size:audioBlob.size
+        });
+        audioAdjuntado=!!ru.ok;
+      }catch(errAudio){ /* el pedido ya se creó, no bloqueamos por el audio */ }
+    }
+
     bar(false);
     var lista = esAdminProyectos ? (proyectosTodos.length?proyectosTodos:proyectosDisponibles) : proyectosDisponibles;
     var pr = lista.find(function(x){return x.id===mState.proyecto;});
@@ -2479,8 +2720,10 @@ async function enviarPedido(){
       '<div class="ms-ticket-id">'+ticket+'</div>'+
       '<div class="ms-ticket-info">'+esc(pr?pr.nombre:mState.proyecto)+' → '+esc(mState.tipo)+'</div>'+
       '<div style="font-size:11px;color:var(--txt3);margin-top:3px;">Solicitante: '+esc(usuario.nombre)+'</div>'+
-      '<div style="font-size:11px;color:var(--azul-t);margin-top:3px;">📎 Material: '+esc(mState.ubic.substring(0,60))+'</div>';
+      '<div style="font-size:11px;color:var(--azul-t);margin-top:3px;">📎 Material: '+esc(mState.ubic.substring(0,60))+'</div>'+
+      (audioAdjuntado?'<div style="font-size:11px;color:var(--verde-t);margin-top:3px;">🎤 Audio adjuntado</div>':'');
     mStep=3; setMStep(3);
+    descartarAudio();
     silentRefresh();
   }catch(e){
     bar(false); btn.disabled=false; btn.textContent='Reintentar';
