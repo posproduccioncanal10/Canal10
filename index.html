@@ -319,17 +319,26 @@ button,input,textarea,select{font-family:var(--sans);}
 }
 .clip-icon{font-size:12px;opacity:0.6;}
 
-/* ── Story detail panel ── */
+/* ── Story detail panel: ventana flotante centrada con fondo desenfocado ── */
 .detail-panel{
-  width:380px;min-width:380px;
-  background:var(--bg2);
-  border-left:1px solid var(--borde);
+  display:none;align-items:center;justify-content:center;
+  position:fixed;inset:0;z-index:700;
+  background:rgba(0,0,0,0.65);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  padding:1.5rem;
+}
+.detail-panel:not(.hidden){display:flex;}
+.detail-box{
+  width:100%;max-width:640px;max-height:88vh;
+  background:var(--bg2);border:1px solid var(--borde2);
+  border-radius:16px;
   display:flex;flex-direction:column;
   overflow:hidden;
-  transition:width 0.2s ease;
+  box-shadow:0 24px 70px rgba(0,0,0,0.55);
+  animation:detailIn 0.18s ease;
 }
-.detail-panel.hidden{width:0;min-width:0;overflow:hidden;}
-.detail-inner{flex:1;overflow-y:auto;padding:1.25rem;}
+@keyframes detailIn{from{opacity:0;transform:translateY(10px) scale(0.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+.detail-inner{flex:1;overflow-y:auto;padding:1.5rem;}
 
 .detail-ticket{
   font-family:var(--mono);font-size:11px;color:var(--txt3);
@@ -745,13 +754,9 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
   .kanban-col{width:100%;max-height:none;}
   .kanban-col-body{max-height:56vh;}
 
-  /* Panel de detalle: pantalla completa en vez de columna lateral */
-  .detail-panel{
-    position:fixed;inset:0;z-index:650;
-    width:100%!important;min-width:0!important;
-    transform:translateX(0);transition:transform 0.2s ease;
-  }
-  .detail-panel.hidden{transform:translateX(100%);}
+  /* Panel de detalle: ocupa casi toda la pantalla en mobile, sigue centrado y flotante */
+  .detail-panel{padding:0.5rem;}
+  .detail-box{max-width:100%;max-height:94vh;}
   .detail-inner{padding-bottom:2rem;}
 
   /* Menú superior se reemplaza por la barra inferior */
@@ -983,13 +988,15 @@ input[type="datetime-local"].m-input{color-scheme:dark;}
           </div>
         </div>
 
-        <!-- Detail panel -->
-        <div class="detail-panel hidden" id="detail-panel">
-          <div class="detail-close">
-            <span class="detail-close-title">Detalle del pedido</span>
-            <button class="btn-close" onclick="closeDetail()">✕</button>
-          </div>
-          <div class="detail-inner" id="detail-inner">
+        <!-- Detail panel: ventana flotante centrada -->
+        <div class="detail-panel hidden" id="detail-panel" onclick="if(event.target===this)closeDetail()">
+          <div class="detail-box">
+            <div class="detail-close">
+              <span class="detail-close-title">Detalle del pedido</span>
+              <button class="btn-close" onclick="closeDetail()">✕</button>
+            </div>
+            <div class="detail-inner" id="detail-inner">
+            </div>
           </div>
         </div>
       </div>
@@ -2324,12 +2331,28 @@ async function refrescarProyectosAdmin(){
   }catch(e){}
 }
 
+async function editarProyectoUI(id,nombreActual,descActual){
+  var nuevoNombre=prompt('Nuevo nombre del proyecto:',nombreActual);
+  if(nuevoNombre===null) return;
+  nuevoNombre=nuevoNombre.trim();
+  if(!nuevoNombre){ alert('El nombre no puede quedar vacío'); return; }
+  var nuevaDesc=prompt('Descripción (opcional):',descActual||'');
+  if(nuevaDesc===null) nuevaDesc=descActual||'';
+  bar(true);
+  try{
+    var r=await post({accion:'editar_proyecto',emailAdmin:usuario.email,id:id,nombre:nuevoNombre,desc:nuevaDesc});
+    bar(false);
+    if(r.ok){ toast('✅ Proyecto renombrado','success'); refrescarProyectosAdmin(); }
+    else alert('Error: '+r.error);
+  }catch(e){ bar(false); alert('Error de conexión'); }
+}
+
 function renderAdminProyectos(lista){
   var el=document.getElementById('admin-proyectos-list');
   if(!el) return;
   if(!lista.length){ el.innerHTML='<div class="empty-state"><div class="empty-ico">🗂</div><div class="empty-txt">Todavía no creaste ningún proyecto</div></div>'; return; }
   el.innerHTML=lista.map(function(p){
-    return '<div style="display:grid;grid-template-columns:26px 1fr 90px 90px;gap:0;padding:9px 12px;border-bottom:1px solid var(--borde);align-items:center;min-height:52px;">'+
+    return '<div style="display:grid;grid-template-columns:26px 1fr 90px auto;gap:8px;padding:9px 12px;border-bottom:1px solid var(--borde);align-items:center;min-height:52px;">'+
       '<span style="width:12px;height:12px;border-radius:50%;background:'+esc(p.color||'#C0392B')+';display:inline-block;"></span>'+
       '<div>'+
         '<div style="font-size:12px;font-weight:700;color:var(--txt);">'+esc(p.nombre)+'</div>'+
@@ -2337,7 +2360,10 @@ function renderAdminProyectos(lista){
         '<div style="font-size:9px;color:var(--txt3);font-family:var(--mono);">'+p.id+'</div>'+
       '</div>'+
       '<div style="font-size:11px;color:'+(p.activo?'var(--verde-t)':'#E74C3C')+';">'+(p.activo?'✓ Activo':'✗ Inactivo')+'</div>'+
-      '<button onclick="toggleProyectoActivo(\''+p.id+'\','+(p.activo?'false':'true')+')" style="background:'+(p.activo?'rgba(231,76,60,0.15)':'rgba(39,174,96,0.15)')+';border:1px solid '+(p.activo?'#E74C3C':'var(--verde-t)')+';color:'+(p.activo?'#E74C3C':'var(--verde-t)')+';border-radius:5px;padding:4px 8px;font-size:10px;font-weight:600;cursor:pointer;">'+(p.activo?'Desactivar':'Activar')+'</button>'+
+      '<div style="display:flex;gap:6px;">'+
+        '<button onclick="editarProyectoUI(\''+p.id+'\',\''+esc(p.nombre).replace(/'/g,"\\'")+'\',\''+esc(p.desc||'').replace(/'/g,"\\'")+'\')" style="background:rgba(93,173,226,0.15);border:1px solid var(--azul);color:var(--azul-t);border-radius:5px;padding:4px 8px;font-size:10px;font-weight:600;cursor:pointer;">✏ Editar</button>'+
+        '<button onclick="toggleProyectoActivo(\''+p.id+'\','+(p.activo?'false':'true')+')" style="background:'+(p.activo?'rgba(231,76,60,0.15)':'rgba(39,174,96,0.15)')+';border:1px solid '+(p.activo?'#E74C3C':'var(--verde-t)')+';color:'+(p.activo?'#E74C3C':'var(--verde-t)')+';border-radius:5px;padding:4px 8px;font-size:10px;font-weight:600;cursor:pointer;">'+(p.activo?'Desactivar':'Activar')+'</button>'+
+      '</div>'+
     '</div>';
   }).join('');
 }
