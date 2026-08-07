@@ -49,6 +49,44 @@ function ahoraAR() {
   return Utilities.formatDate(new Date(),"America/Argentina/Buenos_Aires","dd/MM/yyyy HH:mm");
 }
 
+// ─── Numeración de tickets (a prueba de archivados/borrados) ──
+// Antes se usaba sh.getLastRow(), que se repetía apenas se archivaba o
+// borraba un pedido (bajaba el conteo de filas). Ahora usamos un contador
+// persistente por año, protegido con lock, y que además se "autocura":
+// si el contador guardado quedó atrasado respecto al ticket más alto que
+// ya existe en Pedidos o Archivo, arranca desde ahí.
+function siguienteTicket(anio) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var props = PropertiesService.getScriptProperties();
+    var key = "TICKET_COUNTER_" + anio;
+    var guardado = parseInt(props.getProperty(key) || "0", 10);
+    var maxExistente = maxTicketExistente(anio);
+    var siguiente = Math.max(guardado, maxExistente) + 1;
+    props.setProperty(key, siguiente.toString());
+    return "C10-" + anio + "-" + String(siguiente).padStart(3,"0");
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function maxTicketExistente(anio) {
+  var max = 0;
+  var re = new RegExp("C10-" + anio + "-(\\d+)");
+  ["Pedidos","Archivo"].forEach(function(nombreHoja){
+    var sh = ss().getSheetByName(nombreHoja);
+    if (!sh) return;
+    var rows = sh.getDataRange().getValues();
+    for (var i=1; i<rows.length; i++) {
+      var t = (rows[i][0]||"").toString();
+      var m = t.match(re);
+      if (m) { var n = parseInt(m[1],10); if (n>max) max=n; }
+    }
+  });
+  return max;
+}
+
 function getSheet(name) {
   var sh = ss().getSheetByName(name);
   if (!sh) {
@@ -235,7 +273,7 @@ function nuevoPedido(datos) {
 
   var sh = getSheet(SHEET_PEDIDOS);
   var anio = new Date().getFullYear();
-  var ticket = "C10-"+anio+"-"+String(sh.getLastRow()).padStart(3,"0");
+  var ticket = siguienteTicket(anio);
 
   sh.appendRow([
     ticket, ahoraAR(),
@@ -299,7 +337,7 @@ function subirArchivoDrive(datos) {
     // Actualizar columna archivos en Pedidos
     var shP = getSheet(SHEET_PEDIDOS);
     var rows = shP.getDataRange().getValues();
-    for (var i=1; i<rows.length; i++) {
+    for (var i=rows.length-1; i>=1; i--) {
       if (rows[i][COL.TICKET-1]===datos.ticket) {
         var actual = rows[i][COL.ARCHIVOS-1]||"";
         var nuevoVal = actual ? actual+" | "+datos.nombre+" ("+url+")" : datos.nombre+" ("+url+")";
@@ -349,7 +387,7 @@ function asignarEditor(datos) {
 
   var sh = getSheet(SHEET_PEDIDOS);
   var rows = sh.getDataRange().getValues();
-  for (var i=1; i<rows.length; i++) {
+  for (var i=rows.length-1; i>=1; i--) {
     if (rows[i][COL.TICKET-1]===datos.ticket) {
       sh.getRange(i+1,COL.EDITOR).setValue(datos.editor);
       // Si estaba PENDIENTE, pasa a EN CURSO automáticamente
@@ -377,7 +415,7 @@ function cambiarEstado(datos) {
 
   var sh = getSheet(SHEET_PEDIDOS);
   var rows = sh.getDataRange().getValues();
-  for (var i=1; i<rows.length; i++) {
+  for (var i=rows.length-1; i>=1; i--) {
     if (rows[i][COL.TICKET-1]===datos.ticket) {
       var editorAsig = (rows[i][COL.EDITOR-1]||"").toString().toLowerCase().trim();
       // Editor solo puede cambiar si está asignado a él, o si el pedido todavía no tiene editor (lo puede tomar)
@@ -416,7 +454,7 @@ function soltarTarea(datos) {
 
   var sh = getSheet(SHEET_PEDIDOS);
   var rows = sh.getDataRange().getValues();
-  for (var i=1; i<rows.length; i++) {
+  for (var i=rows.length-1; i>=1; i--) {
     if (rows[i][COL.TICKET-1]===datos.ticket) {
       var editorAsig = (rows[i][COL.EDITOR-1]||"").toString().toLowerCase().trim();
       if (rolActual!==ROLES.ADMIN && editorAsig!==datos.email.toLowerCase().trim())
@@ -437,7 +475,7 @@ function eliminarPedido(datos) {
   if (!esAdmin(datos.emailAdmin)) return jsonOut({ok:false,error:"Sin permisos"});
   var sh = getSheet(SHEET_PEDIDOS);
   var rows = sh.getDataRange().getValues();
-  for (var i=1; i<rows.length; i++) {
+  for (var i=rows.length-1; i>=1; i--) {
     if (rows[i][COL.TICKET-1]===datos.ticket) {
       sh.deleteRow(i+1);
       return jsonOut({ok:true});
@@ -706,7 +744,7 @@ function responderPedido(datos) {
 
   var sh   = getSheet(SHEET_PEDIDOS);
   var rows = sh.getDataRange().getValues();
-  for (var i=1; i<rows.length; i++) {
+  for (var i=rows.length-1; i>=1; i--) {
     if (rows[i][COL.TICKET-1] === datos.ticket) {
       sh.getRange(i+1, COL.RESPUESTA).setValue(datos.linkRespuesta);
       // Asegurar col existe con encabezado

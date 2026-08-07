@@ -1273,6 +1273,12 @@ var SUPERADMIN_EMAIL = 'juliodavidchalup@gmail.com';  // ← tu email real acá
 // ─── Estado global ────────────────────────────
 var usuario = null;
 var pedidos  = [];
+// Busca un pedido por ticket priorizando la coincidencia más reciente
+// (por si quedó algún ticket viejo duplicado en la planilla)
+function buscarPedidoPorTicket(ticket){
+  for(var i=pedidos.length-1;i>=0;i--){ if(pedidos[i].ticket===ticket) return pedidos[i]; }
+  return null;
+}
 var editores = [];
 var filtro   = "todos";
 var adminFiltro = "todos";
@@ -1748,7 +1754,7 @@ function kbCardHtml(p){
   return '<div class="kb-card'+sel+'" style="border-left-color:'+aColor+';" '+
     'draggable="'+(puede?'true':'false')+'" data-ticket="'+p.ticket+'" '+
     (puede?'ondragstart="kbDragStart(event,\''+p.ticket+'\')" ondragend="kbDragEnd(event)"':'')+
-    ' onclick="showDetail(pedidos.find(function(x){return x.ticket===\''+p.ticket+'\';}));selectedTicket=\''+p.ticket+'\';document.getElementById(\'detail-panel\').classList.remove(\'hidden\');renderKanban();">'+
+    ' onclick="showDetail(buscarPedidoPorTicket(\''+p.ticket+'\'));selectedTicket=\''+p.ticket+'\';document.getElementById(\'detail-panel\').classList.remove(\'hidden\');renderKanban();">'+
     '<div class="kb-card-top">'+
       '<span style="width:9px;height:9px;border-radius:50%;background:'+aColor+';flex-shrink:0;"></span>'+
       '<span class="kb-card-ticket">'+p.ticket+'</span>'+nuevo+
@@ -1815,7 +1821,7 @@ async function kbDrop(e,nuevoEstado){
   e.currentTarget.classList.remove('drag-over');
   var ticket=kbDragTicket; kbDragTicket=null;
   if(!ticket) return;
-  var p=pedidos.find(function(x){return x.ticket===ticket;});
+  var p=buscarPedidoPorTicket(ticket);
   if(!p||p.estado===nuevoEstado) return;
   if(!puedeMoverTarjeta(p)){ toast('No tenés permiso para mover ese pedido','error'); return; }
   var estadoAnterior=p.estado;
@@ -1830,7 +1836,7 @@ async function kbDrop(e,nuevoEstado){
 // ─── Detail panel ────────────────────────────
 function selectStory(ticket){
   selectedTicket=ticket; renderRundown();
-  var p=pedidos.find(function(x){return x.ticket===ticket;});
+  var p=buscarPedidoPorTicket(ticket);
   if(p) showDetail(p);
   document.getElementById('detail-panel').classList.remove('hidden');
 }
@@ -1982,11 +1988,11 @@ function buildDetailHTML(p,pClass,eClass,archHtml){
   '</div>'+
   respuestaHTML+
   responderHTML+
-  '<button class="btn-refresh" onclick="var pp=pedidos.find(function(x){return x.ticket===\''+p.ticket+'\';});if(pp)showDetail(pp);">↻ Actualizar estado</button>';
+  '<button class="btn-refresh" onclick="var pp=buscarPedidoPorTicket(\''+p.ticket+'\');if(pp)showDetail(pp);">↻ Actualizar estado</button>';
 }
 
 function mkRow(k,v){ return '<div class="detail-row"><span class="detail-row-key">'+k+'</span><span class="detail-row-val">'+esc(v)+'</span></div>'; }
-function refreshDetail(ticket){ var p=pedidos.find(function(x){return x.ticket===ticket;}); if(p) showDetail(p); }
+function refreshDetail(ticket){ var p=buscarPedidoPorTicket(ticket); if(p) showDetail(p); }
 
 async function cambiarEstadoUI(ticket,estado){
   if(!usuario) return;
@@ -2012,7 +2018,7 @@ async function enviarRespuesta(ticket){
     if(r.ok){
       toast('✅ Respuesta enviada correctamente','success');
       await silentRefresh();
-      var p = pedidos.find(function(x){ return x.ticket===ticket; });
+      var p = buscarPedidoPorTicket(ticket);
       if(p) showDetail(p);
     } else {
       toast('Error: '+(r.error||'No se pudo guardar'),'error');
